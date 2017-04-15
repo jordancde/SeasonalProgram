@@ -46,32 +46,9 @@ public class UI extends JFrame {
         public ArrayList<JComponent[]> sectorsInput = new ArrayList<JComponent[]>();
         public ArrayList<JComponent[]> triggersInput = new ArrayList<JComponent[]>();
 
-        public JTextField[][] fieldHolder;
-        
-        public JCheckBox RSBox;
-        public JComboBox RSCombo1;
-        public JTextField RSText1;
-        public JComboBox RSCombo2;
-        public JTextField RSText2;
-        public JCheckBox MABox;
-        public JComboBox MACombo1;
-        public JTextField MAText1;
-        public JComboBox MACombo2;
-        public JTextField MAText2;
-        public JCheckBox RSIBox;
-        public JComboBox RSICombo1;
-        public JTextField RSIText1;
-        public JComboBox RSICombo2;
-        public JTextField RSIText2;
-        public JCheckBox BTBox;
-        public JComboBox BTCombo1;
-        public JTextField BTText1;
-        public JComboBox BTCombo2;
-        public JTextField BTText2;
-        
     
         public UI(){
-            super("Program Name");
+            super("Seasonal Program");
 
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setDefaultLookAndFeelDecorated(true);

@@ -15,9 +15,11 @@ class Core {
     public String name;
     public Date buyDate;
     public Date sellDate;
+    public Dataset dataset;
     public Core(String name, Date buyDate, Date sellDate){
         this.name = name;
         this.buyDate = buyDate;
         this.sellDate = sellDate;
+        dataset = SeasonalProgram.data.getDataset(name);
     }
 }

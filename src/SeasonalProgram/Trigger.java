@@ -15,6 +15,7 @@ class Trigger {
     public int param1;
     public boolean expOrSim2;
     public int param2;
+
     public Trigger(String name, boolean expOrSim1,int param1, boolean expOrSim2, int param2){
         this.name = name;
         this.expOrSim1 = expOrSim1;

@@ -21,13 +21,16 @@ public class SeasonalProgram {
      */
     public static Model seasonalModel;
     public static Data data;
+    public static UI ui;
     
     public static void main(String[] args) throws IOException, ParseException {
 
         data = new Data("input.csv");
         
-        UI ui = new UI();
+        //initializes seasonalModel
+        ui = new UI();
         ui.setVisible(true);
+        
         
     }
     

@@ -16,11 +16,13 @@ class Sector {
     public Date startDate;
     public Date stopDate;
     public double leverage;
+    public Dataset dataset;
+
     public Sector(String name, Date startDate, Date stopDate, double leverage){
         this.name = name;
         this.startDate = startDate;
         this.stopDate = stopDate;
         this.leverage = leverage;
-        
+        dataset = SeasonalProgram.data.getDataset(name);
     }
 }
