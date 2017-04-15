@@ -41,7 +41,7 @@ class Model {
         
          ArrayList<JComponent[]> coreInput,
         
-         JTextField[][] fieldHolder,
+         ArrayList<JComponent[]> sectorsInput,
         
          JCheckBox RSBox,
          JComboBox RSCombo1,
@@ -80,11 +80,16 @@ class Model {
             cores.add(new Core(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText())));
         }
         
-        for(JTextField[] sector:fieldHolder){
-            if(!(sector[0].getText().equals(""))){
-                sectors.add(new Sector(sector[0].getText(),sdf.parse(sector[1].getText()),sdf.parse(sector[2].getText()),Double.parseDouble(sector[3].getText())));
-            }
+        for(JComponent[] component:sectorsInput){
+            JComboBox jcb = (JComboBox)component[0];
+            JTextField jtb1 = (JTextField)component[1];
+            JTextField jtb2 = (JTextField)component[2];
+            JTextField jtb3 = (JTextField)component[3];
+            sectors.add(new Sector(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
         }
+        
+        
+        
         
         if(RSBox.isSelected()){
             triggers.add(new Trigger("Relative Strength",checkCombo(RSCombo1),Integer.parseInt(RSText1.getText()),checkCombo(RSCombo2),Integer.parseInt(RSText2.getText())));

@@ -43,9 +43,8 @@ public class UI extends JFrame {
         public JRadioButton individual;
         
         public ArrayList<JComponent[]> cores = new ArrayList<JComponent[]>();
-        
+        public ArrayList<JComponent[]> sectorsInput = new ArrayList<JComponent[]>();
 
-        
         public JTextField[][] fieldHolder;
         
         public JCheckBox RSBox;
@@ -138,9 +137,6 @@ public class UI extends JFrame {
             
             GridLayout gl = new GridLayout(0,3);
             secTwo.setLayout(gl);
-            
-
-            
             //Row One 
             secTwo.add(new JLabel("Core"));
             secTwo.add(new JLabel("Buy Date"));
@@ -188,34 +184,59 @@ public class UI extends JFrame {
         public JPanel sectionThree(int sectors){
         //Creates Grid to [][] array
             
-            int rows = 1+sectors;
+            
             int columns = 4;
-            JPanel secThree = new JPanel(new GridLayout(rows, columns));
+            GridLayout gl = new GridLayout(0,4);
             
-            
-            JPanel[][] panelHolder = new JPanel[rows][columns];    
-            secThree.setLayout(new GridLayout(rows,columns,0,0));
-
-            for(int m = 0; m < rows; m++) {
-               for(int n = 0; n < columns; n++) {
-                  panelHolder[m][n] = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                  secThree.add(panelHolder[m][n]);
-               }
-            }
+            JPanel secThree = new JPanel(gl);
             
             //Row One 
-            panelHolder[0][0].add(new JLabel("Sector"));
-            panelHolder[0][1].add(new JLabel("Start"));
-            panelHolder[0][2].add(new JLabel("Stop"));
-            panelHolder[0][3].add(new JLabel("Lev %"));
+            secThree.add(new JLabel("Sector"));
+            secThree.add(new JLabel("Start"));
+            secThree.add(new JLabel("Stop"));
+            secThree.add(new JLabel("Lev %"));
             
-            fieldHolder = new JTextField[sectors][columns]; 
-            for(int i = 0; i<sectors;i++){
-                for(int j = 0;j<columns;j++){
-                    fieldHolder[i][j] = new JTextField(20);
-                    panelHolder[i+1][j].add(fieldHolder[i][j]);
-                }
+            JComponent[] components = new JComponent[4];
+            JComboBox jcb = new JComboBox(SeasonalProgram.data.getDatasetNames());
+       
+            components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
+            components[1] = new JTextField(20);
+            components[2] = new JTextField(20);
+            components[3] = new JTextField(20);
+            
+            sectorsInput.add(components);
+            for(JComponent jc:components){
+                secThree.add(jc);
             }
+            
+            JButton addSector = new JButton("Add Sector");
+            secThree.add(addSector);
+            
+            addSector.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComponent[] components = new JComponent[4];
+                    JComboBox jcb = new JComboBox(SeasonalProgram.data.getDatasetNames());
+
+                    components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
+                    components[1] = new JTextField(20);
+                    components[2] = new JTextField(20);
+                    components[3] = new JTextField(20);
+
+                    sectorsInput.add(components);
+                    for(JComponent jc:components){
+                        secThree.add(jc);
+                    }
+                    
+                    secThree.remove(addSector);
+                    for(JComponent jc:components){
+                        secThree.add(jc);
+                    }
+                    secThree.add(addSector);
+                    secThree.revalidate();
+                }
+            });
+            
             secThree.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
 
             return secThree;
@@ -318,7 +339,7 @@ public class UI extends JFrame {
                                 
                                 cores,
                                 
-                                fieldHolder,
+                                sectorsInput,
                                 
                                 RSBox,
                                 RSCombo1,
