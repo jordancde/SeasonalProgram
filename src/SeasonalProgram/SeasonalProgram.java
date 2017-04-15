@@ -20,10 +20,13 @@ public class SeasonalProgram {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, ParseException {
-        UI ui = new UI();
-        ui.setVisible(true);
+        
+        //UI ui = new UI();
+        //ui.setVisible(true);
         
         Data d = new Data("input.csv");
+        
+        
     }
     
 }

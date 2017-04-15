@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class Data {
     public static String FILEPATH;
     public static String[][] rawData;
-    public static String[] dataSetNames;
+    public Dataset[] datasets;
     
     public Data(String name) throws IOException, ParseException{
         URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
@@ -29,7 +29,7 @@ public class Data {
         
         rawData = convertToArray(readFile(FILEPATH));
         
-        Dataset[] datasets = createDataSets();
+        datasets = createDataSets();
         
     }
     
@@ -44,16 +44,15 @@ public class Data {
         
         ArrayList<String> names = new ArrayList<String>();
         for(String s:nameHeader){
-            if(s!=""){
+            if(!s.equals("")){
                 names.add(s);
             }
         }
         
         //creates the datasets
         Dataset[] datasets = new Dataset[names.size()];
-        
         for(int i = 0;i<names.size();i++){
-            datasets[0] = new Dataset(rawData,i,nameListPos,dataColumnCount);
+            datasets[i] = new Dataset(rawData,i,nameListPos,dataColumnCount);
         }  
         
         return datasets;
@@ -79,7 +78,7 @@ public class Data {
             while ((line = br.readLine()) != null) {
                 
                 // use comma as separator
-                String[] data = line.split(cvsSplitBy);
+                String[] data = line.split(cvsSplitBy, -1);
                 historicalData.add(data);
                 
             }
@@ -88,5 +87,22 @@ public class Data {
             e.printStackTrace();
         }
         return historicalData;
+    }
+    
+    public Dataset getDataset(String setName){
+        for(int i = 0;i<datasets.length;i++){
+            if(datasets[i].name.equals(setName)){
+                return datasets[i];
+            }
+        }
+        return null;
+    }
+    
+    public String[] getDatasetNames(){
+        String[] setNames = new String[datasets.length];
+        for(int i = 0;i<datasets.length;i++){
+            setNames[i]= datasets[i].name;
+        }
+        return setNames;
     }
 }
