@@ -14,6 +14,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.ComboBox;
@@ -23,6 +24,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,15 +42,9 @@ public class UI extends JFrame {
         public JRadioButton model;
         public JRadioButton individual;
         
-        public JCheckBox SPBox;
-        public JTextField SPBuy;
-        public JTextField SPSell;
-        public JCheckBox TSXBox;
-        public JTextField TSXBuy;
-        public JTextField TSXSell;
-        public JCheckBox OtherBox;
-        public JTextField OtherBuy;
-        public JTextField OtherSell;
+        public ArrayList<JComponent[]> cores = new ArrayList<JComponent[]>();
+        
+
         
         public JTextField[][] fieldHolder;
         
@@ -136,49 +132,53 @@ public class UI extends JFrame {
         public JPanel sectionTwo(){
         //Creates Grid to [][] array
             
-            int i = 4;
-            int j = 3;
-            JPanel secTwo = new JPanel(new GridLayout(i, j));
+            
+            JPanel secTwo = new JPanel(new GridLayout());
             
             
-            JPanel[][] panelHolder = new JPanel[i][j];    
-            secTwo.setLayout(new GridLayout(i,j,0,0));
+            GridLayout gl = new GridLayout(0,3);
+            secTwo.setLayout(gl);
+            
 
-            for(int m = 0; m < i; m++) {
-               for(int n = 0; n < j; n++) {
-                  panelHolder[m][n] = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                  secTwo.add(panelHolder[m][n]);
-               }
-            }
             
             //Row One 
-            panelHolder[0][0].add(new JLabel("Core"));
-            panelHolder[0][1].add(new JLabel("Buy Date"));
-            panelHolder[0][2].add(new JLabel("Sell Date"));
+            secTwo.add(new JLabel("Core"));
+            secTwo.add(new JLabel("Buy Date"));
+            secTwo.add(new JLabel("Sell Date"));
             
             //Row Two
-            SPBox = new JCheckBox("S&P 500");
-            panelHolder[1][0].add(SPBox);
-            SPBuy = new JTextField(20);
-            panelHolder[1][1].add(SPBuy);
-            SPSell = new JTextField(20);
-            panelHolder[1][2].add(SPSell);
+            //JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JComponent[] components = new JComponent[3];
+            JComboBox jcb = new JComboBox(SeasonalProgram.data.getDatasetNames());
+       
+            components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
+            components[1] = new JTextField(20);
+            components[2] = new JTextField(20);
+            cores.add(components);
+            for(JComponent jc:components){
+                secTwo.add(jc);
+            }
             
-            //Row Three
-            TSXBox = new JCheckBox("TSX");
-            panelHolder[2][0].add(TSXBox);
-            TSXBuy = new JTextField(20);
-            panelHolder[2][1].add(TSXBuy);
-            TSXSell = new JTextField(20);
-            panelHolder[2][2].add(TSXSell);
             
-            //Row Four
-            OtherBox = new JCheckBox("Other");
-            panelHolder[3][0].add(OtherBox);
-            OtherBuy = new JTextField(20);
-            panelHolder[3][1].add(OtherBuy);
-            OtherSell = new JTextField(20);
-            panelHolder[3][2].add(OtherSell);
+            JButton addCore = new JButton("Add Core");
+            secTwo.add(addCore);
+
+            addCore.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComponent[] components = new JComponent[3];
+                    components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
+                    components[1] = new JTextField(20);
+                    components[2] = new JTextField(20);
+                    cores.add(components);
+                    secTwo.remove(addCore);
+                    for(JComponent jc:components){
+                        secTwo.add(jc);
+                    }
+                    secTwo.add(addCore);
+                    secTwo.revalidate();
+                }
+            });
             
             secTwo.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
 
@@ -316,15 +316,7 @@ public class UI extends JFrame {
                                 model,
                                 individual,
                                 
-                                SPBox,
-                                SPBuy,
-                                SPSell,
-                                TSXBox,
-                                TSXBuy,
-                                TSXSell,
-                                OtherBox,
-                                OtherBuy,
-                                OtherSell,
+                                cores,
                                 
                                 fieldHolder,
                                 

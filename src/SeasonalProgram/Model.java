@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -38,15 +39,7 @@ class Model {
          JRadioButton model,
          JRadioButton individual,
         
-         JCheckBox SPBox,
-         JTextField SPBuy,
-         JTextField SPSell,
-         JCheckBox TSXBox,
-         JTextField TSXBuy,
-         JTextField TSXSell,
-         JCheckBox OtherBox,
-         JTextField OtherBuy,
-         JTextField OtherSell,
+         ArrayList<JComponent[]> coreInput,
         
          JTextField[][] fieldHolder,
         
@@ -79,16 +72,14 @@ class Model {
         }else if(individual.isSelected()){
             isModel = false;
         }
+
+        for(JComponent[] component:coreInput){
+            JComboBox jcb = (JComboBox)component[0];
+            JTextField jtb1 = (JTextField)component[1];
+            JTextField jtb2 = (JTextField)component[2];
+            cores.add(new Core(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText())));
+        }
         
-        if(SPBox.isSelected()){
-            cores.add(new Core("S&P 500",sdf.parse(SPBuy.getText()),sdf.parse(SPSell.getText())));
-        }
-        if(TSXBox.isSelected()){
-            cores.add(new Core("TSX",sdf.parse(TSXBuy.getText()),sdf.parse(TSXSell.getText())));
-        }
-        if(OtherBox.isSelected()){
-            cores.add(new Core("Other",sdf.parse(OtherBuy.getText()),sdf.parse(OtherSell.getText())));
-        }
         for(JTextField[] sector:fieldHolder){
             if(!(sector[0].getText().equals(""))){
                 sectors.add(new Sector(sector[0].getText(),sdf.parse(sector[1].getText()),sdf.parse(sector[2].getText()),Double.parseDouble(sector[3].getText())));
