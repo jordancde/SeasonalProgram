@@ -43,26 +43,8 @@ class Model {
         
          ArrayList<JComponent[]> sectorsInput,
         
-         JCheckBox RSBox,
-         JComboBox RSCombo1,
-         JTextField RSText1,
-         JComboBox RSCombo2,
-         JTextField RSText2,
-         JCheckBox MABox,
-         JComboBox MACombo1,
-         JTextField MAText1,
-         JComboBox MACombo2,
-         JTextField MAText2,
-         JCheckBox RSIBox,
-         JComboBox RSICombo1,
-         JTextField RSIText1,
-         JComboBox RSICombo2,
-         JTextField RSIText2,
-         JCheckBox BTBox,
-         JComboBox BTCombo1,
-         JTextField BTText1,
-         JComboBox BTCombo2,
-         JTextField BTText2) throws ParseException {
+         ArrayList<JComponent[]> triggersInput
+         ) throws ParseException {
     
         startDate = sdf.parse(startDateText.getText());
         endDate = sdf.parse(endDateText.getText());
@@ -87,22 +69,15 @@ class Model {
             JTextField jtb3 = (JTextField)component[3];
             sectors.add(new Sector(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
         }
-        
-        
-        
-        
-        if(RSBox.isSelected()){
-            triggers.add(new Trigger("Relative Strength",checkCombo(RSCombo1),Integer.parseInt(RSText1.getText()),checkCombo(RSCombo2),Integer.parseInt(RSText2.getText())));
-        }
-        if(MABox.isSelected()){
-            triggers.add(new Trigger("Moving Averages",checkCombo(MACombo1),Integer.parseInt(MAText1.getText()),checkCombo(MACombo2),Integer.parseInt(MAText2.getText())));
-        }
-        if(RSIBox.isSelected()){
-            triggers.add(new Trigger("RSI",checkCombo(RSICombo1),Integer.parseInt(RSIText1.getText()),checkCombo(RSICombo2),Integer.parseInt(RSIText2.getText())));
-        }
-        if(BTBox.isSelected()){
-            triggers.add(new Trigger("Brooke Thackray RS",checkCombo(BTCombo1),Integer.parseInt(BTText1.getText()),checkCombo(BTCombo2),Integer.parseInt(BTText2.getText())));
-        }
+
+        for(JComponent[] component:triggersInput){
+            JComboBox jcb = (JComboBox)component[0];
+            JComboBox jcb2 = (JComboBox)component[1];
+            JTextField jtf1 = (JTextField)component[2];
+            JComboBox jcb3 = (JComboBox)component[3];
+            JTextField jtf2 = (JTextField)component[4];
+            triggers.add(new Trigger(jcb.getSelectedItem().toString(),checkCombo(jcb2),Integer.parseInt(jtf1.getText()),checkCombo(jcb3),Integer.parseInt(jtf2.getText())));
+        }    
     
     }
     public boolean checkCombo(JComboBox cb){

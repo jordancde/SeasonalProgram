@@ -42,8 +42,9 @@ public class UI extends JFrame {
         public JRadioButton model;
         public JRadioButton individual;
         
-        public ArrayList<JComponent[]> cores = new ArrayList<JComponent[]>();
+        public ArrayList<JComponent[]> coresInput = new ArrayList<JComponent[]>();
         public ArrayList<JComponent[]> sectorsInput = new ArrayList<JComponent[]>();
+        public ArrayList<JComponent[]> triggersInput = new ArrayList<JComponent[]>();
 
         public JTextField[][] fieldHolder;
         
@@ -145,12 +146,11 @@ public class UI extends JFrame {
             //Row Two
             //JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
             JComponent[] components = new JComponent[3];
-            JComboBox jcb = new JComboBox(SeasonalProgram.data.getDatasetNames());
        
             components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
             components[1] = new JTextField(20);
             components[2] = new JTextField(20);
-            cores.add(components);
+            coresInput.add(components);
             for(JComponent jc:components){
                 secTwo.add(jc);
             }
@@ -166,7 +166,7 @@ public class UI extends JFrame {
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
                     components[1] = new JTextField(20);
                     components[2] = new JTextField(20);
-                    cores.add(components);
+                    coresInput.add(components);
                     secTwo.remove(addCore);
                     for(JComponent jc:components){
                         secTwo.add(jc);
@@ -197,7 +197,6 @@ public class UI extends JFrame {
             secThree.add(new JLabel("Lev %"));
             
             JComponent[] components = new JComponent[4];
-            JComboBox jcb = new JComboBox(SeasonalProgram.data.getDatasetNames());
        
             components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
             components[1] = new JTextField(20);
@@ -216,7 +215,6 @@ public class UI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JComponent[] components = new JComponent[4];
-                    JComboBox jcb = new JComboBox(SeasonalProgram.data.getDatasetNames());
 
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
                     components[1] = new JTextField(20);
@@ -243,76 +241,62 @@ public class UI extends JFrame {
         }
         
         public JPanel sectionFour(){
-        //Creates Grid to [][] array
             
-            int rows = 5;
-            int columns = 3;
-            JPanel secFour = new JPanel(new GridLayout(rows, columns));
+            int columns = 5;
+            GridLayout gl = new GridLayout(0,columns);
             
-            
-            JPanel[][] panelHolder = new JPanel[rows][columns];    
-            secFour.setLayout(new GridLayout(rows,columns,0,0));
-
-            for(int m = 0; m < rows; m++) {
-               for(int n = 0; n < columns; n++) {
-                  panelHolder[m][n] = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                  secFour.add(panelHolder[m][n]);
-               }
-            }
+            JPanel secFour = new JPanel(gl);
             
             //Row One 
-            panelHolder[0][0].add(new JLabel("Triggers"));
+            secFour.add(new JLabel("Triggers"));
+            secFour.add(new JLabel("Type"));
+            secFour.add(new JLabel("Param"));
+            secFour.add(new JLabel("Type"));
+            secFour.add(new JLabel("Param"));
             
             
+            JComponent[] components = new JComponent[5];
+            String[] triggerNames = {"Relative Strength","Moving Averages","RSI","Brooke Thackray RS"};
             String[] options = {"Exponential","Simple"};
+            
+            components[0] = new JComboBox(triggerNames);
+            components[1] = new JComboBox(options);
+            components[2] = new JTextField(4);
+            components[3] = new JComboBox(options);
+            components[4] = new JTextField(4);
+            
+            triggersInput.add(components);
+            for(JComponent jc:components){
+                secFour.add(jc);
+            }
+            
+            JButton addTrigger = new JButton("Add Trigger");
+            secFour.add(addTrigger);
 
-            //Row Two
-            RSBox = new JCheckBox("Relative Strength");
-            panelHolder[1][0].add(RSBox);
-            RSCombo1 = new JComboBox(options);
-            panelHolder[1][1].add(RSCombo1);
-            RSText1 = new JTextField(4);
-            panelHolder[1][1].add(RSText1);
-            RSCombo2 = new JComboBox(options);
-            panelHolder[1][2].add(RSCombo2);
-            RSText2 = new JTextField(4);
-            panelHolder[1][2].add(RSText2);
-            
-            //Row Three
-            MABox = new JCheckBox("Moving Averages");
-            panelHolder[2][0].add(MABox);
-            MACombo1 = new JComboBox(options);
-            panelHolder[2][1].add(MACombo1);
-            MAText1 = new JTextField(4);
-            panelHolder[2][1].add(MAText1);
-            MACombo2 = new JComboBox(options);
-            panelHolder[2][2].add(MACombo2);
-            MAText2 = new JTextField(4);
-            panelHolder[2][2].add(MAText2);
-            
-            //Row Four
-            RSIBox = new JCheckBox("RSI");
-            panelHolder[3][0].add(RSIBox);
-            RSICombo1 = new JComboBox(options);
-            panelHolder[3][1].add(RSICombo1);
-            RSIText1 = new JTextField(4);
-            panelHolder[3][1].add(RSIText1);
-            RSICombo2 = new JComboBox(options);
-            panelHolder[3][2].add(RSICombo2);
-            RSIText2 = new JTextField(4);
-            panelHolder[3][2].add(RSIText2);
-            
-            //Row Four
-            BTBox = new JCheckBox("Brooke Thackray RS");
-            panelHolder[4][0].add(BTBox);
-            BTCombo1 = new JComboBox(options);
-            panelHolder[4][1].add(BTCombo1);
-            BTText1 = new JTextField(4);
-            panelHolder[4][1].add(BTText1);
-            BTCombo2 = new JComboBox(options);
-            panelHolder[4][2].add(BTCombo2);
-            BTText2 = new JTextField(4);
-            panelHolder[4][2].add(BTText2);
+            addTrigger.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComponent[] components = new JComponent[5];
+
+                    components[0] = new JComboBox(triggerNames);
+                    components[1] = new JComboBox(options);
+                    components[2] = new JTextField(4);
+                    components[3] = new JComboBox(options);
+                    components[4] = new JTextField(4);
+
+                    triggersInput.add(components);
+                    for(JComponent jc:components){
+                        secFour.add(jc);
+                    }
+                    
+                    secFour.remove(addTrigger);
+                    for(JComponent jc:components){
+                        secFour.add(jc);
+                    }
+                    secFour.add(addTrigger);
+                    secFour.revalidate();
+                }
+            });
            
             secFour.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
 
@@ -332,35 +316,13 @@ public class UI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         SeasonalProgram.seasonalModel = new Model(
-                                startDateText,
-                                endDateText,
-                                model,
-                                individual,
-                                
-                                cores,
-                                
-                                sectorsInput,
-                                
-                                RSBox,
-                                RSCombo1,
-                                RSText1,
-                                RSCombo2,
-                                RSText2,
-                                MABox,
-                                MACombo1,
-                                MAText1,
-                                MACombo2,
-                                MAText2,
-                                RSIBox,
-                                RSICombo1,
-                                RSIText1,
-                                RSICombo2,
-                                RSIText2,
-                                BTBox,
-                                BTCombo1,
-                                BTText1,
-                                BTCombo2,
-                                BTText2
+                            startDateText,
+                            endDateText,
+                            model,
+                            individual,
+                            coresInput,
+                            sectorsInput,
+                            triggersInput      
                         );
                         status.setForeground(Color.green);
                         status.setText("Model ran successfully");
