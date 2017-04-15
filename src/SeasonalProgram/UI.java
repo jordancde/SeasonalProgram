@@ -7,13 +7,20 @@ package SeasonalProgram;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.control.ComboBox;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -28,6 +35,45 @@ import javax.swing.JTextField;
  */
 public class UI extends JFrame {
         
+        public JTextField startDateText;
+        public JTextField endDateText;
+        public JRadioButton model;
+        public JRadioButton individual;
+        
+        public JCheckBox SPBox;
+        public JTextField SPBuy;
+        public JTextField SPSell;
+        public JCheckBox TSXBox;
+        public JTextField TSXBuy;
+        public JTextField TSXSell;
+        public JCheckBox OtherBox;
+        public JTextField OtherBuy;
+        public JTextField OtherSell;
+        
+        public JTextField[][] fieldHolder;
+        
+        public JCheckBox RSBox;
+        public JComboBox RSCombo1;
+        public JTextField RSText1;
+        public JComboBox RSCombo2;
+        public JTextField RSText2;
+        public JCheckBox MABox;
+        public JComboBox MACombo1;
+        public JTextField MAText1;
+        public JComboBox MACombo2;
+        public JTextField MAText2;
+        public JCheckBox RSIBox;
+        public JComboBox RSICombo1;
+        public JTextField RSIText1;
+        public JComboBox RSICombo2;
+        public JTextField RSIText2;
+        public JCheckBox BTBox;
+        public JComboBox BTCombo1;
+        public JTextField BTText1;
+        public JComboBox BTCombo2;
+        public JTextField BTText2;
+        
+    
         public UI(){
             super("Program Name");
 
@@ -36,10 +82,12 @@ public class UI extends JFrame {
             getContentPane().setPreferredSize(new Dimension(400,400));
             
             setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+            
             add(sectionOne());
             add(sectionTwo());
             add(sectionThree(3));
             add(sectionFour());
+            add(sectionFive());
             
             pack();
         }
@@ -63,16 +111,16 @@ public class UI extends JFrame {
             }
             
             //Row One 
-            panelHolder[0][0].add(new JLabel("Start Date"));
-            panelHolder[0][1].add(new JLabel("End Date"));
-            JTextField startDateText = new JTextField(20);
+            panelHolder[0][0].add(new JLabel("Start Date (yyyy/mm/dd)"));
+            panelHolder[0][1].add(new JLabel("End Date (yyyy/mm/dd)"));
+            startDateText = new JTextField(20);
             panelHolder[0][0].add(startDateText);
-            JTextField endDateText = new JTextField(20);
+            endDateText = new JTextField(20);
             panelHolder[0][1].add(endDateText);
             
             //Row Two
-            JRadioButton model = new JRadioButton("Model");
-            JRadioButton individual = new JRadioButton("Individual");
+            model = new JRadioButton("Model");
+            individual = new JRadioButton("Individual");
             ButtonGroup bG = new ButtonGroup();
             bG.add(model);
             bG.add(individual);
@@ -109,27 +157,27 @@ public class UI extends JFrame {
             panelHolder[0][2].add(new JLabel("Sell Date"));
             
             //Row Two
-            JCheckBox SPBox = new JCheckBox("S&P 500");
+            SPBox = new JCheckBox("S&P 500");
             panelHolder[1][0].add(SPBox);
-            JTextField SPBuy = new JTextField(20);
+            SPBuy = new JTextField(20);
             panelHolder[1][1].add(SPBuy);
-            JTextField SPSell = new JTextField(20);
+            SPSell = new JTextField(20);
             panelHolder[1][2].add(SPSell);
             
             //Row Three
-            JCheckBox TSXBox = new JCheckBox("TSX");
+            TSXBox = new JCheckBox("TSX");
             panelHolder[2][0].add(TSXBox);
-            JTextField TSXBuy = new JTextField(20);
+            TSXBuy = new JTextField(20);
             panelHolder[2][1].add(TSXBuy);
-            JTextField TSXSell = new JTextField(20);
+            TSXSell = new JTextField(20);
             panelHolder[2][2].add(TSXSell);
             
             //Row Four
-            JCheckBox OtherBox = new JCheckBox("Other");
+            OtherBox = new JCheckBox("Other");
             panelHolder[3][0].add(OtherBox);
-            JTextField OtherBuy = new JTextField(20);
+            OtherBuy = new JTextField(20);
             panelHolder[3][1].add(OtherBuy);
-            JTextField OtherSell = new JTextField(20);
+            OtherSell = new JTextField(20);
             panelHolder[3][2].add(OtherSell);
             
             secTwo.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
@@ -161,7 +209,7 @@ public class UI extends JFrame {
             panelHolder[0][2].add(new JLabel("Stop"));
             panelHolder[0][3].add(new JLabel("Lev %"));
             
-            JTextField[][] fieldHolder = new JTextField[rows][columns]; 
+            fieldHolder = new JTextField[sectors][columns]; 
             for(int i = 0; i<sectors;i++){
                 for(int j = 0;j<columns;j++){
                     fieldHolder[i][j] = new JTextField(20);
@@ -198,56 +246,119 @@ public class UI extends JFrame {
             String[] options = {"Exponential","Simple"};
 
             //Row Two
-            JCheckBox RSBox = new JCheckBox("Relative Strength");
+            RSBox = new JCheckBox("Relative Strength");
             panelHolder[1][0].add(RSBox);
-            JComboBox RSCombo1 = new JComboBox(options);
+            RSCombo1 = new JComboBox(options);
             panelHolder[1][1].add(RSCombo1);
-            JTextField RSText1 = new JTextField(4);
+            RSText1 = new JTextField(4);
             panelHolder[1][1].add(RSText1);
-            JComboBox RSCombo2 = new JComboBox(options);
+            RSCombo2 = new JComboBox(options);
             panelHolder[1][2].add(RSCombo2);
-            JTextField RSText2 = new JTextField(4);
+            RSText2 = new JTextField(4);
             panelHolder[1][2].add(RSText2);
             
             //Row Three
-            JCheckBox MABox = new JCheckBox("Moving Averages");
+            MABox = new JCheckBox("Moving Averages");
             panelHolder[2][0].add(MABox);
-            JComboBox MACombo1 = new JComboBox(options);
+            MACombo1 = new JComboBox(options);
             panelHolder[2][1].add(MACombo1);
-            JTextField MAText1 = new JTextField(4);
+            MAText1 = new JTextField(4);
             panelHolder[2][1].add(MAText1);
-            JComboBox MACombo2 = new JComboBox(options);
+            MACombo2 = new JComboBox(options);
             panelHolder[2][2].add(MACombo2);
-            JTextField MAText2 = new JTextField(4);
+            MAText2 = new JTextField(4);
             panelHolder[2][2].add(MAText2);
             
             //Row Four
-            JCheckBox RSIBox = new JCheckBox("RSI");
+            RSIBox = new JCheckBox("RSI");
             panelHolder[3][0].add(RSIBox);
-            JComboBox RSICombo1 = new JComboBox(options);
+            RSICombo1 = new JComboBox(options);
             panelHolder[3][1].add(RSICombo1);
-            JTextField RSIText1 = new JTextField(4);
+            RSIText1 = new JTextField(4);
             panelHolder[3][1].add(RSIText1);
-            JComboBox RSICombo2 = new JComboBox(options);
+            RSICombo2 = new JComboBox(options);
             panelHolder[3][2].add(RSICombo2);
-            JTextField RSIText2 = new JTextField(4);
+            RSIText2 = new JTextField(4);
             panelHolder[3][2].add(RSIText2);
             
             //Row Four
-            JCheckBox BTBox = new JCheckBox("Brooke Thackray RS");
+            BTBox = new JCheckBox("Brooke Thackray RS");
             panelHolder[4][0].add(BTBox);
-            JComboBox BTCombo1 = new JComboBox(options);
+            BTCombo1 = new JComboBox(options);
             panelHolder[4][1].add(BTCombo1);
-            JTextField BTText1 = new JTextField(4);
+            BTText1 = new JTextField(4);
             panelHolder[4][1].add(BTText1);
-            JComboBox BTCombo2 = new JComboBox(options);
+            BTCombo2 = new JComboBox(options);
             panelHolder[4][2].add(BTCombo2);
-            JTextField BTText2 = new JTextField(4);
+            BTText2 = new JTextField(4);
             panelHolder[4][2].add(BTText2);
            
             secFour.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
 
             return secFour;
+        }
+        
+        public JPanel sectionFive(){   
+            JPanel secFive = new JPanel();
+            //
+            JButton submitButton = new JButton("Submit");
+            secFive.add(submitButton);
+            
+            JLabel status = new JLabel("Click Submit to Run");
+            secFive.add(status);
+            submitButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        SeasonalProgram.seasonalModel = new Model(
+                                startDateText,
+                                endDateText,
+                                model,
+                                individual,
+                                
+                                SPBox,
+                                SPBuy,
+                                SPSell,
+                                TSXBox,
+                                TSXBuy,
+                                TSXSell,
+                                OtherBox,
+                                OtherBuy,
+                                OtherSell,
+                                
+                                fieldHolder,
+                                
+                                RSBox,
+                                RSCombo1,
+                                RSText1,
+                                RSCombo2,
+                                RSText2,
+                                MABox,
+                                MACombo1,
+                                MAText1,
+                                MACombo2,
+                                MAText2,
+                                RSIBox,
+                                RSICombo1,
+                                RSIText1,
+                                RSICombo2,
+                                RSIText2,
+                                BTBox,
+                                BTCombo1,
+                                BTText1,
+                                BTCombo2,
+                                BTText2
+                        );
+                        status.setForeground(Color.green);
+                        status.setText("Model ran successfully");
+                    } catch (Exception ex) {
+                        status.setForeground(Color.red);
+                        status.setText("Error: Check date format or empty field");
+                        Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }              
+            });
+            return secFive;
         }
 
 }

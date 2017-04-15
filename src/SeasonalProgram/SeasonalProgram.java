@@ -19,13 +19,14 @@ public class SeasonalProgram {
     /**
      * @param args the command line arguments
      */
+    public static Model seasonalModel;
+    
     public static void main(String[] args) throws IOException, ParseException {
-        
-        //UI ui = new UI();
-        //ui.setVisible(true);
-        
+
         Data d = new Data("input.csv");
         
+        UI ui = new UI();
+        ui.setVisible(true);
         
     }
     
