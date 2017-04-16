@@ -5,14 +5,23 @@
  */
 package SeasonalProgram;
 
+import static SeasonalProgram.Data.FILEPATH;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -27,6 +36,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -310,7 +320,138 @@ public class UI extends JFrame {
                     }
                 }              
             });
+            
+            JButton loadPresets = new JButton("Load Presets");
+            secFive.add(loadPresets);
+            loadPresets.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        loadPresets();
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }              
+            });
+            
+            JButton savePresets = new JButton("Save Presets");
+            secFive.add(savePresets);
+            savePresets.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        savePresets();
+                    } catch (IOException ex) {
+                        Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }              
+            });
+            
+            
             return secFive;
         }
+        
+        public void loadPresets() throws URISyntaxException{
+            URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
+            File folder = new File(location.toURI());
+            File[] listOfFiles = folder.listFiles();
+            
+            int numPresets = 0;
+            for(int i = 0; i < listOfFiles.length; i++){
+                if(listOfFiles[i].getName().contains("PRESET")){
+                    numPresets++;
+                }
+            }
+            String[] fileNames = new String[numPresets];
+            //current position in fileNames
+            int currentPos = 0;
+            for (int i = 0; i < listOfFiles.length; i++) {
+                if (listOfFiles[i].isFile()&&listOfFiles[i].getName().contains("PRESET")) {
+                  String fileName = listOfFiles[i].getName();
+                  fileName = fileName.replace("PRESET", "");
+                  fileName = fileName.replace(".csv", "");
+                  fileNames[currentPos] = fileName;
+                  currentPos++;
+                }
+            }
+           
+            String input = (String) JOptionPane.showInputDialog(null, "Select Preset",
+            "Presets", JOptionPane.QUESTION_MESSAGE, null, fileNames,fileNames[0]);
+            
+            String path = location.getFile()+"PRESET"+input+".csv";
+            
+            loadPreset(path);
+        }
+        
+        public void loadPreset(String path){
+             
+        }
+        
+        public void savePresets() throws IOException{
+            String presetName = JOptionPane.showInputDialog("Enter Preset Name:");
+            
+            URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
 
+            String path = location.getFile()+"PRESET"+presetName+".csv";
+            int result = 0;
+            if(!(new File(path).canRead())){
+                (new File(path)).createNewFile();
+            }else{
+                //cancel ==2, ok ==0
+                result = JOptionPane.showConfirmDialog((Component) null, "Preset exists, overwrite?","alert",JOptionPane.OK_CANCEL_OPTION);
+                
+            }
+            //if ok
+            if(result == 0){
+                try(
+                FileWriter fw = new FileWriter(path, false);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw))
+                {       
+                    out.print(startDateText.getText()+",");
+                    out.print(endDateText.getText()+",");
+                    out.print(model.isSelected()+",");
+                    out.print(individual.isSelected()+",");
+                    out.println("");
+                    for(JComponent[] c:coresInput){
+                        JComboBox jcb = (JComboBox)c[0];
+                        JTextField jtb1 = (JTextField)c[1];
+                        JTextField jtb2 = (JTextField)c[2];
+                        out.print(jcb.getSelectedItem().toString()+",");
+                        out.print(jtb1.getText()+",");
+                        out.print(jtb2.getText()+",");
+                    }  
+                    out.println("");
+                    for(JComponent[] c:sectorsInput){
+                        JComboBox jcb = (JComboBox)c[0];
+                        JTextField jtb1 = (JTextField)c[1];
+                        JTextField jtb2 = (JTextField)c[2];
+                        JTextField jtb3 = (JTextField)c[3];
+                        out.print(jcb.getSelectedItem().toString()+",");
+                        out.print(jtb1.getText()+",");
+                        out.print(jtb2.getText()+",");
+                        out.print(jtb3.getText()+",");
+                    }
+                    out.println("");
+                    for(JComponent[] c:triggersInput){
+                        JComboBox jcb = (JComboBox)c[0];
+                        JComboBox jcb2 = (JComboBox)c[1];
+                        JTextField jtf1 = (JTextField)c[2];
+                        JComboBox jcb3 = (JComboBox)c[3];
+                        JTextField jtf2 = (JTextField)c[4];
+                        out.print(jcb.getSelectedItem().toString()+",");
+                        out.print(jcb2.getSelectedItem().toString()+",");
+                        out.print(jtf1.getText()+",");
+                        out.print(jcb3.getSelectedItem().toString()+",");
+                        out.print(jtf2.getText()+",");
+                    }
+                    out.println("");
+
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+            
+            
+        }
 }
