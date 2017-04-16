@@ -60,23 +60,56 @@ public class Dataset {
         }
 
         //initialize arrays
-        dates = new Date[lastRow-rowOffset];
-        opens = new double[lastRow-rowOffset];
-        highs = new double[lastRow-rowOffset];
-        lows = new double[lastRow-rowOffset];
-        closes = new double[lastRow-rowOffset];
-        volumes = new double[lastRow-rowOffset];
+        dates = new Date[lastRow-nameListPos-rowOffset];
+        opens = new double[lastRow-rowOffset-nameListPos];
+        highs = new double[lastRow-rowOffset-nameListPos];
+        lows = new double[lastRow-rowOffset-nameListPos];
+        closes = new double[lastRow-rowOffset-nameListPos];
+        volumes = new double[lastRow-rowOffset-nameListPos];
         
         //Under the dataset name list by two rows starts the data
-        for(int i = nameListPos+rowOffset;i<lastRow;i++){
-            dates[i-nameListPos-rowOffset]=new SimpleDateFormat("yyyy/MM/dd").parse(data[i][startColumn]);
-            opens[i-nameListPos-rowOffset]=Double.parseDouble(data[i][startColumn+1]);
-            highs[i-nameListPos-rowOffset]=Double.parseDouble(data[i][startColumn+2]);
-            lows[i-nameListPos-rowOffset]=Double.parseDouble(data[i][startColumn+3]);
-            closes[i-nameListPos-rowOffset]=Double.parseDouble(data[i][startColumn+4]);
-            volumes[i-nameListPos-rowOffset] = Double.parseDouble(data[i][startColumn+5]);
+        for(int i = 0;i<lastRow-nameListPos-rowOffset;i++){
+            dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[lastRow-i-1][startColumn]);
+            opens[i]=Double.parseDouble(data[lastRow-i-1][startColumn+1]);
+            highs[i]=Double.parseDouble(data[lastRow-i-1][startColumn+2]);
+            lows[i]=Double.parseDouble(data[lastRow-i-1][startColumn+3]);
+            closes[i]=Double.parseDouble(data[lastRow-i-1][startColumn+4]);
+            volumes[i] = Double.parseDouble(data[lastRow-i-1][startColumn+5]);
         }
+        
+        
 
+    }
+    
+    public void trimData(Date startDate, Date endDate){
+        int startDateIndex = 0;
+        for(int i = 0;i<dates.length;i++){
+            if(dates[i].compareTo(startDate)>=0){
+                startDateIndex = i;
+                break;
+            }
+        }
+        Date[] tempDates = new Date[dates.length-startDateIndex-1];
+        double[] tempOpens = new double[dates.length-startDateIndex-1];
+        double[] tempHighs = new double[dates.length-startDateIndex-1];
+        double[] tempLows = new double[dates.length-startDateIndex-1];
+        double[] tempCloses = new double[dates.length-startDateIndex-1];
+        double[] tempVolumes = new double[dates.length-startDateIndex-1];
+        
+        for(int i = 0;i<tempDates.length;i++){
+            tempDates[i] = dates[startDateIndex+i];
+            tempOpens[i] = opens[startDateIndex+i];
+            tempHighs[i] = highs[startDateIndex+i];
+            tempLows[i] = lows[startDateIndex+i];
+            tempCloses[i] = closes[startDateIndex+i];
+            tempVolumes[i] = volumes[startDateIndex+i];
+        }
+        dates = tempDates;
+        opens = tempOpens;
+        highs = tempHighs;
+        lows = tempLows;
+        closes = tempCloses;
+        volumes = tempVolumes;
     }
     
     

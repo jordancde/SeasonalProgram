@@ -24,5 +24,6 @@ class Sector {
         this.stopDate = stopDate;
         this.leverage = leverage;
         dataset = SeasonalProgram.data.getDataset(name);
+        dataset.trimData(startDate, stopDate);
     }
 }

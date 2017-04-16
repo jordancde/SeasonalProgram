@@ -21,5 +21,9 @@ class Core {
         this.buyDate = buyDate;
         this.sellDate = sellDate;
         dataset = SeasonalProgram.data.getDataset(name);
+        dataset.trimData(buyDate, sellDate);
     }
+    
+    
+    
 }
