@@ -17,12 +17,14 @@ class Sector {
     public Date stopDate;
     public double leverage;
     public Dataset dataset;
+    public double allocation;
 
-    public Sector(String name, Date startDate, Date stopDate, double leverage){
+    public Sector(String name, Date startDate, Date stopDate, double allocation, double leverage){
         this.name = name;
         this.startDate = startDate;
         this.stopDate = stopDate;
         this.leverage = leverage;
+        this.allocation = allocation;
         dataset = SeasonalProgram.data.getDataset(name);
         dataset.trimData(startDate, stopDate);
     }

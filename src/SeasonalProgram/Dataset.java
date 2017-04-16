@@ -76,8 +76,6 @@ public class Dataset {
             closes[i]=Double.parseDouble(data[lastRow-i-1][startColumn+4]);
             volumes[i] = Double.parseDouble(data[lastRow-i-1][startColumn+5]);
         }
-        
-        
 
     }
     
