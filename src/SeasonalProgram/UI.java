@@ -15,8 +15,10 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,10 +53,24 @@ public class UI extends JFrame {
         public JTextField endDateText;
         public JRadioButton model;
         public JRadioButton individual;
+        public ButtonGroup bg;
+        
+        public JPanel one;
+        public JPanel two;
+        public JPanel three;
+        public JPanel four;
+        public JPanel five;
         
         public ArrayList<JComponent[]> coresInput = new ArrayList<JComponent[]>();
         public ArrayList<JComponent[]> sectorsInput = new ArrayList<JComponent[]>();
         public ArrayList<JComponent[]> triggersInput = new ArrayList<JComponent[]>();
+        
+        public JButton addCore;
+        public JButton addSector;
+        public JButton addTrigger;
+        
+        public String[] triggerNames = {"Relative Strength","Moving Averages","RSI","Brooke Thackray RS"};
+        public String[] options = {"Exponential","Simple"};
 
     
         public UI(){
@@ -66,11 +82,16 @@ public class UI extends JFrame {
             
             setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
             
-            add(sectionOne());
-            add(sectionTwo());
-            add(sectionThree(3));
-            add(sectionFour());
-            add(sectionFive());
+            one = sectionOne();
+            two = sectionTwo();
+            three = sectionThree();
+            four = sectionFour();
+            five = sectionFive();
+            add(one);
+            add(two);
+            add(three);
+            add(four);
+            add(five);
             
             pack();
         }
@@ -104,9 +125,9 @@ public class UI extends JFrame {
             //Row Two
             model = new JRadioButton("Model");
             individual = new JRadioButton("Individual");
-            ButtonGroup bG = new ButtonGroup();
-            bG.add(model);
-            bG.add(individual);
+            bg = new ButtonGroup();
+            bg.add(model);
+            bg.add(individual);
             
             panelHolder[1][0].add(model);
             panelHolder[1][0].add(individual);
@@ -143,7 +164,7 @@ public class UI extends JFrame {
             }
             
             
-            JButton addCore = new JButton("Add Core");
+            addCore = new JButton("Add Core");
             secTwo.add(addCore);
 
             addCore.addActionListener(new ActionListener() {
@@ -168,7 +189,7 @@ public class UI extends JFrame {
             return secTwo;
         }
         
-        public JPanel sectionThree(int sectors){
+        public JPanel sectionThree(){
         //Creates Grid to [][] array
             
             
@@ -195,7 +216,7 @@ public class UI extends JFrame {
                 secThree.add(jc);
             }
             
-            JButton addSector = new JButton("Add Sector");
+            addSector = new JButton("Add Sector");
             secThree.add(addSector);
             
             addSector.addActionListener(new ActionListener() {
@@ -243,8 +264,7 @@ public class UI extends JFrame {
             
             
             JComponent[] components = new JComponent[5];
-            String[] triggerNames = {"Relative Strength","Moving Averages","RSI","Brooke Thackray RS"};
-            String[] options = {"Exponential","Simple"};
+            
             
             components[0] = new JComboBox(triggerNames);
             components[1] = new JComboBox(options);
@@ -257,7 +277,7 @@ public class UI extends JFrame {
                 secFour.add(jc);
             }
             
-            JButton addTrigger = new JButton("Add Trigger");
+            addTrigger = new JButton("Add Trigger");
             secFour.add(addTrigger);
 
             addTrigger.addActionListener(new ActionListener() {
@@ -327,7 +347,11 @@ public class UI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        loadPresets();
+                        try {
+                            loadPreset(loadPresets());
+                        } catch (IOException ex) {
+                            Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     } catch (URISyntaxException ex) {
                         Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -347,11 +371,31 @@ public class UI extends JFrame {
                 }              
             });
             
+            JButton deletePreset = new JButton("Delete Preset");
+            secFive.add(deletePreset);
+            deletePreset.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        try {
+                            deletePreset(loadPresets());
+                        } catch (IOException ex) {
+                            Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(UI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }              
+            });
+            
             
             return secFive;
         }
+        public void deletePreset(String path) throws URISyntaxException, IOException{
+            (new File(path)).delete();
+        }
         
-        public void loadPresets() throws URISyntaxException{
+        public String loadPresets() throws URISyntaxException, IOException{
             URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
             File folder = new File(location.toURI());
             File[] listOfFiles = folder.listFiles();
@@ -379,12 +423,150 @@ public class UI extends JFrame {
             "Presets", JOptionPane.QUESTION_MESSAGE, null, fileNames,fileNames[0]);
             
             String path = location.getFile()+"PRESET"+input+".csv";
+            return path;
             
-            loadPreset(path);
+            
         }
         
-        public void loadPreset(String path){
-             
+        public void loadPreset(String path) throws IOException{
+            
+            ArrayList<String[]> preset = readFile(path);
+            startDateText.setText(preset.get(0)[0]);
+            endDateText.setText(preset.get(0)[1]);
+            if(!Boolean.parseBoolean(preset.get(0)[3])){
+                bg.setSelected(individual.getModel(),true);
+            }
+            
+            int lengthOfCore = coresInput.get(0).length;
+            int numCores = (int)preset.get(1).length/lengthOfCore;
+            
+            for(int i = 0;i<preset.get(1).length;i+=lengthOfCore){
+                if(coresInput.size()<i/lengthOfCore){
+                    JComponent[] components = new JComponent[3];
+                    components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
+                    components[1] = new JTextField(20);
+                    components[2] = new JTextField(20);
+                    coresInput.add(components);
+                    two.remove(addCore);
+                    for(JComponent jc:components){
+                        two.add(jc);
+                    }
+                    two.add(addCore);
+                    two.revalidate();
+                }
+            }
+            for(int i = 0;i<coresInput.size();i++){
+                //FIX
+                JComboBox jcb = (JComboBox)coresInput.get(i)[0];
+                JTextField jtb1 = (JTextField)coresInput.get(i)[1];
+                JTextField jtb2 = (JTextField)coresInput.get(i)[2];
+                jcb.setSelectedItem(preset.get(1)[0+i*3]);
+                jtb1.setText(preset.get(1)[1+i*3]);
+                jtb2.setText(preset.get(1)[2+i*3]);
+                
+            }
+              
+           
+            
+            int lengthOfSector = sectorsInput.get(0).length;
+            int numSectors = (int)preset.get(2).length/lengthOfSector;
+            
+            for(int i = 0;i<preset.get(2).length;i+=lengthOfSector){
+                if(sectorsInput.size()<i/lengthOfSector){
+                    JComponent[] components = new JComponent[4];
+
+                    components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
+                    components[1] = new JTextField(20);
+                    components[2] = new JTextField(20);
+                    components[3] = new JTextField(20);
+
+                    sectorsInput.add(components);
+                    for(JComponent jc:components){
+                        three.add(jc);
+                    }
+                    
+                    three.remove(addSector);
+                    for(JComponent jc:components){
+                        three.add(jc);
+                    }
+                    three.add(addSector);
+                    three.revalidate();
+                }
+            }
+            
+            for(int i = 0;i<sectorsInput.size();i++){
+                JComboBox jcb = (JComboBox)sectorsInput.get(i)[0];
+                JTextField jtb1 = (JTextField)sectorsInput.get(i)[1];
+                JTextField jtb2 = (JTextField)sectorsInput.get(i)[2];
+                JTextField jtb3 = (JTextField)sectorsInput.get(i)[3];
+                jcb.setSelectedItem(preset.get(2)[0+i*4]);
+                jtb1.setText(preset.get(2)[1+i*4]);
+                jtb2.setText(preset.get(2)[2+i*4]);
+                jtb3.setText(preset.get(2)[3+i*4]);
+            }
+            
+            int lengthOfTrigger = triggersInput.get(0).length;
+            int numTriggers = (int)preset.get(3).length/lengthOfTrigger;
+            
+            for(int i = 0;i<preset.get(3).length;i+=lengthOfTrigger){
+                if(triggersInput.size()<i/lengthOfTrigger){
+                    JComponent[] components = new JComponent[5];
+
+                    components[0] = new JComboBox(triggerNames);
+                    components[1] = new JComboBox(options);
+                    components[2] = new JTextField(4);
+                    components[3] = new JComboBox(options);
+                    components[4] = new JTextField(4);
+
+                    triggersInput.add(components);
+                    for(JComponent jc:components){
+                        four.add(jc);
+                    }
+                    
+                    four.remove(addTrigger);
+                    for(JComponent jc:components){
+                        four.add(jc);
+                    }
+                    four.add(addTrigger);
+                    four.revalidate();
+                }
+            }
+            
+            for(int i = 0;i<triggersInput.size();i++){
+                JComboBox jcb = (JComboBox)triggersInput.get(i)[0];
+                JComboBox jcb2 = (JComboBox)triggersInput.get(i)[1];
+                JTextField jtf1 = (JTextField)triggersInput.get(i)[2];
+                JComboBox jcb3 = (JComboBox)triggersInput.get(i)[3];
+                JTextField jtf2 = (JTextField)triggersInput.get(i)[4];
+                jcb.setSelectedItem(preset.get(3)[0+i*5]);
+                jcb2.setSelectedItem(preset.get(3)[1+i*5]);
+                jtf1.setText(preset.get(3)[2+i*5]);
+                jcb3.setSelectedItem(preset.get(3)[3+i*5]);
+                jtf2.setText(preset.get(3)[4+i*5]);
+            } 
+            
+        }
+        
+        public static ArrayList<String[]> readFile(String path) throws IOException{
+        
+            String line = "";
+            String cvsSplitBy = ",";
+            ArrayList<String[]> historicalData = new ArrayList<String[]>();
+
+            try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+
+                while ((line = br.readLine()) != null) {
+
+                    // use comma as separator
+                    String[] data = line.split(cvsSplitBy, -1);
+                    historicalData.add(data);
+
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return historicalData;
         }
         
         public void savePresets() throws IOException{
