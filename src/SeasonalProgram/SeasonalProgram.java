@@ -22,6 +22,7 @@ public class SeasonalProgram {
     public static Model seasonalModel;
     public static Data data;
     public static UI ui;
+    public static Portfolio portfolio;
     
     public static void main(String[] args) throws IOException, ParseException {
 
@@ -30,6 +31,9 @@ public class SeasonalProgram {
         //initializes seasonalModel
         ui = new UI();
         ui.setVisible(true);
+        
+        portfolio = new Portfolio("Seasonal Portfolio",data.datasets);
+        
         
         
     }
