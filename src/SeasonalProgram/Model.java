@@ -59,7 +59,8 @@ class Model {
             JComboBox jcb = (JComboBox)component[0];
             JTextField jtb1 = (JTextField)component[1];
             JTextField jtb2 = (JTextField)component[2];
-            cores.add(new Core(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText())));
+            JTextField jtb3 = (JTextField)component[3];
+            cores.add(new Core(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
         }
         
         for(JComponent[] component:sectorsInput){

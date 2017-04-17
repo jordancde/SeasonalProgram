@@ -144,20 +144,22 @@ public class UI extends JFrame {
             JPanel secTwo = new JPanel(new GridLayout());
             
             
-            GridLayout gl = new GridLayout(0,3);
+            GridLayout gl = new GridLayout(0,4);
             secTwo.setLayout(gl);
             //Row One 
             secTwo.add(new JLabel("Core"));
             secTwo.add(new JLabel("Buy Date"));
             secTwo.add(new JLabel("Sell Date"));
+            secTwo.add(new JLabel("Leverage %"));
             
             //Row Two
             //JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            JComponent[] components = new JComponent[3];
+            JComponent[] components = new JComponent[4];
        
             components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
             components[1] = new JTextField(20);
             components[2] = new JTextField(20);
+            components[3] = new JTextField(20);
             coresInput.add(components);
             for(JComponent jc:components){
                 secTwo.add(jc);
@@ -170,10 +172,11 @@ public class UI extends JFrame {
             addCore.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JComponent[] components = new JComponent[3];
+                    JComponent[] components = new JComponent[4];
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
                     components[1] = new JTextField(20);
                     components[2] = new JTextField(20);
+                    components[3] = new JTextField(20);
                     coresInput.add(components);
                     secTwo.remove(addCore);
                     for(JComponent jc:components){
@@ -266,19 +269,7 @@ public class UI extends JFrame {
             secFour.add(new JLabel("Param"));
             
             
-            JComponent[] components = new JComponent[5];
             
-            
-            components[0] = new JComboBox(triggerNames);
-            components[1] = new JComboBox(options);
-            components[2] = new JTextField(4);
-            components[3] = new JComboBox(options);
-            components[4] = new JTextField(4);
-            
-            triggersInput.add(components);
-            for(JComponent jc:components){
-                secFour.add(jc);
-            }
             
             addTrigger = new JButton("Add Trigger");
             secFour.add(addTrigger);
@@ -325,10 +316,16 @@ public class UI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     //checks if allocation if over 100%
+                    
                     int sectorAllocationSum = 0;
-                    for(JComponent[] core:sectorsInput){
-                        JTextField jtf = (JTextField)core[3];
-                        sectorAllocationSum+=Double.parseDouble(jtf.getText());
+                    try{
+                        for(JComponent[] core:sectorsInput){
+                            JTextField jtf = (JTextField)core[3];
+                            sectorAllocationSum+=Double.parseDouble(jtf.getText());
+                        }
+                    }catch (Exception ex) {
+                        status.setForeground(Color.red);
+                        status.setText("Error: %Allocation Empty");
                     }
                     if(sectorAllocationSum>100){
                         status.setForeground(Color.red);
@@ -456,10 +453,11 @@ public class UI extends JFrame {
             
             for(int i = 0;i<preset.get(1).length;i+=lengthOfCore){
                 if(coresInput.size()<i/lengthOfCore){
-                    JComponent[] components = new JComponent[3];
+                    JComponent[] components = new JComponent[4];
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
                     components[1] = new JTextField(20);
                     components[2] = new JTextField(20);
+                    components[3] = new JTextField(20);
                     coresInput.add(components);
                     two.remove(addCore);
                     for(JComponent jc:components){
@@ -474,9 +472,11 @@ public class UI extends JFrame {
                 JComboBox jcb = (JComboBox)coresInput.get(i)[0];
                 JTextField jtb1 = (JTextField)coresInput.get(i)[1];
                 JTextField jtb2 = (JTextField)coresInput.get(i)[2];
-                jcb.setSelectedItem(preset.get(1)[0+i*3]);
-                jtb1.setText(preset.get(1)[1+i*3]);
-                jtb2.setText(preset.get(1)[2+i*3]);
+                JTextField jtb3 = (JTextField)coresInput.get(i)[3];
+                jcb.setSelectedItem(preset.get(1)[0+i*4]);
+                jtb1.setText(preset.get(1)[1+i*4]);
+                jtb2.setText(preset.get(1)[2+i*4]);
+                jtb3.setText(preset.get(1)[3+i*4]);
                 
             }
               
@@ -515,13 +515,13 @@ public class UI extends JFrame {
                 JTextField jtb2 = (JTextField)sectorsInput.get(i)[2];
                 JTextField jtb3 = (JTextField)sectorsInput.get(i)[3];
                 JTextField jtb4 = (JTextField)sectorsInput.get(i)[4];
-                jcb.setSelectedItem(preset.get(2)[0+i*4]);
-                jtb1.setText(preset.get(2)[1+i*4]);
-                jtb2.setText(preset.get(2)[2+i*4]);
-                jtb3.setText(preset.get(2)[3+i*4]);
-                jtb4.setText(preset.get(2)[4+i*4]);
+                jcb.setSelectedItem(preset.get(2)[0+i*5]);
+                jtb1.setText(preset.get(2)[1+i*5]);
+                jtb2.setText(preset.get(2)[2+i*5]);
+                jtb3.setText(preset.get(2)[3+i*5]);
+                jtb4.setText(preset.get(2)[4+i*5]);
             }
-            
+            try{
             int lengthOfTrigger = triggersInput.get(0).length;
             int numTriggers = (int)preset.get(3).length/lengthOfTrigger;
             
@@ -561,6 +561,7 @@ public class UI extends JFrame {
                 jcb3.setSelectedItem(preset.get(3)[3+i*5]);
                 jtf2.setText(preset.get(3)[4+i*5]);
             } 
+            }catch(Exception e){System.out.println("No triggers in Preset");}
             
         }
         
@@ -616,9 +617,11 @@ public class UI extends JFrame {
                         JComboBox jcb = (JComboBox)c[0];
                         JTextField jtb1 = (JTextField)c[1];
                         JTextField jtb2 = (JTextField)c[2];
+                        JTextField jtb3 = (JTextField)c[3];
                         out.print(jcb.getSelectedItem().toString()+",");
                         out.print(jtb1.getText()+",");
                         out.print(jtb2.getText()+",");
+                        out.print(jtb3.getText()+",");
                     }  
                     out.println("");
                     for(JComponent[] c:sectorsInput){

@@ -16,10 +16,12 @@ class Core {
     public Date buyDate;
     public Date sellDate;
     public Dataset dataset;
-    public Core(String name, Date buyDate, Date sellDate){
+    public double allocation;
+    public Core(String name, Date buyDate, Date sellDate, double allocation){
         this.name = name;
         this.buyDate = buyDate;
         this.sellDate = sellDate;
+        this.allocation = allocation;
         dataset = SeasonalProgram.data.getDataset(name);
         dataset.trimData(buyDate, sellDate);
     }
