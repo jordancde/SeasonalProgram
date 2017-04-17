@@ -32,6 +32,7 @@ class Model {
     public ArrayList<Trigger> triggers = new ArrayList<Trigger>();
     
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+    public SimpleDateFormat monthsdf = new SimpleDateFormat("MM/dd");
    
     public Model(
          JTextField startDateText,
@@ -69,7 +70,7 @@ class Model {
             JTextField jtb2 = (JTextField)component[2];
             JTextField jtb3 = (JTextField)component[3];
             JTextField jtb4 = (JTextField)component[4];
-            sectors.add(new Sector(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText()),Double.parseDouble(jtb4.getText())));
+            sectors.add(new Sector(jcb.getSelectedItem().toString(),monthsdf.parse(jtb1.getText()),monthsdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText()),Double.parseDouble(jtb4.getText())));
         }
 
         for(JComponent[] component:triggersInput){

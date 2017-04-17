@@ -22,15 +22,17 @@ import java.util.Calendar;
  */
 public class Portfolio {
     public String name;
-    public Dataset[] datasets;
+    public ArrayList<Dataset> datasets;
     public ArrayList<String[]> portfolioTable;
     public int tableColumns = 17;
-    public Portfolio(String name, Dataset[] datasets) throws IOException{
+    public Data data;
+    public Portfolio(String name, Data data) throws IOException{
         this.name = name;
-        this.datasets = datasets;
+        datasets = new ArrayList<Dataset>();
         //use one dataset to 
+        this.data = data;
         portfolioTable = makeTable();
-        writeTable("test",portfolioTable);
+        //writeTable(name,portfolioTable);
     }
     
     public ArrayList<String[]> makeTable(){

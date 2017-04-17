@@ -203,8 +203,8 @@ public class UI extends JFrame {
             
             //Row One 
             secThree.add(new JLabel("Sector"));
-            secThree.add(new JLabel("Start"));
-            secThree.add(new JLabel("Stop"));
+            secThree.add(new JLabel("Start (mm/dd)"));
+            secThree.add(new JLabel("Stop (mm/dd)"));
             secThree.add(new JLabel("Allocation %"));
             secThree.add(new JLabel("Lev %"));
             
