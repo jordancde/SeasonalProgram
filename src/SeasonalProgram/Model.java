@@ -5,6 +5,7 @@
  */
 package SeasonalProgram;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -86,5 +87,9 @@ class Model {
     public boolean checkCombo(JComboBox cb){
         return cb.getSelectedItem().toString().equals("Exponential");
     }
+  
+   
+    
+    
     
 }

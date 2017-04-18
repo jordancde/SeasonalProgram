@@ -32,7 +32,6 @@ public class SeasonalProgram {
         ui = new UI();
         ui.setVisible(true);
         
-        portfolio = new SeasonalPortfolio("Seasonal Portfolio",data,"S&P 500");
         
         
         

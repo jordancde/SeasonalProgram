@@ -150,7 +150,7 @@ public class UI extends JFrame {
             secTwo.add(new JLabel("Core"));
             secTwo.add(new JLabel("Buy Date"));
             secTwo.add(new JLabel("Sell Date"));
-            secTwo.add(new JLabel("Leverage %"));
+            secTwo.add(new JLabel("Allocation %"));
             
             //Row Two
             //JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -323,6 +323,7 @@ public class UI extends JFrame {
                             JTextField jtf = (JTextField)core[3];
                             sectorAllocationSum+=Double.parseDouble(jtf.getText());
                         }
+                        
                     }catch (Exception ex) {
                         status.setForeground(Color.red);
                         status.setText("Error: %Allocation Empty");

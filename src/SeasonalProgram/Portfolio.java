@@ -15,6 +15,7 @@ import java.net.URL;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  *
@@ -22,15 +23,15 @@ import java.util.Calendar;
  */
 public class Portfolio {
     public String name;
-    public ArrayList<Dataset> datasets;
     public ArrayList<String[]> portfolioTable;
     public int tableColumns = 17;
-    public Data data;
-    public Portfolio(String name, Data data) throws IOException{
+    public Date startDate;
+    public Date endDate;
+    public Portfolio(String name, Date startDate, Date endDate) throws IOException{
         this.name = name;
-        datasets = new ArrayList<Dataset>();
+        this.startDate = startDate;
+        this.endDate = endDate;
         //use one dataset to 
-        this.data = data;
         portfolioTable = makeTable();
         //writeTable(name,portfolioTable);
     }
@@ -102,7 +103,7 @@ public class Portfolio {
     }
     
     public int getFirstYear(){
-        int lowestYear = Integer.MAX_VALUE;
+        /*int lowestYear = Integer.MAX_VALUE;
         for(Dataset d:datasets){
             Calendar cal = Calendar.getInstance();
             cal.setTime(d.dates[0]);
@@ -110,12 +111,15 @@ public class Portfolio {
             if(year<lowestYear){
                 lowestYear = year;
             }
-        }
+        }*/
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        int year = cal.get(Calendar.YEAR);
         
-        return lowestYear;
+        return year;
     }
     public int getLastYear(){
-        int highestYear = Integer.MIN_VALUE;
+        /*int highestYear = Integer.MIN_VALUE;
         for(Dataset d:datasets){
             Calendar cal = Calendar.getInstance();
             cal.setTime(d.dates[d.dates.length-1]);
@@ -123,8 +127,13 @@ public class Portfolio {
             if(year>highestYear){
                 highestYear = year;
             }
-        }
-        return highestYear;
+        }*/
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(endDate);
+        int year = cal.get(Calendar.YEAR);
+        
+        return year;
+        
     }
 
 
