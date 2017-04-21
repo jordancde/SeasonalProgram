@@ -343,6 +343,9 @@ public class UI extends JFrame {
                             sectorsInput,
                             triggersInput      
                         );
+                        //IMPORTANTTT*******
+                        SeasonalProgram.runModel();
+                        
                         status.setForeground(Color.green);
                         status.setText("Model ran successfully");
                     } catch (Exception ex) {

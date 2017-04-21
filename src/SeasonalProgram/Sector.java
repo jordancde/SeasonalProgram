@@ -11,21 +11,8 @@ import java.util.Date;
  *
  * @author jordandearsley
  */
-class Sector {
-    public String name;
-    public Date startDate;
-    public Date stopDate;
-    public double leverage;
-    public Dataset dataset;
-    public double allocation;
-
-    public Sector(String name, Date startDate, Date stopDate, double allocation, double leverage){
-        this.name = name;
-        this.startDate = startDate;
-        this.stopDate = stopDate;
-        this.leverage = leverage;
-        this.allocation = allocation;
-        dataset = SeasonalProgram.data.getDataset(name);
-        dataset.trimData(startDate, stopDate);
+class Sector extends Security{
+    public Sector(String name, Date buyDate, Date sellDate, double allocation, double leverage){
+        super(name, buyDate, sellDate, allocation);
     }
 }

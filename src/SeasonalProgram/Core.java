@@ -11,21 +11,11 @@ import java.util.Date;
  *
  * @author jordandearsley
  */
-class Core {
-    public String name;
-    public Date buyDate;
-    public Date sellDate;
-    public Dataset dataset;
-    public double allocation;
+class Core extends Security{
+    
     public Core(String name, Date buyDate, Date sellDate, double allocation){
-        this.name = name;
-        this.buyDate = buyDate;
-        this.sellDate = sellDate;
-        this.allocation = allocation;
-        dataset = SeasonalProgram.data.getDataset(name);
-        dataset.trimData(buyDate, sellDate);
-    }
+
+    super(name, buyDate, sellDate, allocation);
     
-    
-    
+    } 
 }

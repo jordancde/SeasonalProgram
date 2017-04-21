@@ -5,137 +5,115 @@
  */
 package SeasonalProgram;
 
-import java.awt.Component;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author jordandearsley
  */
 public class Portfolio {
-    public String name;
-    public ArrayList<String[]> portfolioTable;
-    public int tableColumns = 17;
+    
+    public Map<Security, Double> holdings = new HashMap<Security, Double>();
+    public ArrayList<Security> securities;
+    public Map<Date, Map<Security, Double>> historicalPortfolio = new HashMap<Date, Map<Security, Double>>();
+    public ArrayList<Trade> trades;
+    
     public Date startDate;
     public Date endDate;
-    public Portfolio(String name, Date startDate, Date endDate) throws IOException{
-        this.name = name;
+    
+    public Calendar calendar;
+    
+    public Security cash;
+        
+    
+    public Portfolio(ArrayList<Security> securities, Date startDate, Date endDate){
+        this.securities = securities;
         this.startDate = startDate;
         this.endDate = endDate;
-        //use one dataset to 
-        portfolioTable = makeTable();
-        //writeTable(name,portfolioTable);
+        calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        
+        //creates cash at 100% and adds to holdings
+        cash = new Security("Cash",new Date(Long.MIN_VALUE),new Date(Long.MAX_VALUE),100);
+        securities.add(0,cash);
+        holdings.put(cash, 100.000);
     }
     
-    public ArrayList<String[]> makeTable(){
-        ArrayList<String[]> table = new ArrayList<String[]>();
-        //Title Row
-        String[] title = new String[tableColumns];
-        title[0] = name;
-        table.add(title);
-        //Dates Header Row
-        String[] dates = new String[tableColumns];
-        String[] months = new DateFormatSymbols().getMonths();
-        for(int i = 0;i<months.length;i++){
-            dates[i+1] = months[i];
-        }
-        dates[dates.length-2] = "Total Year";
-        dates[dates.length-1] = "Avg";
-        table.add(dates);
-        
-        //data rows
-        for(int i = getFirstYear();i<=getLastYear();i++){
-            String[] row = new String[tableColumns];
-            row[0] = Integer.toString(i);
-            table.add(row);
-        }
-        //Total Row
-        String[] total = new String[tableColumns];
-        total[0] = "TOTAL";
-        table.add(total);
-        //Average Row
-        String[] average = new String[tableColumns];
-        average[0] = "AVG";
-        table.add(average);
-        
-        return table;
-    }
-    
-    public void writeTable(String name, ArrayList<String[]> table) throws IOException{
-        URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
-
-        String path = location.getFile()+"OUTPUT "+name+".csv";
+    public void runPortfolio(){
+        while(calendar.getTime().before(endDate)){
             
-        if(!(new File(path).canRead())){
-            (new File(path)).createNewFile();
-        }else{
-            System.out.println("output file name exists");
-            return;
-        }
-        try(
-            FileWriter fw = new FileWriter(path, false);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw))
-        {       
-            for(String[] row:table){
-                for(String s: row){
-                    if(s==null){
-                        s = "";
-                    }
-                    out.print(s+",");
+            Security base = new Security();
+            //Determine the bank
+            for(Security s:holdings.keySet()){
+                if(s instanceof Core||s.name.equals("Cash")){
+                    base = s;
+                    break;
                 }
-                out.println("");
+            }
+            //MONTHSHSHSHSHSS DO THIS Compare WITHOUT YEAR
+            for(Security s:securities){
+                //Security not held
+                if(!holdings.containsKey(s)){
+                   if(calendar.getTime().after(s.buyDate)){
+                       updatePortfolio(new Trade(calendar.getTime(),base,s,s.allocation));
+                   }
+                    
+                //Security held
+                }else{
+                   if(calendar.getTime().after(s.sellDate)){
+                       updatePortfolio(new Trade(calendar.getTime(),s,base,s.allocation));
+                   }
+                }
             }
             
-        } catch (IOException e) {
-            System.out.println(e);
+            savePortfolio(calendar.getTime());
+            calendar.add(Calendar.DATE, 1);
+        }
+    }
+    
+    public void savePortfolio(Date date){
+        historicalPortfolio.put(date, holdings);
+    }
+    
+    public void updatePortfolio(Trade trade){
+        //subtract from base
+        holdings.put(trade.from,holdings.get(trade.from)-trade.percentage);
+        //remove base in the case of bank shift
+        if(holdings.get(trade.from)<=0){
+            holdings.remove(trade.from);
         }
         
+        if(!holdings.containsKey(trade.to)){
+            holdings.put(trade.to,trade.percentage);
+        }else{
+            holdings.put(trade.to,holdings.get(trade.to)+trade.percentage);
+        }
+        if(allocationOver()){
+            System.out.println("Allocation over 100%, Error");
+        }
+        
+        trades.add(trade);
     }
-    
-    public int getFirstYear(){
-        /*int lowestYear = Integer.MAX_VALUE;
-        for(Dataset d:datasets){
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(d.dates[0]);
-            int year = cal.get(Calendar.YEAR);
-            if(year<lowestYear){
-                lowestYear = year;
-            }
-        }*/
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(startDate);
-        int year = cal.get(Calendar.YEAR);
         
-        return year;
-    }
-    public int getLastYear(){
-        /*int highestYear = Integer.MIN_VALUE;
-        for(Dataset d:datasets){
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(d.dates[d.dates.length-1]);
-            int year = cal.get(Calendar.YEAR);
-            if(year>highestYear){
-                highestYear = year;
-            }
-        }*/
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(endDate);
-        int year = cal.get(Calendar.YEAR);
-        
-        return year;
-        
+    public boolean allocationOver(){
+        double sum = 0;
+        for(Double d:holdings.values()){
+            sum+=d;
+        }
+        if(sum>100){
+            return true;
+        }
+        return false;
     }
 
-
-    
 }
+    
+    
+    
+    
+
+    

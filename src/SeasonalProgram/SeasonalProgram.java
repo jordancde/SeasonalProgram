@@ -5,8 +5,11 @@
  */
 package SeasonalProgram;
 
+
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 
 
@@ -33,8 +36,14 @@ public class SeasonalProgram {
         ui.setVisible(true);
         
         
+       
+ 
+    }
+    
+    public static void runModel(){
         
-        
+        portfolio = new Portfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
+        portfolio.runPortfolio();
     }
     
 }

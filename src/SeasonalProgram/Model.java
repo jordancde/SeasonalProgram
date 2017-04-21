@@ -5,6 +5,7 @@
  */
 package SeasonalProgram;
 
+import static SeasonalProgram.SeasonalProgram.seasonalModel;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,7 +27,7 @@ class Model {
     public Date endDate;
     public boolean isModel;
     
-    public ArrayList<Core> cores = new ArrayList<Core>();
+    public Core core;
    
     public ArrayList<Sector> sectors = new ArrayList<Sector>();
     
@@ -62,7 +63,7 @@ class Model {
             JTextField jtb1 = (JTextField)component[1];
             JTextField jtb2 = (JTextField)component[2];
             JTextField jtb3 = (JTextField)component[3];
-            cores.add(new Core(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
+            core = (new Core(jcb.getSelectedItem().toString(),sdf.parse(jtb1.getText()),sdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
         }
         
         for(JComponent[] component:sectorsInput){
@@ -87,8 +88,15 @@ class Model {
     public boolean checkCombo(JComboBox cb){
         return cb.getSelectedItem().toString().equals("Exponential");
     }
-  
-   
+    
+    public ArrayList<Security> getSecurities(){
+        ArrayList<Security> securities = new ArrayList<Security>();
+        securities.add(core);
+        for(Sector s:sectors){
+            securities.add(s);
+        }
+        return securities;
+    }
     
     
     
