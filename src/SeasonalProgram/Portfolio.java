@@ -20,7 +20,7 @@ public class Portfolio {
     public Map<Security, Double> holdings = new HashMap<Security, Double>();
     public ArrayList<Security> securities;
     public Map<Date, Map<Security, Double>> historicalPortfolio = new HashMap<Date, Map<Security, Double>>();
-    public ArrayList<Trade> trades;
+    public ArrayList<Trade> trades = new ArrayList<Trade>();
     
     public Date startDate;
     public Date endDate;
@@ -37,37 +37,53 @@ public class Portfolio {
         calendar = Calendar.getInstance();
         calendar.setTime(startDate);
         
+        
         //creates cash at 100% and adds to holdings
-        cash = new Security("Cash",new Date(Long.MIN_VALUE),new Date(Long.MAX_VALUE),100);
+        cash = new Core("Cash",getCore(securities).sellDate,getCore(securities).buyDate,100);
         securities.add(0,cash);
         holdings.put(cash, 100.000);
     }
     
     public void runPortfolio(){
         while(calendar.getTime().before(endDate)){
-            
+            setDates(calendar.getTime());
             Security base = new Security();
             //Determine the bank
             for(Security s:holdings.keySet()){
-                if(s instanceof Core||s.name.equals("Cash")){
+                if(s instanceof Core){
                     base = s;
                     break;
                 }
             }
-            //MONTHSHSHSHSHSS DO THIS Compare WITHOUT YEAR
+            
             for(Security s:securities){
                 //Security not held
-                if(!holdings.containsKey(s)){
-                   if(calendar.getTime().after(s.buyDate)){
-                       updatePortfolio(new Trade(calendar.getTime(),base,s,s.allocation));
-                   }
+                if(s instanceof Sector){
+                    if(!holdings.containsKey(s)){
+                       
+                       if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
+                           updatePortfolio(new Trade(calendar.getTime(),base,s,s.allocation));
+                       }
+
+                    //Security held
+                    }else{
+                       if(calendar.getTime().after(s.sellDate)||calendar.getTime().equals(s.sellDate)){
+                           updatePortfolio(new Trade(calendar.getTime(),s,base,s.allocation));
+                       }
+                    }
                     
-                //Security held
-                }else{
-                   if(calendar.getTime().after(s.sellDate)){
-                       updatePortfolio(new Trade(calendar.getTime(),s,base,s.allocation));
-                   }
+                }else if(s instanceof Core){
+                    ///only buy, don't sell, they have swapped buy/sell dates so only buys take care of both
+                    if(!holdings.containsKey(s)){
+                        if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
+                            updatePortfolio(new Trade(calendar.getTime(),base,s,holdings.get(base)));
+                            //update the base
+                            base = s;
+                        }
+                        
+                    }
                 }
+                
             }
             
             savePortfolio(calendar.getTime());
@@ -75,8 +91,58 @@ public class Portfolio {
         }
     }
     
+    public void setDates(Date dateNow){
+        Calendar c = Calendar.getInstance();
+        c.setTime(dateNow);
+        //System.out.println(dateNow);
+        for(Security s:securities){
+            if(compareDates(c.getTime(),s.buyDate)){
+                s.buyDate.setYear(dateNow.getYear()+1);
+            }else{
+                s.buyDate.setYear(dateNow.getYear());
+            }
+            if(compareDates(c.getTime(),s.sellDate)){
+                s.sellDate.setYear(dateNow.getYear()+1);
+            }else{
+                s.sellDate.setYear(dateNow.getYear());
+            }
+            
+            //System.out.println(s.name+" | "+s.buyDate+" | "+s.sellDate);
+        }
+        //System.out.println("");
+    }
+    
+    //returns true if date 1 >= date 2
+    public boolean compareDates(Date date1,Date date2){
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        
+        if(cal1.get(Calendar.MONTH)>cal2.get(Calendar.MONTH)){
+            return true;
+        }else if(cal1.get(Calendar.MONTH)==cal2.get(Calendar.MONTH)){
+            if(cal1.get(Calendar.DAY_OF_MONTH)>cal2.get(Calendar.DAY_OF_MONTH)){
+                return true;
+            }
+        }
+        return false;
+        
+    }
+    
     public void savePortfolio(Date date){
         historicalPortfolio.put(date, holdings);
+    }
+    
+    public Security getCore(ArrayList<Security> securities){
+        for(Security s:securities){
+            if(s instanceof Core){
+                return s;
+                
+            }
+            
+        }
+        return null;
     }
     
     public void updatePortfolio(Trade trade){
@@ -92,12 +158,27 @@ public class Portfolio {
         }else{
             holdings.put(trade.to,holdings.get(trade.to)+trade.percentage);
         }
+        
+        System.out.println("");
+        System.out.println(trade.date);
+        
+        System.out.println("Sold "+trade.from.name+", bought "+trade.to.name+" - "+trade.percentage);
+        printHoldings();
+        
         if(allocationOver()){
             System.out.println("Allocation over 100%, Error");
         }
         
         trades.add(trade);
     }
+    
+    public void printHoldings(){
+        for(Security s:holdings.keySet()){
+            System.out.println(s.name+": "+holdings.get(s));
+        }
+    }
+    
+    
         
     public boolean allocationOver(){
         double sum = 0;

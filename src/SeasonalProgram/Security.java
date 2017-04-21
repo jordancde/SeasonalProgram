@@ -24,7 +24,7 @@ public class Security {
         this.sellDate = sellDate;
         this.allocation = allocation;
         dataset = SeasonalProgram.data.getDataset(name);
-        dataset.trimData(buyDate, sellDate);
+        //dataset.trimData(buyDate, sellDate);
     }
     public Security(){}
     

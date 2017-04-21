@@ -148,8 +148,8 @@ public class UI extends JFrame {
             secTwo.setLayout(gl);
             //Row One 
             secTwo.add(new JLabel("Core"));
-            secTwo.add(new JLabel("Buy Date"));
-            secTwo.add(new JLabel("Sell Date"));
+            secTwo.add(new JLabel("Buy Date (mm/dd)"));
+            secTwo.add(new JLabel("Sell Date (mm/dd)"));
             secTwo.add(new JLabel("Allocation %"));
             
             //Row Two
@@ -166,26 +166,7 @@ public class UI extends JFrame {
             }
             
             
-            addCore = new JButton("Add Core");
-            secTwo.add(addCore);
-
-            addCore.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JComponent[] components = new JComponent[4];
-                    components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
-                    components[1] = new JTextField(20);
-                    components[2] = new JTextField(20);
-                    components[3] = new JTextField(20);
-                    coresInput.add(components);
-                    secTwo.remove(addCore);
-                    for(JComponent jc:components){
-                        secTwo.add(jc);
-                    }
-                    secTwo.add(addCore);
-                    secTwo.revalidate();
-                }
-            });
+            
             
             secTwo.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
 
