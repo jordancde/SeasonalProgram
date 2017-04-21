@@ -17,9 +17,9 @@ import java.util.Map;
  */
 public class Portfolio {
     
-    public Map<Security, Double> holdings = new HashMap<Security, Double>();
+    public Map<Security, Double[]> holdings = new HashMap<Security, Double[]>();
     public ArrayList<Security> securities;
-    public Map<Date, Map<Security, Double>> historicalPortfolio = new HashMap<Date, Map<Security, Double>>();
+    public Map<Date, Map<Security, Double[]>> historicalPortfolio = new HashMap<Date, Map<Security, Double[]>>();
     public ArrayList<Trade> trades = new ArrayList<Trade>();
     
     public Date startDate;
@@ -38,10 +38,13 @@ public class Portfolio {
         calendar.setTime(startDate);
         
         
-        //creates cash at 100% and adds to holdings
+        //creates cash at 100% with value of 1 and adds to holdings
         cash = new Core("Cash",getCore(securities).sellDate,getCore(securities).buyDate,100);
         securities.add(0,cash);
-        holdings.put(cash, 100.000);
+        Double[] cashStats = new Double[2];
+        cashStats[0] = 100.00;
+        cashStats[1] = 1.0;
+        holdings.put(cash, cashStats);
     }
     
     public void runPortfolio(){
@@ -76,7 +79,7 @@ public class Portfolio {
                     ///only buy, don't sell, they have swapped buy/sell dates so only buys take care of both
                     if(!holdings.containsKey(s)){
                         if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
-                            updatePortfolio(new Trade(calendar.getTime(),base,s,holdings.get(base)));
+                            updatePortfolio(new Trade(calendar.getTime(),base,s,holdings.get(base)[0]));
                             //update the base
                             base = s;
                         }
@@ -85,7 +88,7 @@ public class Portfolio {
                 }
                 
             }
-            
+            updatePortfolioValues(calendar.getTime());
             savePortfolio(calendar.getTime());
             calendar.add(Calendar.DATE, 1);
         }
@@ -147,16 +150,19 @@ public class Portfolio {
     
     public void updatePortfolio(Trade trade){
         //subtract from base
-        holdings.put(trade.from,holdings.get(trade.from)-trade.percentage);
+        Double[] holdingFromStats = {holdings.get(trade.from)[0]-trade.percentage,getValue(trade.date,trade.from)};
+        holdings.put(trade.from,holdingFromStats);
         //remove base in the case of bank shift
-        if(holdings.get(trade.from)<=0){
+        if(holdings.get(trade.from)[0]<=0){
             holdings.remove(trade.from);
         }
         
         if(!holdings.containsKey(trade.to)){
-            holdings.put(trade.to,trade.percentage);
+            Double[] holdingToStats = {trade.percentage,getValue(trade.date,trade.to)};
+            holdings.put(trade.to,holdingToStats);
         }else{
-            holdings.put(trade.to,holdings.get(trade.to)+trade.percentage);
+            Double[] holdingToStats = {holdings.get(trade.to)[0]+trade.percentage,getValue(trade.date,trade.to)};
+            holdings.put(trade.to,holdingToStats);
         }
         
         System.out.println("");
@@ -172,6 +178,17 @@ public class Portfolio {
         trades.add(trade);
     }
     
+    public void updateHoldingValues(Date timeNow){
+        for(Security s:holdings.keySet()){
+            Double[] newStats = {holdings.get(s)[0],getValue(timeNow,s)};
+            holdings.put(s, newStats);
+        }
+    }
+    
+    public double getValue(Date d,Security s){
+        
+    }
+    
     public void printHoldings(){
         for(Security s:holdings.keySet()){
             System.out.println(s.name+": "+holdings.get(s));
@@ -182,8 +199,8 @@ public class Portfolio {
         
     public boolean allocationOver(){
         double sum = 0;
-        for(Double d:holdings.values()){
-            sum+=d;
+        for(Double[] d:holdings.values()){
+            sum+=d[0];
         }
         if(sum>100){
             return true;
