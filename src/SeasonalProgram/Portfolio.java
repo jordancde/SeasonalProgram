@@ -88,7 +88,7 @@ public class Portfolio {
                 }
                 
             }
-            updatePortfolioValues(calendar.getTime());
+            updateHoldingValues(calendar.getTime());
             savePortfolio(calendar.getTime());
             calendar.add(Calendar.DATE, 1);
         }
@@ -186,12 +186,21 @@ public class Portfolio {
     }
     
     public double getValue(Date d,Security s){
-        
+        if(s.name.equals("Cash")){
+            return 1;
+        }
+        Date[] dates = SeasonalProgram.data.getDataset(s.name).dates;
+        for(int i = 0;i<dates.length;i++){
+            if(dates[i].compareTo(d)>=0){
+                return SeasonalProgram.data.getDataset(s.name).closes[i];
+            }
+        }
+        return 0;
     }
     
     public void printHoldings(){
         for(Security s:holdings.keySet()){
-            System.out.println(s.name+": "+holdings.get(s));
+            System.out.println(s.name+": "+holdings.get(s)[0]+"%, "+holdings.get(s)[1]);
         }
     }
     

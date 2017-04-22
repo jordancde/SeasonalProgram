@@ -58,6 +58,7 @@ public class Dataset {
             }
            
         }
+        
 
         //initialize arrays
         dates = new Date[lastRow-nameListPos-rowOffset];
@@ -78,6 +79,8 @@ public class Dataset {
         }
 
     }
+    
+    
     
     public void trimData(Date startDate, Date endDate){
         int startDateIndex = 0;
