@@ -134,7 +134,10 @@ public class Portfolio {
     }
     
     public void savePortfolio(Date date){
-        historicalPortfolio.put(date, holdings);
+        //System.out.println(date);
+        //printHoldings(holdings);
+        historicalPortfolio.put(date, new HashMap<Security,Double[]>(holdings));
+        
     }
     
     public Security getCore(ArrayList<Security> securities){
@@ -169,7 +172,7 @@ public class Portfolio {
         System.out.println(trade.date);
         
         System.out.println("Sold "+trade.from.name+", bought "+trade.to.name+" - "+trade.percentage);
-        printHoldings();
+        printHoldings(holdings);
         
         if(allocationOver()){
             System.out.println("Allocation over 100%, Error");
@@ -191,21 +194,19 @@ public class Portfolio {
         }
         Date[] dates = SeasonalProgram.data.getDataset(s.name).dates;
         for(int i = 0;i<dates.length;i++){
-            if(dates[i].compareTo(d)>=0){
+            if(dates[i].after(d)||dates[i].equals(d)){
                 return SeasonalProgram.data.getDataset(s.name).closes[i];
             }
         }
         return 0;
     }
     
-    public void printHoldings(){
-        for(Security s:holdings.keySet()){
-            System.out.println(s.name+": "+holdings.get(s)[0]+"%, "+holdings.get(s)[1]);
+    public void printHoldings(Map<Security, Double[]> map){
+        for(Security s:map.keySet()){
+            System.out.println(s.name+": "+map.get(s)[0]+"%, "+map.get(s)[1]);
         }
     }
-    
-    
-        
+       
     public boolean allocationOver(){
         double sum = 0;
         for(Double[] d:holdings.values()){
@@ -215,6 +216,44 @@ public class Portfolio {
             return true;
         }
         return false;
+    }
+    
+    public Map<Date, Double> getReturns(){
+        Map<Date,Double> data = new HashMap<Date,Double>();
+        for(Date d:historicalPortfolio.keySet()){
+            double weightedGrowth = 0.00000000000;
+            //get previous day
+            Calendar c = Calendar.getInstance();
+            c.setTime(d);
+            c.add(Calendar.DATE, -1);
+            
+            if(historicalPortfolio.containsKey(c.getTime())){
+                for(Security s: historicalPortfolio.get(d).keySet()){
+                    //get current values
+                    double securityPercent = historicalPortfolio.get(d).get(s)[0];
+                    double securityValue = historicalPortfolio.get(d).get(s)[1];
+                    //get previous values
+                    double previousSecurityValue = 0;
+                    //if the security was held yesterday
+                    
+                    //printHoldings(historicalPortfolio.get(c.getTime()));
+                    if(historicalPortfolio.get(c.getTime()).containsKey(s)){
+                        //double previousSecurityPercent = historicalPortfolio.get(c.getTime()).get(s)[0];
+                        previousSecurityValue = historicalPortfolio.get(c.getTime()).get(s)[1];
+                    }else{
+                        //use current value for comparison if not held yesterday
+                        previousSecurityValue = historicalPortfolio.get(d).get(s)[1];
+                    }
+                    //System.out.println(d+" | "+c.getTime());
+                    double growth = (securityValue-previousSecurityValue)/previousSecurityValue;
+                    weightedGrowth+=growth*(securityPercent/100);
+
+                }
+            }
+            data.put(d, weightedGrowth);
+            //System.out.println(d+" | "+weightedGrowth);
+        }
+        return data;
     }
 
 }

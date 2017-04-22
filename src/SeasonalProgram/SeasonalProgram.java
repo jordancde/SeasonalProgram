@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Map;
 
 
 
@@ -44,6 +46,7 @@ public class SeasonalProgram {
         
         portfolio = new Portfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
         portfolio.runPortfolio();
+        Map<Date, Double> returns = portfolio.getReturns();
     }
     
 }
