@@ -54,6 +54,9 @@ public class Table {
         dates[dates.length-1] = "Avg";
         table.add(dates);
         
+        int[] monthValueCounts = new int[12];
+        double[] monthValueTotals = new double[12];
+        
         //data rows
         for(int i = getFirstYear();i<=getLastYear();i++){
             String[] row = new String[tableColumns];
@@ -62,24 +65,62 @@ public class Table {
                 String dateString = j+"/"+i;
                 String returnValue = String.format("%.5f", data.get(dateString));
                 row[j+1] = returnValue;
+                monthValueTotals[j]+=data.get(dateString);
+                monthValueCounts[j]++;
             }
+            row[row.length-1] = round(getAverage(row));
+            row[row.length-2] = round(getTotal(row));
             table.add(row);
         }
         //Total Row
         String[] total = new String[tableColumns];
         total[0] = "TOTAL";
+        for(int i = 0;i<12;i++){
+            total[i+1] = round(monthValueTotals[i]);
+        }
+        total[total.length-1] = round(getAverage(total));
+        total[total.length-2] = round(getTotal(total));
         table.add(total);
+
         //Average Row
         String[] average = new String[tableColumns];
         average[0] = "AVG";
+        for(int i = 0;i<12;i++){
+            average[i+1] = round(monthValueTotals[i]/monthValueCounts[i]);
+        }
+        average[average.length-1] = round(getAverage(average));
+        average[average.length-2] = round(getTotal(average));
         table.add(average);
         
         return table;
     }
+ 
+    
+    public String round(double d){
+        return String.format("%.5f", d);
+    }
     
     //START HERE
-    public double getTotal(){}
-    public double getAverage(){}
+    public double getTotal(String[] input){
+        double total = 0;
+        for(int i = 1;i<=12;i++){
+            if(!(input[i]==null)){
+                total+=Double.parseDouble(input[i]);
+            }
+        }
+        return total;
+    }
+    public double getAverage(String[] input){
+        double total = 0;
+        int count = 0;
+        for(int i = 1;i<=12;i++){
+            if(!(input[i]==null)){
+                total+=Double.parseDouble(input[i]);
+                count++;
+            }
+        }
+        return total/count;
+    }
     
     public int getFirstMonth(int year, Map<String,Double> data){
         ArrayList<String> datesInYear = new ArrayList<String>();
