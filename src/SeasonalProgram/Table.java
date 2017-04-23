@@ -60,10 +60,9 @@ public class Table {
             row[0] = Integer.toString(i);
             for(int j = getFirstMonth(i,data);j<=getLastMonth(i,data);j++){
                 String dateString = j+"/"+i;
-                ///System.out.println(dateString+data.get(dateString));
-                row[j+1] = Long.toString(Math.round(data.get(dateString)*100000)/100000);
+                String returnValue = String.format("%.5f", data.get(dateString));
+                row[j+1] = returnValue;
             }
-            
             table.add(row);
         }
         //Total Row
@@ -77,25 +76,31 @@ public class Table {
         
         return table;
     }
-    //FIX
+    
+    //START HERE
+    public double getTotal(){}
+    public double getAverage(){}
+    
     public int getFirstMonth(int year, Map<String,Double> data){
         ArrayList<String> datesInYear = new ArrayList<String>();
         for(String s:data.keySet()){
             if(Integer.parseInt(s.substring(s.lastIndexOf("/") + 1))==year){
                 datesInYear.add(s);
+                
             }
         }
         ArrayList<Integer> monthsInYear = new ArrayList<Integer>();
-        int minMonth = 0;
+        int minMonth = Integer.MAX_VALUE;
         for(String s:datesInYear){
+            
             if(Integer.parseInt(s.substring(0,s.indexOf("/")))<minMonth){
                 minMonth = Integer.parseInt(s.substring(0,s.indexOf("/")));
+                
             }
         }
-        System.out.print(year+"/"+minMonth);
+        //System.out.println(year+"/"+minMonth);
         return minMonth;
     }
-    //FIX
     public int getLastMonth(int year, Map<String,Double> data){
         ArrayList<String> datesInYear = new ArrayList<String>();
         for(String s:data.keySet()){
@@ -110,7 +115,7 @@ public class Table {
                 maxMonth = Integer.parseInt(s.substring(0,s.indexOf("/")));
             }
         }
-        System.out.print(year+"/"+maxMonth);
+        //System.out.println(year+"/"+maxMonth);
         return maxMonth;
     }
     
@@ -126,6 +131,14 @@ public class Table {
             System.out.println("output file name exists");
             return;
         }
+        
+        /*for(String[] s:table){
+            for(String string:s){
+                System.out.print(string+",");
+            }
+            System.out.println("");
+        }*/
+        
         try(
             FileWriter fw = new FileWriter(path, false);
             BufferedWriter bw = new BufferedWriter(fw);

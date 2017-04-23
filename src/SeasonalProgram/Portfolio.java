@@ -266,7 +266,7 @@ public class Portfolio {
             c.setTime(d);
             String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
 
-            System.out.println(monthString);
+            //System.out.println(monthString);
             if(monthlyReturns.containsKey(monthString)){
                 monthlyReturns.put(monthString, monthlyReturns.get(monthString)+returns.get(d));
             }else {
