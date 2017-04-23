@@ -17,6 +17,7 @@ import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 /**
  *
@@ -28,16 +29,16 @@ public class Table {
     public int tableColumns = 17;
     public Date startDate;
     public Date endDate;
-    public Table(String name, Date startDate, Date endDate) throws IOException{
+    public Table(String name, Map<String,Double> data, Date startDate, Date endDate) throws IOException{
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         //use one dataset to 
-        portfolioTable = makeTable();
-        //writeTable(name,portfolioTable);
+        portfolioTable = makeTable(data);
+        writeTable(name,portfolioTable);
     }
     
-    public ArrayList<String[]> makeTable(){
+    public ArrayList<String[]> makeTable(Map<String,Double> data){
         ArrayList<String[]> table = new ArrayList<String[]>();
         //Title Row
         String[] title = new String[tableColumns];
@@ -57,6 +58,12 @@ public class Table {
         for(int i = getFirstYear();i<=getLastYear();i++){
             String[] row = new String[tableColumns];
             row[0] = Integer.toString(i);
+            for(int j = getFirstMonth(i,data);j<=getLastMonth(i,data);j++){
+                String dateString = j+"/"+i;
+                ///System.out.println(dateString+data.get(dateString));
+                row[j+1] = Long.toString(Math.round(data.get(dateString)*100000)/100000);
+            }
+            
             table.add(row);
         }
         //Total Row
@@ -70,6 +77,43 @@ public class Table {
         
         return table;
     }
+    //FIX
+    public int getFirstMonth(int year, Map<String,Double> data){
+        ArrayList<String> datesInYear = new ArrayList<String>();
+        for(String s:data.keySet()){
+            if(Integer.parseInt(s.substring(s.lastIndexOf("/") + 1))==year){
+                datesInYear.add(s);
+            }
+        }
+        ArrayList<Integer> monthsInYear = new ArrayList<Integer>();
+        int minMonth = 0;
+        for(String s:datesInYear){
+            if(Integer.parseInt(s.substring(0,s.indexOf("/")))<minMonth){
+                minMonth = Integer.parseInt(s.substring(0,s.indexOf("/")));
+            }
+        }
+        System.out.print(year+"/"+minMonth);
+        return minMonth;
+    }
+    //FIX
+    public int getLastMonth(int year, Map<String,Double> data){
+        ArrayList<String> datesInYear = new ArrayList<String>();
+        for(String s:data.keySet()){
+            if(Integer.parseInt(s.substring(s.lastIndexOf("/") + 1))==year){
+                datesInYear.add(s);
+            }
+        }
+        ArrayList<Integer> monthsInYear = new ArrayList<Integer>();
+        int maxMonth = 0;
+        for(String s:datesInYear){
+            if(Integer.parseInt(s.substring(0,s.indexOf("/")))>maxMonth){
+                maxMonth = Integer.parseInt(s.substring(0,s.indexOf("/")));
+            }
+        }
+        System.out.print(year+"/"+maxMonth);
+        return maxMonth;
+    }
+    
     
     public void writeTable(String name, ArrayList<String[]> table) throws IOException{
         URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();

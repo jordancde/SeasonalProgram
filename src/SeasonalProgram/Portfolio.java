@@ -5,6 +5,8 @@
  */
 package SeasonalProgram;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -255,11 +257,24 @@ public class Portfolio {
         }
         return data;
     }
+    
+    public Map<String, Double> getMonthlyReturns(){
+        Map<Date, Double> returns = getReturns();
+        Calendar c = Calendar.getInstance();
+        Map<String, Double> monthlyReturns = new HashMap<String, Double>();
+        for(Date d:returns.keySet()){
+            c.setTime(d);
+            String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
+
+            System.out.println(monthString);
+            if(monthlyReturns.containsKey(monthString)){
+                monthlyReturns.put(monthString, monthlyReturns.get(monthString)+returns.get(d));
+            }else {
+                monthlyReturns.put(monthString, returns.get(d));
+            }
+        }
+        return monthlyReturns;
+    }
 
 }
-    
-    
-    
-    
-
     

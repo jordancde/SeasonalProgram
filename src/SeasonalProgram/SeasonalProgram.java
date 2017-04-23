@@ -42,11 +42,13 @@ public class SeasonalProgram {
  
     }
     
-    public static void runModel(){
+    public static void runModel() throws IOException{
         
         portfolio = new Portfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
         portfolio.runPortfolio();
-        Map<Date, Double> returns = portfolio.getReturns();
+        Map<String, Double> monthlyReturns = portfolio.getMonthlyReturns();
+        Table table = new Table("Static Seasonal Gains",monthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        
     }
     
 }
