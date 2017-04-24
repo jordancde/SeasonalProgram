@@ -78,6 +78,10 @@ public class SeasonalProgram {
         MonthlyStaticReturnsTable cashTable = new MonthlyStaticReturnsTable("Cash",cash,seasonalModel.startDate,seasonalModel.endDate);
         cashTable.writeTable();
         
+        Map<String, Double> trades = portfolio.getMonthlyTrades();
+        MonthlyStaticReturnsTable tradeTable = new MonthlyStaticReturnsTable("Number of Trades",trades,seasonalModel.startDate,seasonalModel.endDate);
+        tradeTable.writeTable();
+        
     }
 
     

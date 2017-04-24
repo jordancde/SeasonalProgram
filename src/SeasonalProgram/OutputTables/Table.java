@@ -49,7 +49,7 @@ public class Table {
     public double getTotal(String[] input){
         double total = 0;
         for(int i = 1;i<=12;i++){
-            if(!(input[i]==null)){
+            if(!(input[i]==null)&&!(input[i].equals("null"))){
                 total+=Double.parseDouble(input[i]);
             }
         }
@@ -59,7 +59,7 @@ public class Table {
         double total = 0;
         int count = 0;
         for(int i = 1;i<=12;i++){
-            if(!(input[i]==null)){
+            if(!(input[i]==null)&&!(input[i].equals("null"))){
                 total+=Double.parseDouble(input[i]);
                 count++;
             }
@@ -135,6 +135,8 @@ public class Table {
                 for(String s: row){
                     if(s==null){
                         s = "";
+                    }else if(s.equals("null")){
+                        s = "0";
                     }
                     out.print(s+",");
                 }

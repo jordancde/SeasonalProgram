@@ -50,7 +50,9 @@ public class MonthlyStaticReturnsTable extends Table {
                 String dateString = j+"/"+i;
                 String returnValue = String.format("%.5f", data.get(dateString));
                 row[j+1] = returnValue;
-                monthValueTotals[j]+=data.get(dateString);
+                if(data.get(dateString)!=null){
+                    monthValueTotals[j]+=data.get(dateString);
+                }
                 monthValueCounts[j]++;
             }
             row[row.length-1] = round(getAverage(row));

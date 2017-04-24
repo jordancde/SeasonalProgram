@@ -22,7 +22,7 @@ public class Portfolio {
     public Map<Security, Double[]> holdings = new HashMap<Security, Double[]>();
     public ArrayList<Security> securities;
     public Map<Date, Map<Security, Double[]>> historicalPortfolio = new HashMap<Date, Map<Security, Double[]>>();
-    public ArrayList<Trade> trades = new ArrayList<Trade>();
+    public Map<Date,Trade> trades = new HashMap<Date,Trade>();
     
     public Date startDate;
     public Date endDate;
@@ -180,7 +180,7 @@ public class Portfolio {
             System.out.println("Allocation over 100%, Error");
         }
         
-        trades.add(trade);
+        trades.put(trade.date,trade);
     }
     
     public void updateHoldingValues(Date timeNow){
@@ -334,6 +334,21 @@ public class Portfolio {
         }
         
         return monthlyReturns;
+    }
+    
+    public Map<String, Double> getMonthlyTrades(){
+        Calendar c = Calendar.getInstance();
+        Map<String, Double> monthlyTrades = new HashMap<String, Double>();
+        for(Date d:trades.keySet()){
+            c.setTime(d);
+            String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
+            if(monthlyTrades.containsKey(monthString)){
+                monthlyTrades.put(monthString,monthlyTrades.get(monthString)+1);
+            }else {
+                monthlyTrades.put(monthString, 1.0);
+            }
+        }
+        return monthlyTrades;
     }
  
 
