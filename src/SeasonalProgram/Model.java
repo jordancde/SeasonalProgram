@@ -25,7 +25,7 @@ class Model {
 
     public Date startDate;
     public Date endDate;
-    public boolean isModel;
+    //public boolean isModel;
     
     public Core core;
    
@@ -39,8 +39,8 @@ class Model {
     public Model(
          JTextField startDateText,
          JTextField endDateText,
-         JRadioButton model,
-         JRadioButton individual,
+         /*JRadioButton model,
+         JRadioButton individual,*/
         
          ArrayList<JComponent[]> coreInput,
         
@@ -52,11 +52,11 @@ class Model {
         startDate = sdf.parse(startDateText.getText());
         endDate = sdf.parse(endDateText.getText());
 
-        if(model.isSelected()){
+        /*if(model.isSelected()){
             isModel = true;
         }else if(individual.isSelected()){
             isModel = false;
-        }
+        }*/
 
         for(JComponent[] component:coreInput){
             JComboBox jcb = (JComboBox)component[0];

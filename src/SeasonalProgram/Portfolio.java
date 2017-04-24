@@ -220,7 +220,7 @@ public class Portfolio {
         return false;
     }
     
-    public Map<Date, Double> getReturns(){
+    public Map<Date, Double> getReturns(String settings){
         Map<Date,Double> data = new HashMap<Date,Double>();
         for(Date d:historicalPortfolio.keySet()){
             double weightedGrowth = 0.00000000000;
@@ -230,7 +230,46 @@ public class Portfolio {
             c.add(Calendar.DATE, -1);
             
             if(historicalPortfolio.containsKey(c.getTime())){
+                
+                //get base stats
+                double coreGrowth = 0;
+                if(settings.equals("Relative Benchmark")){
+                    for(Security s:historicalPortfolio.get(d).keySet()){
+                        if(s instanceof Core){
+                            //get current values
+                            double coreValue = historicalPortfolio.get(d).get(s)[1];
+                            //get previous values
+                            double previousCoreValue = 0;
+                            //if the security was held yesterday
+
+                            //printHoldings(historicalPortfolio.get(c.getTime()));
+                            if(historicalPortfolio.get(c.getTime()).containsKey(s)){
+                                //double previousSecurityPercent = historicalPortfolio.get(c.getTime()).get(s)[0];
+                                previousCoreValue = historicalPortfolio.get(c.getTime()).get(s)[1];
+                            }else{
+                                //use current value for comparison if not held yesterday
+                                previousCoreValue = historicalPortfolio.get(d).get(s)[1];
+                            }
+                            //System.out.println(d+" | "+c.getTime());
+                            coreGrowth = (coreValue-previousCoreValue)/previousCoreValue;
+                            
+                            break;
+                        }
+                    }
+                }
+                
                 for(Security s: historicalPortfolio.get(d).keySet()){
+                    
+                    if(settings.equals("Benchmark")&&s instanceof Sector){
+                        continue;
+                    }
+                    if(settings.equals("Cash")&&!s.name.equals("Cash")){
+                        continue;
+                    }else if(settings.equals("Cash")&&s.name.equals("Cash")){
+                        weightedGrowth = historicalPortfolio.get(d).get(s)[0];
+                        break;
+                    }
+                    
                     //get current values
                     double securityPercent = historicalPortfolio.get(d).get(s)[0];
                     double securityValue = historicalPortfolio.get(d).get(s)[1];
@@ -249,19 +288,23 @@ public class Portfolio {
                     //System.out.println(d+" | "+c.getTime());
                     double growth = (securityValue-previousSecurityValue)/previousSecurityValue;
                     weightedGrowth+=growth*(securityPercent/100);
-
+                    
                 }
+                //should be 0 if relative to core turned off
+                weightedGrowth-=coreGrowth;
             }
+            
             data.put(d, weightedGrowth);
             //System.out.println(d+" | "+weightedGrowth);
         }
         return data;
     }
     
-    public Map<String, Double> getMonthlyReturns(){
-        Map<Date, Double> returns = getReturns();
+    public Map<String, Double> getMonthlyReturns(String preference, boolean useFrequency){
+        Map<Date, Double> returns = getReturns(preference);
         Calendar c = Calendar.getInstance();
         Map<String, Double> monthlyReturns = new HashMap<String, Double>();
+        Map<String,Integer> monthlyTradingDayCount = new HashMap<String,Integer>();
         for(Date d:returns.keySet()){
             c.setTime(d);
             String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
@@ -269,12 +312,30 @@ public class Portfolio {
             //System.out.println(monthString);
             if(monthlyReturns.containsKey(monthString)){
                 monthlyReturns.put(monthString, monthlyReturns.get(monthString)+returns.get(d));
+                monthlyTradingDayCount.put(monthString,monthlyTradingDayCount.get(monthString)+1);
             }else {
                 monthlyReturns.put(monthString, returns.get(d));
+                monthlyTradingDayCount.put(monthString,1);
             }
         }
+        if(preference.equals("Cash")){
+            for(String s: monthlyReturns.keySet()){
+                monthlyReturns.put(s,(monthlyReturns.get(s)/monthlyTradingDayCount.get(s))/100);
+            }
+        }
+        if(useFrequency){
+            for(String s: monthlyReturns.keySet()){
+                if(monthlyReturns.get(s)>0){
+                   monthlyReturns.put(s,1.0);
+                }else{
+                   monthlyReturns.put(s,0.0);
+                }
+            }
+        }
+        
         return monthlyReturns;
     }
+ 
 
 }
     

@@ -6,6 +6,8 @@
 package SeasonalProgram;
 
 
+import SeasonalProgram.OutputTables.MonthlyStaticReturnsTable;
+import SeasonalProgram.OutputTables.Table;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.text.ParseException;
@@ -46,9 +48,37 @@ public class SeasonalProgram {
         
         portfolio = new Portfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
         portfolio.runPortfolio();
-        Map<String, Double> monthlyReturns = portfolio.getMonthlyReturns();
-        Table table = new Table("Static Seasonal Gains",monthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        
+        Map<String, Double> monthlyReturns = portfolio.getMonthlyReturns("Full", false);
+        MonthlyStaticReturnsTable fullPortfolio = new MonthlyStaticReturnsTable("Static Seasonal Gains",monthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        fullPortfolio.writeTable();
+        
+        Map<String, Double> benchmarkMonthlyReturns = portfolio.getMonthlyReturns("Benchmark", false);
+        MonthlyStaticReturnsTable benchmark = new MonthlyStaticReturnsTable("Benchmark Seasonal Gains",benchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        benchmark.writeTable();
+        
+        Map<String, Double> relativeBenchmarkMonthlyReturns = portfolio.getMonthlyReturns("Relative Benchmark", false);
+        MonthlyStaticReturnsTable relativeBenchmark = new MonthlyStaticReturnsTable("Relative Benchmark Seasonal Gains",relativeBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        relativeBenchmark.writeTable();
+        
+        
+        Map<String, Double> fqMonthlyReturns = portfolio.getMonthlyReturns("Full", true);
+        MonthlyStaticReturnsTable fq = new MonthlyStaticReturnsTable("Seasonal Frequency Pos",fqMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        fq.writeTable();
+        
+        Map<String, Double> fqBenchmarkMonthlyReturns = portfolio.getMonthlyReturns("Benchmark", true);
+        MonthlyStaticReturnsTable fqBenchmark = new MonthlyStaticReturnsTable("Seasonal Benchmark Frequency Pos",fqBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        fqBenchmark.writeTable();
+        
+        Map<String, Double> fqRelativeBenchmarkMonthlyReturns = portfolio.getMonthlyReturns("Relative Benchmark", true);
+        MonthlyStaticReturnsTable fqRelativeBenchmark = new MonthlyStaticReturnsTable("Seasonal Relative Benchmark Frequency Pos",fqRelativeBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        fqRelativeBenchmark.writeTable();
+        
+        Map<String, Double> cash = portfolio.getMonthlyReturns("Cash", false);
+        MonthlyStaticReturnsTable cashTable = new MonthlyStaticReturnsTable("Cash",cash,seasonalModel.startDate,seasonalModel.endDate);
+        cashTable.writeTable();
         
     }
+
     
 }

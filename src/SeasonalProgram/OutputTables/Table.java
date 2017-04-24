@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package SeasonalProgram;
+package SeasonalProgram.OutputTables;
 
+import SeasonalProgram.SeasonalProgram;
 import SeasonalProgram.SeasonalProgram;
 import java.awt.Component;
 import java.io.BufferedWriter;
@@ -29,71 +30,15 @@ public class Table {
     public int tableColumns = 17;
     public Date startDate;
     public Date endDate;
+    public String outputName = "Out";
     public Table(String name, Map<String,Double> data, Date startDate, Date endDate) throws IOException{
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
-        //use one dataset to 
-        portfolioTable = makeTable(data);
-        writeTable(name,portfolioTable);
+        
+        
     }
-    
-    public ArrayList<String[]> makeTable(Map<String,Double> data){
-        ArrayList<String[]> table = new ArrayList<String[]>();
-        //Title Row
-        String[] title = new String[tableColumns];
-        title[0] = name;
-        table.add(title);
-        //Dates Header Row
-        String[] dates = new String[tableColumns];
-        String[] months = new DateFormatSymbols().getMonths();
-        for(int i = 0;i<months.length;i++){
-            dates[i+1] = months[i];
-        }
-        dates[dates.length-2] = "Total Year";
-        dates[dates.length-1] = "Avg";
-        table.add(dates);
-        
-        int[] monthValueCounts = new int[12];
-        double[] monthValueTotals = new double[12];
-        
-        //data rows
-        for(int i = getFirstYear();i<=getLastYear();i++){
-            String[] row = new String[tableColumns];
-            row[0] = Integer.toString(i);
-            for(int j = getFirstMonth(i,data);j<=getLastMonth(i,data);j++){
-                String dateString = j+"/"+i;
-                String returnValue = String.format("%.5f", data.get(dateString));
-                row[j+1] = returnValue;
-                monthValueTotals[j]+=data.get(dateString);
-                monthValueCounts[j]++;
-            }
-            row[row.length-1] = round(getAverage(row));
-            row[row.length-2] = round(getTotal(row));
-            table.add(row);
-        }
-        //Total Row
-        String[] total = new String[tableColumns];
-        total[0] = "TOTAL";
-        for(int i = 0;i<12;i++){
-            total[i+1] = round(monthValueTotals[i]);
-        }
-        total[total.length-1] = round(getAverage(total));
-        total[total.length-2] = round(getTotal(total));
-        table.add(total);
-
-        //Average Row
-        String[] average = new String[tableColumns];
-        average[0] = "AVG";
-        for(int i = 0;i<12;i++){
-            average[i+1] = round(monthValueTotals[i]/monthValueCounts[i]);
-        }
-        average[average.length-1] = round(getAverage(average));
-        average[average.length-2] = round(getTotal(average));
-        table.add(average);
-        
-        return table;
-    }
+   
  
     
     public String round(double d){
@@ -161,17 +106,17 @@ public class Table {
     }
     
     
-    public void writeTable(String name, ArrayList<String[]> table) throws IOException{
+    public void writeTable() throws IOException{
         URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
 
-        String path = location.getFile()+"OUTPUT "+name+".csv";
+        String path = location.getFile()+"OUTPUT "+outputName+".csv";
             
         if(!(new File(path).canRead())){
             (new File(path)).createNewFile();
-        }else{
+        }/*else{
             System.out.println("output file name exists");
             return;
-        }
+        }*/
         
         /*for(String[] s:table){
             for(String string:s){
@@ -181,11 +126,12 @@ public class Table {
         }*/
         
         try(
-            FileWriter fw = new FileWriter(path, false);
+            FileWriter fw = new FileWriter(path, true);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
-        {       
-            for(String[] row:table){
+        {      
+            out.println("");
+            for(String[] row:portfolioTable){
                 for(String s: row){
                     if(s==null){
                         s = "";
