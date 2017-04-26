@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * @author jordandearsley
  */
-class Core extends Security{
+public class Core extends Security{
     
     public Core(String name, Date buyDate, Date sellDate, double allocation){
 

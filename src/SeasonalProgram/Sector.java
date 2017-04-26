@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * @author jordandearsley
  */
-class Sector extends Security{
+public class Sector extends Security{
     public Sector(String name, Date buyDate, Date sellDate, double allocation, double leverage){
         super(name, buyDate, sellDate, allocation);
     }

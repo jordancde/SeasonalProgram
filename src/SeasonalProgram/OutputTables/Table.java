@@ -7,6 +7,7 @@ package SeasonalProgram.OutputTables;
 
 import SeasonalProgram.SeasonalProgram;
 import SeasonalProgram.SeasonalProgram;
+import SeasonalProgram.Trade;
 import java.awt.Component;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +39,11 @@ public class Table {
         
         
     }
-   
+    public Table(String name, ArrayList<Trade> data, Date startDate, Date endDate) throws IOException {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
  
     
     public String round(double d){

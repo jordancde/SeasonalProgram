@@ -7,6 +7,7 @@ package SeasonalProgram;
 
 
 import SeasonalProgram.OutputTables.MonthlyStaticReturnsTable;
+import SeasonalProgram.OutputTables.StaticTradesTable;
 import SeasonalProgram.OutputTables.Table;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -81,6 +82,10 @@ public class SeasonalProgram {
         Map<String, Double> trades = portfolio.getMonthlyTrades();
         MonthlyStaticReturnsTable tradeTable = new MonthlyStaticReturnsTable("Number of Trades",trades,seasonalModel.startDate,seasonalModel.endDate);
         tradeTable.writeTable();
+        
+        ArrayList<Trade> tradeHistory = portfolio.getTrades();
+        StaticTradesTable tradeHistoryTable = new StaticTradesTable("Trade History",tradeHistory,seasonalModel.startDate,seasonalModel.endDate);
+        tradeHistoryTable.writeTable();
         
     }
 

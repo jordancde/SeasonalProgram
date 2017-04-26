@@ -67,13 +67,13 @@ public class Portfolio {
                     if(!holdings.containsKey(s)){
                        
                        if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
-                           updatePortfolio(new Trade(calendar.getTime(),base,s,s.allocation));
+                           updatePortfolio(new Trade(calendar.getTime(),base,getValue(calendar.getTime(),base),s,getValue(calendar.getTime(),s),s.allocation));
                        }
 
                     //Security held
                     }else{
                        if(calendar.getTime().after(s.sellDate)||calendar.getTime().equals(s.sellDate)){
-                           updatePortfolio(new Trade(calendar.getTime(),s,base,s.allocation));
+                           updatePortfolio(new Trade(calendar.getTime(),s,getValue(calendar.getTime(),s),base,getValue(calendar.getTime(),base),s.allocation));
                        }
                     }
                     
@@ -81,7 +81,7 @@ public class Portfolio {
                     ///only buy, don't sell, they have swapped buy/sell dates so only buys take care of both
                     if(!holdings.containsKey(s)){
                         if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
-                            updatePortfolio(new Trade(calendar.getTime(),base,s,holdings.get(base)[0]));
+                            updatePortfolio(new Trade(calendar.getTime(),base,getValue(calendar.getTime(),base),s,getValue(calendar.getTime(),s),holdings.get(base)[0]));
                             //update the base
                             base = s;
                         }
@@ -350,6 +350,31 @@ public class Portfolio {
         }
         return monthlyTrades;
     }
+    
+    public ArrayList<Trade> getTrades(){
+        Calendar c = Calendar.getInstance();
+        ArrayList<Trade> tradeOrderedList= new ArrayList<Trade>();
+        for(Date d:trades.keySet()){
+            c.setTime(d);
+            //String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
+            if(tradeOrderedList.size()==0){
+                tradeOrderedList.add(trades.get(d));
+            }else{
+                for(int i = 0;i<tradeOrderedList.size();i++){
+                    if(d.after(tradeOrderedList.get(i).date)){
+                        tradeOrderedList.add(trades.get(d));
+                    }
+                }
+            }
+            
+        }
+        for(Trade t:tradeOrderedList){
+            System.out.println(t.date);
+            
+        }
+        return tradeOrderedList;
+    }
+    
  
 
 }
