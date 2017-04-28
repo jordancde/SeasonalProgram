@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -65,6 +66,18 @@ public class Data {
             data[i] = input.get(i);
         }
         return data;
+    }
+    public double getValue(Date d,Security s){
+        if(s.name.equals("Cash")){
+            return 1;
+        }
+        Date[] dates = getDataset(s.name).dates;
+        for(int i = 0;i<dates.length;i++){
+            if(dates[i].after(d)||dates[i].equals(d)){
+                return getDataset(s.name).closes[i];
+            }
+        }
+        return 0;
     }
     
     public static ArrayList<String[]> readFile(String path) throws IOException{

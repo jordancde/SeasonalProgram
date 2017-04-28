@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package SeasonalProgram.OutputTables;
+package SeasonalProgram;
 
 import SeasonalProgram.Trade;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import SeasonalProgram.Core;
+import SeasonalProgram.OutputTables.Table;
 import SeasonalProgram.Sector;
 
 /**
@@ -50,28 +51,51 @@ public class StaticTradesTable extends Table {
         tableTitles[5] = "Difference";
         table.add(tableTitles);
         
-        for(Trade t:data){
-            if(t.to instanceof Sector){
+        ArrayList<Trade> checked = new ArrayList<Trade>();
+        for(Trade buyTrade:data){
+            if(buyTrade.to instanceof Sector&&!checked.contains(buyTrade)){
                 String[] row = new String[tableColumns];
-                row[0] = t.to.name;
-                row[1] = t.to.buyDate.toString();
-                row[2] = t.to.sellDate.toString();
+                row[0] = buyTrade.to.name;
+                row[1] = buyTrade.date.toString();
+                
+                double sectorBuyValue = 0;
+                double sectorSellValue = 0;
+                double coreBuyValue = 0;
+                double coreSellValue= 0;
                 for(Trade sellTrade:data){
-                    if(sellTrade.from.equals(t.to)){
-                        row[3] = Double.toString((t.toValue-sellTrade.fromValue)/sellTrade.fromValue);
-                        row[4] = Double.toString((t.fromValue-sellTrade.toValue)/sellTrade.toValue);
+                    if(sellTrade.from.equals(buyTrade.to)&&!checked.contains(sellTrade)){
+                        //Temp fix
+                        row[2] = sellTrade.date.toString();
+                        sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
+                        sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
+                        coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
+                        coreSellValue = SeasonalProgram.portfolio.getCoreValue(sellTrade.date);
+                        System.out.println(buyTrade.date+"Bought "+buyTrade.to.name+" at "+sectorBuyValue+", Sold at "+sectorSellValue);
+                        row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
+                        row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
+                        checked.add(buyTrade);
+                        checked.add(sellTrade);
                         break;
                     }
-                }  
+                }
+                if(row[3]==null){
+                    sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
+                    sectorSellValue = SeasonalProgram.portfolio.getValue(endDate,buyTrade.to);//???
+                    coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
+                    coreSellValue = SeasonalProgram.portfolio.getCoreValue(endDate);
+                    row[2] = endDate.toString();
+                    row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
+                    row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
+                }
+                
                 row[5] = Double.toString(Double.parseDouble(row[3])-Double.parseDouble(row[4]));
-                System.out.println("Worked");
                 table.add(row);
             }   
         }
         
         String[] avgRow = new String[tableColumns];
         avgRow[0] = "Average";
-        for(int i = 0;i<2;i++){
+        for(int i = 0;i<3;i++){
             double sum = 0;
             for(int j = 0;j<table.size()-4;j++){
                 sum += Double.parseDouble(table.get(j+4)[3+i]);
@@ -82,7 +106,7 @@ public class StaticTradesTable extends Table {
         
         String[] fqRow = new String[tableColumns];
         fqRow[0] = "Fq > 0";
-        for(int i = 0;i<2;i++){
+        for(int i = 0;i<3;i++){
             double sum = 0;
             //-5 to skip average row
             for(int j = 0;j<table.size()-5;j++){

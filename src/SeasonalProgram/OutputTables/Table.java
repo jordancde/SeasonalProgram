@@ -147,7 +147,7 @@ public class Table {
                 }
                 out.println("");
             }
-            
+  
         } catch (IOException e) {
             System.out.println(e);
         }

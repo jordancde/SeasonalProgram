@@ -5,6 +5,8 @@
  */
 package SeasonalProgram;
 
+import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,7 +24,8 @@ public class Portfolio {
     public Map<Security, Double[]> holdings = new HashMap<Security, Double[]>();
     public ArrayList<Security> securities;
     public Map<Date, Map<Security, Double[]>> historicalPortfolio = new HashMap<Date, Map<Security, Double[]>>();
-    public Map<Date,Trade> trades = new HashMap<Date,Trade>();
+    public ArrayList<Trade> trades = new ArrayList<Trade>();
+    ArrayList<TradingDay> tradingDays;
     
     public Date startDate;
     public Date endDate;
@@ -67,13 +70,12 @@ public class Portfolio {
                     if(!holdings.containsKey(s)){
                        
                        if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
-                           updatePortfolio(new Trade(calendar.getTime(),base,getValue(calendar.getTime(),base),s,getValue(calendar.getTime(),s),s.allocation));
+                           updatePortfolio(new Trade(calendar.getTime(),base,s,s.allocation));
                        }
-
                     //Security held
                     }else{
                        if(calendar.getTime().after(s.sellDate)||calendar.getTime().equals(s.sellDate)){
-                           updatePortfolio(new Trade(calendar.getTime(),s,getValue(calendar.getTime(),s),base,getValue(calendar.getTime(),base),s.allocation));
+                           updatePortfolio(new Trade(calendar.getTime(),s,base,s.allocation));
                        }
                     }
                     
@@ -81,7 +83,7 @@ public class Portfolio {
                     ///only buy, don't sell, they have swapped buy/sell dates so only buys take care of both
                     if(!holdings.containsKey(s)){
                         if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
-                            updatePortfolio(new Trade(calendar.getTime(),base,getValue(calendar.getTime(),base),s,getValue(calendar.getTime(),s),holdings.get(base)[0]));
+                            updatePortfolio(new Trade(calendar.getTime(),base,s,holdings.get(base)[0]));
                             //update the base
                             base = s;
                         }
@@ -94,6 +96,7 @@ public class Portfolio {
             savePortfolio(calendar.getTime());
             calendar.add(Calendar.DATE, 1);
         }
+        
     }
     
     public void setDates(Date dateNow){
@@ -103,6 +106,7 @@ public class Portfolio {
         for(Security s:securities){
             if(compareDates(c.getTime(),s.buyDate)){
                 s.buyDate.setYear(dateNow.getYear()+1);
+                
             }else{
                 s.buyDate.setYear(dateNow.getYear());
             }
@@ -154,7 +158,14 @@ public class Portfolio {
     }
     
     public void updatePortfolio(Trade trade){
+        System.out.println("");
+        System.out.println(DateFormat.getDateInstance().format(trade.date));
+        System.out.println("Initial Portfolio");
+        printHoldings(holdings);
+        System.out.println("Transactions");
+        
         //subtract from base
+        Double[] previousFromStats = holdings.get(trade.from);
         Double[] holdingFromStats = {holdings.get(trade.from)[0]-trade.percentage,getValue(trade.date,trade.from)};
         holdings.put(trade.from,holdingFromStats);
         //remove base in the case of bank shift
@@ -169,18 +180,23 @@ public class Portfolio {
             Double[] holdingToStats = {holdings.get(trade.to)[0]+trade.percentage,getValue(trade.date,trade.to)};
             holdings.put(trade.to,holdingToStats);
         }
+        try{
+            System.out.println("Sell "+trade.from.name+" "+trade.percentage+"%, new value "+holdings.get(trade.from)[0]+"%");
+        }catch(Exception e){
+            System.out.println("Sell "+trade.from.name+" "+trade.percentage+"%, new value 0.00%");
+        }
+        System.out.println("Buy "+trade.to.name+" price "+getValue(trade.date,trade.to)+" new value "+holdings.get(trade.to)[0]+"%");
         
-        System.out.println("");
-        System.out.println(trade.date);
-        
-        System.out.println("Sold "+trade.from.name+", bought "+trade.to.name+" - "+trade.percentage);
+        System.out.println("End Portfolio");
         printHoldings(holdings);
+        
+        System.out.println("Portfolio Value "+getPortfolioValue(trade.date));
         
         if(allocationOver()){
             System.out.println("Allocation over 100%, Error");
         }
         
-        trades.put(trade.date,trade);
+        trades.add(trade);
     }
     
     public void updateHoldingValues(Date timeNow){
@@ -189,7 +205,14 @@ public class Portfolio {
             holdings.put(s, newStats);
         }
     }
-    
+    public double getCoreValue(Date d){
+        for(Security s:securities){
+            if(s.name.equals("S&P 500")){
+                return getValue(d,s);
+            }
+        }
+        return 0;
+    }
     public double getValue(Date d,Security s){
         if(s.name.equals("Cash")){
             return 1;
@@ -202,6 +225,15 @@ public class Portfolio {
         }
         return 0;
     }
+    
+    public double getLastValue(Security s){
+        if(s.name.equals("Cash")){
+            return 1;
+        }
+        int length = SeasonalProgram.data.getDataset(s.name).closes.length;
+        return SeasonalProgram.data.getDataset(s.name).closes[length-1];
+    }
+    
     
     public void printHoldings(Map<Security, Double[]> map){
         for(Security s:map.keySet()){
@@ -222,6 +254,7 @@ public class Portfolio {
     
     public Map<Date, Double> getReturns(String settings){
         Map<Date,Double> data = new HashMap<Date,Double>();
+        tradingDays = new ArrayList<TradingDay>();
         for(Date d:historicalPortfolio.keySet()){
             double weightedGrowth = 0.00000000000;
             //get previous day
@@ -293,7 +326,7 @@ public class Portfolio {
                 //should be 0 if relative to core turned off
                 weightedGrowth-=coreGrowth;
             }
-            
+            tradingDays.add(new TradingDay(d,historicalPortfolio.get(d),weightedGrowth));
             data.put(d, weightedGrowth);
             //System.out.println(d+" | "+weightedGrowth);
         }
@@ -339,8 +372,8 @@ public class Portfolio {
     public Map<String, Double> getMonthlyTrades(){
         Calendar c = Calendar.getInstance();
         Map<String, Double> monthlyTrades = new HashMap<String, Double>();
-        for(Date d:trades.keySet()){
-            c.setTime(d);
+        for(Trade t:trades){
+            c.setTime(t.date);
             String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
             if(monthlyTrades.containsKey(monthString)){
                 monthlyTrades.put(monthString,monthlyTrades.get(monthString)+1);
@@ -352,27 +385,21 @@ public class Portfolio {
     }
     
     public ArrayList<Trade> getTrades(){
-        Calendar c = Calendar.getInstance();
-        ArrayList<Trade> tradeOrderedList= new ArrayList<Trade>();
-        for(Date d:trades.keySet()){
-            c.setTime(d);
-            //String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
-            if(tradeOrderedList.size()==0){
-                tradeOrderedList.add(trades.get(d));
-            }else{
-                for(int i = 0;i<tradeOrderedList.size();i++){
-                    if(d.after(tradeOrderedList.get(i).date)){
-                        tradeOrderedList.add(trades.get(d));
-                    }
-                }
-            }
+        for(Date d:historicalPortfolio.keySet()){
+            Map<Security, Double[]> dailyHoldings = historicalPortfolio.get(d);
             
         }
-        for(Trade t:tradeOrderedList){
-            System.out.println(t.date);
-            
+        return trades;
+    }
+
+    public double getPortfolioValue(Date date) {
+        getReturns("Full");
+        double portfolioValue = 100.00;
+        for(TradingDay d:tradingDays){
+            if(d.d.after(date)){break;}
+            portfolioValue+=d.growth*100;
         }
-        return tradeOrderedList;
+        return portfolioValue;
     }
     
  

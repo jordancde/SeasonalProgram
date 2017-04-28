@@ -7,7 +7,6 @@ package SeasonalProgram;
 
 
 import SeasonalProgram.OutputTables.MonthlyStaticReturnsTable;
-import SeasonalProgram.OutputTables.StaticTradesTable;
 import SeasonalProgram.OutputTables.Table;
 import java.awt.event.ActionEvent;
 import java.io.IOException;

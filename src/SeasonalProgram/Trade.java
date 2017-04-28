@@ -16,14 +16,12 @@ public class Trade {
     public Security from;
     public Security to;
     public double percentage;
-    public double fromValue;
-    public double toValue;
-    public Trade(Date date, Security from,double fromValue,Security to, double toValue,double percentage){
+
+    public Trade(Date date, Security from,Security to, double percentage){
         this.date = date;
         this.from = from;
         this.to = to;
         this.percentage = percentage;
-        this.fromValue = fromValue;
-        this.toValue = toValue;
+
     }
 }
