@@ -7,9 +7,11 @@
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Core.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/OutputTables/Table.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Trade.java</file>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/TradingDay.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/SeasonalProgram.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/IndividualTradesUI.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Dataset.java</file>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/StaticTradesTable.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Trigger.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/UI.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Model.java</file>
@@ -17,7 +19,6 @@
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/ModelUI.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Sector.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Data.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/OutputTables/StaticTradesTable.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Security.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/OutputTables/MonthlyStaticReturnsTable.java</file>
         </group>

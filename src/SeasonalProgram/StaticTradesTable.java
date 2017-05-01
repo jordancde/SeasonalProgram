@@ -70,7 +70,7 @@ public class StaticTradesTable extends Table {
                         sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
                         coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
                         coreSellValue = SeasonalProgram.portfolio.getCoreValue(sellTrade.date);
-                        System.out.println(buyTrade.date+"Bought "+buyTrade.to.name+" at "+sectorBuyValue+", Sold at "+sectorSellValue);
+                        //System.out.println(buyTrade.date+"Bought "+buyTrade.to.name+" at "+sectorBuyValue+", Sold at "+sectorSellValue);
                         row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
                         row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
                         checked.add(buyTrade);

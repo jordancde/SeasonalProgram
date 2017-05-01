@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -321,6 +322,11 @@ public class ModelUI extends JPanel {
                             sectorsInput,
                             triggersInput      
                         );
+                        logInputs(startDateText,
+                            endDateText,
+                            coresInput,
+                            sectorsInput,
+                            triggersInput);
                         //IMPORTANTTT*******
                         SeasonalProgram.runModel();
                         
@@ -419,6 +425,42 @@ public class ModelUI extends JPanel {
             return path;
             
             
+        }
+        
+        public void logInputs(JTextField startDateText,
+            JTextField endDateText,
+            ArrayList<JComponent[]> coresInput,
+            ArrayList<JComponent[]> sectorsInput,
+            ArrayList<JComponent[]> triggersInput){
+            System.out.println("--------------------------------");     
+
+            System.out.println("Start Date: "+startDateText.getText());
+            System.out.println("End Date: "+endDateText.getText());
+            
+            System.out.println("");
+            System.out.println("Core Inputs");
+            
+            for(JComponent[] component:coresInput){
+                JComboBox jcb = (JComboBox)component[0];
+                JTextField jtb1 = (JTextField)component[1];
+                JTextField jtb2 = (JTextField)component[2];
+                JTextField jtb3 = (JTextField)component[3];
+                System.out.println(jcb.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText());
+            }
+            
+            System.out.println("");
+            System.out.println("Sector Inputs");
+            
+            for(JComponent[] component:sectorsInput){
+                JComboBox jcb = (JComboBox)component[0];
+                JTextField jtb1 = (JTextField)component[1];
+                JTextField jtb2 = (JTextField)component[2];
+                JTextField jtb3 = (JTextField)component[3];
+                JTextField jtb4 = (JTextField)component[4];
+                System.out.println(jcb.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText()+", "+jtb4.getText());
+            }
+           
+            System.out.println("--------------------------------");     
         }
         
         public void loadPreset(String path) throws IOException{
