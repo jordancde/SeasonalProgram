@@ -15,10 +15,10 @@ import java.util.Map;
 public class TradingDay {
     public Date d;
     public Map<Security, Double[]> holdings;
-    public double growth;
-    public TradingDay(Date d, Map<Security,Double[]> holdings,double growth){
+    public double portfolioValue;
+    public TradingDay(Date d, Map<Security,Double[]> holdings, double portfolioValue){
         this.d = d;
         this.holdings = holdings;
-        this.growth = growth;
+        portfolioValue = this.portfolioValue;
     }
 }

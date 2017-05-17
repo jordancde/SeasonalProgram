@@ -29,7 +29,7 @@ public class SeasonalProgram {
     public static Model seasonalModel;
     public static Data data;
     public static UI ui;
-    public static Portfolio portfolio;
+    public static NewPortfolio portfolio;
     
     public static void main(String[] args) throws IOException, ParseException {
 
@@ -46,9 +46,9 @@ public class SeasonalProgram {
     
     public static void runModel() throws IOException{
         
-        portfolio = new Portfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
+        portfolio = new NewPortfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
         portfolio.runPortfolio();
-        
+        /*
         Map<String, Double> monthlyReturns = portfolio.getMonthlyReturns("Full", false);
         MonthlyStaticReturnsTable fullPortfolio = new MonthlyStaticReturnsTable("Static Seasonal Gains",monthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
         fullPortfolio.writeTable();
@@ -85,7 +85,7 @@ public class SeasonalProgram {
         ArrayList<Trade> tradeHistory = portfolio.getTrades();
         StaticTradesTable tradeHistoryTable = new StaticTradesTable("Trade History",tradeHistory,seasonalModel.startDate,seasonalModel.endDate);
         tradeHistoryTable.writeTable();
-        
+        */
     }
 
     

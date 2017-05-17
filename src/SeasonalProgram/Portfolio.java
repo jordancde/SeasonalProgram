@@ -46,13 +46,15 @@ public class Portfolio {
         //creates cash at 100% with value of 1 and adds to holdings
         cash = new Core("Cash",getCore(securities).sellDate,getCore(securities).buyDate,100);
         securities.add(0,cash);
-        Double[] cashStats = new Double[3];
+        Double[] cashStats = new Double[4];
         //percent of portfolio
         cashStats[0] = 100.00;
         //value
         cashStats[1] = 1.0;
         //buyValue
         cashStats[2] = 1.0;
+        //initial allocation
+        cashStats[3] = 100.00;
         holdings.put(cash, cashStats);
     }
     
@@ -173,7 +175,7 @@ public class Portfolio {
         
         //subtract from base
  
-        Double[] holdingFromStats = {holdings.get(trade.from)[0]-trade.percentage,getValue(trade.date,trade.from),holdings.get(trade.from)[2]};
+        Double[] holdingFromStats = {holdings.get(trade.from)[0]-trade.percentage,getValue(trade.date,trade.from),holdings.get(trade.from)[2],holdings.get(trade.from)[0]-trade.percentage};
         holdings.put(trade.from,holdingFromStats);
         //remove base in the case of bank shift
         if(holdings.get(trade.from)[0]<=0){
@@ -181,10 +183,10 @@ public class Portfolio {
         }
         
         if(!holdings.containsKey(trade.to)){
-            Double[] holdingToStats = {trade.percentage,getValue(trade.date,trade.to),getValue(trade.date,trade.to)};
+            Double[] holdingToStats = {trade.percentage,getValue(trade.date,trade.to),getValue(trade.date,trade.to),trade.percentage};
             holdings.put(trade.to,holdingToStats);
         }else{
-            Double[] holdingToStats = {holdings.get(trade.to)[0]+trade.percentage,getValue(trade.date,trade.to),getValue(trade.date,trade.to)};
+            Double[] holdingToStats = {holdings.get(trade.to)[0]+trade.percentage,getValue(trade.date,trade.to),getValue(trade.date,trade.to),holdings.get(trade.to)[3]};
             holdings.put(trade.to,holdingToStats);
         }
         try{
@@ -208,10 +210,26 @@ public class Portfolio {
     
     public void updateHoldingValues(Date timeNow){
         for(Security s:holdings.keySet()){
-            Double[] newStats = {holdings.get(s)[0],getValue(timeNow,s),holdings.get(s)[2]};
+            Double[] newStats = {holdings.get(s)[0],getValue(timeNow,s),holdings.get(s)[2],holdings.get(s)[3]};
+            //newStats = updateStatsWeighting(newStats);
+            //s.allocation = newStats[0];
             holdings.put(s, newStats);
         }
     }
+    //Idk what to do about this
+    public Double[] updateStatsWeighting(Double[] stats){
+        Double[] newStats = new Double[4];
+        double growth = (stats[1]-stats[2])/stats[2];
+        growth = 1+growth;
+        
+        newStats[0] = stats[3]*growth;
+        newStats[1] = stats[1];
+        newStats[2] = stats[2];
+        newStats[3] = stats[3];
+                
+        return newStats;
+    }
+    
     public double getCoreValue(Date d){
         for(Security s:securities){
             if(s.name.equals("S&P 500")){
@@ -254,7 +272,7 @@ public class Portfolio {
         for(Security s:map.keySet()){
             double growth = (map.get(s)[1]-map.get(s)[2])/map.get(s)[2];
             growth = round(growth*100);
-            System.out.println(s.name+": "+map.get(s)[0]+"%, Price "+map.get(s)[1]+", "+growth+"% growth");
+            System.out.println(s.name+": Price "+round(map.get(s)[1])+", "+growth+"% growth, "+round(map.get(s)[0])+"% of Portfolio");
         }
     }
     
@@ -420,7 +438,7 @@ public class Portfolio {
         double portfolioValue = 100.00;
         for(TradingDay d:tradingDays){
             if(d.d.after(date)){break;}
-            portfolioValue+=round(d.growth*100);
+            portfolioValue+=d.growth*100;
         }
         return portfolioValue;
     }
