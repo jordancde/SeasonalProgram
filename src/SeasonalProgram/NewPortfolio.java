@@ -63,24 +63,33 @@ public class NewPortfolio {
     
     public void runPortfolio(){
         days.add(new TradingDay(calendar.getTime(),holdings,portfolioValue));
+        setDates(calendar.getTime());
         while(calendar.getTime().before(endDate)){
-            setDates(calendar.getTime());
+            if(isWeekend(calendar)){
+                calendar.add(Calendar.DATE, 1);
+                continue;
+            }
+            
+            updatePortfolio(calendar.getTime());
+            
             for(Security s: securities){
                 if(!holdings.containsKey(s)){
                     if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
                         buy(s,s.allocation);
+                        setDate(calendar,s);
                     }
                 }else{
                     if(calendar.getTime().after(s.sellDate)||calendar.getTime().equals(s.sellDate)){
                         sell(s);
+                        setDate(calendar,s);
                     }
                 }
             }
             
-            updatePortfolio(calendar.getTime());
+            
             days.add(new TradingDay(calendar.getTime(),holdings,portfolioValue));
             calendar.add(Calendar.DATE, 1);
-            if(calendar.get(Calendar.DAY_OF_MONTH)==1){
+            if(calendar.get(Calendar.DATE) == calendar.getActualMaximum(Calendar.DATE)){
                 printUpdate(calendar.getTime());
             }
         }   
@@ -90,7 +99,7 @@ public class NewPortfolio {
         for(Security s:holdings.keySet()){
             double growth = (holdings.get(s)[1]-holdings.get(s)[2])/holdings.get(s)[2];
             growth = round(growth*100);
-            System.out.println(s.name+": Price "+round(holdings.get(s)[1])+", "+growth+"% growth, "+round(holdings.get(s)[0])+" value, "+round(100*holdings.get(s)[0]/portfolioValue)+"% of Portfolio");
+            System.out.println(s.name+" (Bought "+round(holdings.get(s)[2])+"): Price "+round(holdings.get(s)[1])+", "+growth+"% growth, "+round(holdings.get(s)[0])+" value, "+round(100*holdings.get(s)[0]/portfolioValue)+"% of Portfolio");
         }
     }
     
@@ -146,9 +155,8 @@ public class NewPortfolio {
         Double[] newSecurityStats = {realAllocation, getValue(calendar.getTime(),s),getValue(calendar.getTime(),s)};
         holdings.put(s, newSecurityStats);
         
-        System.out.println("Sell "+core.name+" "+round(holdings.get(s)[0])+", new value "+round(holdings.get(core)[0]));
-        System.out.println("Buy "+s.name+" "+round(holdings.get(s)[0])+", price "+round(holdings.get(s)[1])+", new value "+round(holdings.get(s)[0]));
-
+        System.out.println("Sell "+core.name+" "+round(holdings.get(s)[0])+" ("+allocationPercent+"%), new value "+round(holdings.get(core)[0]));
+        System.out.println("Buy "+s.name+" "+round(holdings.get(s)[0])+" ("+allocationPercent+"%), price "+round(holdings.get(s)[1])+", new value "+round(holdings.get(s)[0]));
         
         System.out.println("End Portfolio");
         printHoldings();
@@ -169,9 +177,7 @@ public class NewPortfolio {
         
         System.out.println("Sell "+s.name+" "+round(holdings.get(s)[0])+", new value "+round(holdings.get(s)[0]));
         System.out.println("Buy "+core.name+" "+round(holdings.get(s)[0])+", price "+round(getValue(calendar.getTime(),core))+", new value "+round(holdings.get(core)[0]));
-        
         holdings.remove(s);
-        
         System.out.println("End Portfolio");
         printHoldings();
         System.out.println("Portfolio Value "+round(portfolioValue));
@@ -182,7 +188,7 @@ public class NewPortfolio {
     public void swapCores(Security source){
         printPreTransaction();
         double allocation = holdings.get(source)[0];
-        System.out.println("Sell "+source.name+" "+round(allocation));
+        System.out.println("Sell "+source.name+" "+round(allocation)+" ("+round(100*allocation/portfolioValue)+"%)");
 
         holdings.remove(source);
         for(Security s:securities){
@@ -190,12 +196,13 @@ public class NewPortfolio {
                 double currentValue = getValue(calendar.getTime(),s);
                 Double[] newCoreStats = {allocation,currentValue,currentValue};
                 holdings.put(s,newCoreStats);
-                System.out.println("Buy "+s.name+" "+allocation+", price "+round(getValue(calendar.getTime(),s))+", new value "+round(holdings.get(s)[0]));
+                System.out.println("Buy "+s.name+" "+round(allocation)+", price "+round(getValue(calendar.getTime(),s))+", new value "+round(holdings.get(s)[0]));
 
                 
                 break;
             }
         }
+        setDate(calendar,source);
         System.out.println("End Portfolio");
         printHoldings();
         System.out.println("Portfolio Value "+round(portfolioValue));
@@ -222,6 +229,20 @@ public class NewPortfolio {
             //System.out.println(s.name+" | "+s.buyDate+" | "+s.sellDate);
         }
         //System.out.println("");
+    }
+    
+    public void setDate(Calendar c, Security s){
+        if(compareDates(c.getTime(),s.buyDate)){
+                s.buyDate.setYear(c.getTime().getYear()+1);
+                
+            }else{
+                s.buyDate.setYear(c.getTime().getYear());
+            }
+            if(compareDates(c.getTime(),s.sellDate)){
+                s.sellDate.setYear(c.getTime().getYear()+1);
+            }else{
+                s.sellDate.setYear(c.getTime().getYear());
+            }
     }
     
     public boolean compareDates(Date date1,Date date2){
@@ -274,9 +295,19 @@ public class NewPortfolio {
         }
         return 0;
     }
+    public boolean isWeekend(Calendar c){
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == Calendar.SUNDAY) { // If it's Friday so skip to Monday
+            return true;
+        } else if (dayOfWeek == Calendar.SATURDAY) { // If it's Saturday skip to Monday
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     public double round(double d){
-        double factor = 1e5; // = 1 * 10^5 = 100000.
+        double factor = 1e4; // = 1 * 10^5 = 100000.
         return Math.round(d * factor) / factor;
     }
     
