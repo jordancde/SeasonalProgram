@@ -63,21 +63,26 @@ public class StaticTradesTable extends Table {
                 double coreBuyValue = 0;
                 double coreSellValue= 0;
                 for(Trade sellTrade:data){
+                    System.out.println(checked.size());
                     if(sellTrade.from.equals(buyTrade.to)&&!checked.contains(sellTrade)){
                         //Temp fix
                         row[2] = sellTrade.date.toString();
+                                                
                         sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                         sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
                         coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
                         coreSellValue = SeasonalProgram.portfolio.getCoreValue(sellTrade.date);
                         //System.out.println(buyTrade.date+"Bought "+buyTrade.to.name+" at "+sectorBuyValue+", Sold at "+sectorSellValue);
+                        
                         row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
                         row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
                         checked.add(buyTrade);
                         checked.add(sellTrade);
+                        
                         break;
                     }
                 }
+                
                 if(row[3]==null){
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(endDate,buyTrade.to);//???
@@ -92,6 +97,7 @@ public class StaticTradesTable extends Table {
                 table.add(row);
             }   
         }
+        
         
         String[] avgRow = new String[tableColumns];
         avgRow[0] = "Average";

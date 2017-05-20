@@ -24,4 +24,12 @@ public class Trade {
         this.percentage = percentage;
 
     }
+    public Trade(Date date, Security from,Security to){
+        this.date = date;
+        this.from = from;
+        this.to = to;
+    }
+    public Trade(Date date){
+        this.date = date;
+    }
 }

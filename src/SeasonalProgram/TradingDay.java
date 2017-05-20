@@ -19,6 +19,6 @@ public class TradingDay {
     public TradingDay(Date d, Map<Security,Double[]> holdings, double portfolioValue){
         this.d = d;
         this.holdings = holdings;
-        portfolioValue = this.portfolioValue;
+        this.portfolioValue = portfolioValue;
     }
 }

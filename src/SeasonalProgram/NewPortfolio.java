@@ -30,8 +30,10 @@ public class NewPortfolio {
     public double portfolioValue;
     
     public ArrayList<TradingDay> days = new ArrayList<TradingDay>();
-    
+    public ArrayList<Trade> trades = new ArrayList<Trade>();
     public Map<Security, Double[]> holdings = new HashMap<Security, Double[]>();
+    
+    public boolean weekend = false;
     
     public NewPortfolio(ArrayList<Security> securities, Date startDate, Date endDate){
         this.securities = securities;
@@ -67,6 +69,7 @@ public class NewPortfolio {
         while(calendar.getTime().before(endDate)){
             if(isWeekend(calendar)){
                 calendar.add(Calendar.DATE, 1);
+                weekend = true;
                 continue;
             }
             
@@ -82,12 +85,13 @@ public class NewPortfolio {
                     if(calendar.getTime().after(s.sellDate)||calendar.getTime().equals(s.sellDate)){
                         sell(s);
                         setDate(calendar,s);
+                        trades.add(new Trade(calendar.getTime()));
                     }
                 }
             }
             
             
-            days.add(new TradingDay(calendar.getTime(),holdings,portfolioValue));
+            days.add(new TradingDay(calendar.getTime(),new HashMap<Security, Double[]>(holdings),portfolioValue));
             calendar.add(Calendar.DATE, 1);
             if(calendar.get(Calendar.DATE) == calendar.getActualMaximum(Calendar.DATE)){
                 printUpdate(calendar.getTime());
@@ -145,6 +149,7 @@ public class NewPortfolio {
         if(s instanceof Core){
             return;
         } 
+
         printPreTransaction();
         double realAllocation = portfolioValue*allocationPercent/100;
         Security core = getHoldingsCore();
@@ -154,6 +159,8 @@ public class NewPortfolio {
         
         Double[] newSecurityStats = {realAllocation, getValue(calendar.getTime(),s),getValue(calendar.getTime(),s)};
         holdings.put(s, newSecurityStats);
+        
+        trades.add(new Trade(calendar.getTime(),core,s));
         
         System.out.println("Sell "+core.name+" "+round(holdings.get(s)[0])+" ("+allocationPercent+"%), new value "+round(holdings.get(core)[0]));
         System.out.println("Buy "+s.name+" "+round(holdings.get(s)[0])+" ("+allocationPercent+"%), price "+round(holdings.get(s)[1])+", new value "+round(holdings.get(s)[0]));
@@ -174,6 +181,8 @@ public class NewPortfolio {
         Double[] currentCoreStats = holdings.get(core);
         currentCoreStats[0] += holdings.get(s)[0];
         holdings.put(core,currentCoreStats);
+        
+        trades.add(new Trade(calendar.getTime(),s,core));
         
         System.out.println("Sell "+s.name+" "+round(holdings.get(s)[0])+", new value "+round(holdings.get(s)[0]));
         System.out.println("Buy "+core.name+" "+round(holdings.get(s)[0])+", price "+round(getValue(calendar.getTime(),core))+", new value "+round(holdings.get(core)[0]));
@@ -196,12 +205,15 @@ public class NewPortfolio {
                 double currentValue = getValue(calendar.getTime(),s);
                 Double[] newCoreStats = {allocation,currentValue,currentValue};
                 holdings.put(s,newCoreStats);
-                System.out.println("Buy "+s.name+" "+round(allocation)+", price "+round(getValue(calendar.getTime(),s))+", new value "+round(holdings.get(s)[0]));
-
                 
+                trades.add(new Trade(calendar.getTime(),source,s));
+                
+                System.out.println("Buy "+s.name+" "+round(allocation)+", price "+round(getValue(calendar.getTime(),s))+", new value "+round(holdings.get(s)[0]));
                 break;
             }
         }
+        
+        
         setDate(calendar,source);
         System.out.println("End Portfolio");
         printHoldings();
@@ -290,11 +302,17 @@ public class NewPortfolio {
         for(int i = 0;i<dates.length;i++){
             if(dates[i].after(d)||dates[i].equals(d)){
                 //-1 for previous day close
-                return SeasonalProgram.data.getDataset(s.name).closes[i-1];
+                if(weekend){
+                    weekend = false;
+                    return SeasonalProgram.data.getDataset(s.name).closes[i-1];
+                }else{
+                    return SeasonalProgram.data.getDataset(s.name).closes[i];
+                }
             }
         }
         return 0;
     }
+    
     public boolean isWeekend(Calendar c){
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
         if (dayOfWeek == Calendar.SUNDAY) { // If it's Friday so skip to Monday
@@ -310,5 +328,131 @@ public class NewPortfolio {
         double factor = 1e4; // = 1 * 10^5 = 100000.
         return Math.round(d * factor) / factor;
     }
+    
+    //START OUTPUT STUFF
+    public Map<Date, Double> getReturns(String settings){
+        Map<Date,Double> data = new HashMap<Date,Double>();
+        for(TradingDay day:days){
+            Date date = day.d;
+            TradingDay previousDay;
+            try{
+                previousDay = days.get(days.indexOf(day)-1);
+            }catch(Exception e){
+                previousDay = day;
+            }
+            
+            double portfolioGrowth = (day.portfolioValue-previousDay.portfolioValue)/previousDay.portfolioValue;
+            
+            Security previousCore = new Security();
+            Security core = new Security();
+            Security cash = new Security();
+            
+            for(Security s:previousDay.holdings.keySet()){
+                if(s instanceof Core){
+                    previousCore = s;
+                    break;
+                }
+            }
+            for(Security s:day.holdings.keySet()){
+                if(s instanceof Core){
+                    core = s;
+                    break;
+                }
+            }
+            double coreGrowth = (day.holdings.get(core)[0]-previousDay.holdings.get(previousCore)[0])/previousDay.holdings.get(previousCore)[0];
+            for(Security s:day.holdings.keySet()){
+                if(s instanceof Core&&s.name.equals("Cash")){
+                    cash = s;
+                    break;
+                }
+            }
+            
+            if(settings.equals("Full")){
+                data.put(date,portfolioGrowth);
+                
+            }else if(settings.equals("Benchmark")){
+                data.put(date,coreGrowth);
+            
+            }else if(settings.equals("Relative Benchmark")){
+                data.put(date,portfolioGrowth-coreGrowth);
+                
+            }else if(settings.equals("Cash")){
+                try{
+                    data.put(date,day.holdings.get(cash)[0]);
+                }catch(Exception e){
+                    data.put(date,0.0);
+                }
+            }
+            
+        }    
+            
+        return data;
+    }
+    
+    public Map<String, Double> getMonthlyReturns(String preference, boolean useFrequency){
+        Map<Date, Double> returns = getReturns(preference);
+        Calendar c = Calendar.getInstance();
+        Map<String, Double> monthlyReturns = new HashMap<String, Double>();
+        Map<String,Integer> monthlyTradingDayCount = new HashMap<String,Integer>();
+        for(Date d:returns.keySet()){
+            c.setTime(d);
+            String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
+
+            //System.out.println(monthString);
+            if(monthlyReturns.containsKey(monthString)){
+                monthlyReturns.put(monthString, monthlyReturns.get(monthString)+returns.get(d));
+                monthlyTradingDayCount.put(monthString,monthlyTradingDayCount.get(monthString)+1);
+            }else {
+                monthlyReturns.put(monthString, returns.get(d));
+                monthlyTradingDayCount.put(monthString,1);
+            }
+        }
+        if(preference.equals("Cash")){
+            for(String s: monthlyReturns.keySet()){
+                monthlyReturns.put(s,(monthlyReturns.get(s)/monthlyTradingDayCount.get(s))/100);
+            }
+        }
+        if(useFrequency){
+            for(String s: monthlyReturns.keySet()){
+                if(monthlyReturns.get(s)>0){
+                   monthlyReturns.put(s,1.0);
+                }else{
+                   monthlyReturns.put(s,0.0);
+                }
+            }
+        }
+        
+        return monthlyReturns;
+    }
+    
+    public Map<String, Double> getMonthlyTrades(){
+        Calendar c = Calendar.getInstance();
+        Map<String, Double> monthlyTrades = new HashMap<String, Double>();
+        for(Trade t:trades){
+            c.setTime(t.date);
+            String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
+            if(monthlyTrades.containsKey(monthString)){
+                monthlyTrades.put(monthString,monthlyTrades.get(monthString)+1);
+            }else {
+                monthlyTrades.put(monthString, 1.0);
+            }
+        }
+        return monthlyTrades;
+    }
+    
+    public ArrayList<Trade> getTrades(){
+        return trades;
+    }
+    
+    public double getCoreValue(Date d){
+        for(Security s:securities){
+            if(s.name.equals("S&P 500")){
+                return getValue(d,s);
+            }
+        }
+        return 0;
+    }
+    
+    
     
 }
