@@ -157,7 +157,8 @@ public class NewPortfolio {
         currentCoreStats[0] -= realAllocation;
         holdings.put(core,currentCoreStats);
         
-        Double[] newSecurityStats = {realAllocation, getValue(calendar.getTime(),s),getValue(calendar.getTime(),s)};
+        double newSecurityValue = getValue(calendar.getTime(),s);
+        Double[] newSecurityStats = {realAllocation, newSecurityValue,newSecurityValue};
         holdings.put(s, newSecurityStats);
         
         trades.add(new Trade(calendar.getTime(),core,s));
@@ -185,7 +186,8 @@ public class NewPortfolio {
         trades.add(new Trade(calendar.getTime(),s,core));
         
         System.out.println("Sell "+s.name+" "+round(holdings.get(s)[0])+", new value "+round(holdings.get(s)[0]));
-        System.out.println("Buy "+core.name+" "+round(holdings.get(s)[0])+", price "+round(getValue(calendar.getTime(),core))+", new value "+round(holdings.get(core)[0]));
+        double buyValue = getValue(calendar.getTime(),core);
+        System.out.println("Buy "+core.name+" "+round(holdings.get(s)[0])+", price "+round(buyValue)+", new value "+round(holdings.get(core)[0]));
         holdings.remove(s);
         System.out.println("End Portfolio");
         printHoldings();
@@ -208,7 +210,7 @@ public class NewPortfolio {
                 
                 trades.add(new Trade(calendar.getTime(),source,s));
                 
-                System.out.println("Buy "+s.name+" "+round(allocation)+", price "+round(getValue(calendar.getTime(),s))+", new value "+round(holdings.get(s)[0]));
+                System.out.println("Buy "+s.name+" "+round(allocation)+", price "+round(currentValue)+", new value "+round(holdings.get(s)[0]));
                 break;
             }
         }
@@ -302,7 +304,9 @@ public class NewPortfolio {
         for(int i = 0;i<dates.length;i++){
             if(dates[i].after(d)||dates[i].equals(d)){
                 //-1 for previous day close
-                if(weekend){
+                Calendar c = Calendar.getInstance();
+                c.setTime(d);
+                if(weekend||isWeekend(c)){
                     weekend = false;
                     return SeasonalProgram.data.getDataset(s.name).closes[i-1];
                 }else{
