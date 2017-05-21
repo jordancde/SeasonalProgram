@@ -69,6 +69,12 @@ public class Portfolio {
         while(calendar.getTime().before(endDate)){
             if(isWeekend(calendar)){
                 calendar.add(Calendar.DATE, 1);
+                updatePortfolio(calendar.getTime());
+                
+                //if end of month falls on weekend
+                if(calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){ 
+                    printUpdate(calendar.getTime());
+                }
                 weekend = true;
                 continue;
             }
@@ -93,7 +99,8 @@ public class Portfolio {
             
             days.add(new TradingDay(calendar.getTime(),new HashMap<Security, Double[]>(holdings),portfolioValue));
             calendar.add(Calendar.DATE, 1);
-            if(calendar.get(Calendar.DATE) == calendar.getActualMaximum(Calendar.DATE)){
+            
+            if(calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){ 
                 printUpdate(calendar.getTime());
             }
         }   
@@ -103,8 +110,17 @@ public class Portfolio {
         for(Security s:holdings.keySet()){
             double growth = (holdings.get(s)[1]-holdings.get(s)[2])/holdings.get(s)[2];
             growth = round(growth*100);
-            System.out.println(s.name+" (Bought "+round(holdings.get(s)[2])+"): Price "+round(holdings.get(s)[1])+", "+growth+"% growth, "+round(holdings.get(s)[0])+" value, "+round(100*holdings.get(s)[0]/portfolioValue)+"% of Portfolio");
+            System.out.println(s.name+" (Bought "+getBoughtDate(s)+" "+round(holdings.get(s)[2])+"): Price "+round(holdings.get(s)[1])+", "+growth+"% growth, "+round(holdings.get(s)[0])+" value, "+round(100*holdings.get(s)[0]/portfolioValue)+"% of Portfolio");
         }
+    }
+    
+    public String getBoughtDate(Security s){
+        for(int i = 0;i<trades.size();i++){
+            if(trades.get(trades.size()-1-i).to==s){
+                return sm.format(trades.get(trades.size()-1-i).date);
+            }
+        }
+        return null;
     }
     
     public void printUpdate(Date d){

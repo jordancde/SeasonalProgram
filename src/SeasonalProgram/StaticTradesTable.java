@@ -65,7 +65,6 @@ public class StaticTradesTable extends Table {
                 Trade sellTrade = buyTrade.sell;
         
                 if(sellTrade==null){
-                    System.out.println("Null");
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(endDate,buyTrade.to);//???
                     coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
@@ -74,7 +73,6 @@ public class StaticTradesTable extends Table {
                     row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
                     row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
                 }else{
-                    System.out.println("Not Null");
 
                     row[2] = sellTrade.date.toString();
                                                 
