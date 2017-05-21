@@ -127,14 +127,14 @@ public class Portfolio {
     
     public void printUpdate(Date d){
         System.out.println("");
-        System.out.println(sm.format(d));
+        System.out.println(sm.format(convertToTrading(d)));
         printHoldings();
         System.out.println("Portfolio Value "+round(portfolioValue));
     }
     
     public void printPreTransaction(){
         System.out.println("");
-        System.out.println(sm.format(calendar.getTime()));
+        System.out.println(sm.format(convertToTrading(calendar.getTime())));
         System.out.println("Initial Portfolio");
         printHoldings();
         System.out.println("Transactions");
@@ -479,6 +479,23 @@ public class Portfolio {
             }
         }
         return 0;
+    }
+    
+    public Date convertToTrading(Calendar c){
+        Calendar newCal = Calendar.getInstance();
+        newCal.setTime(c.getTime());
+        while(isWeekend(newCal)){
+            newCal.add(Calendar.DATE, 1);
+        }
+        return newCal.getTime();
+    }
+    public Date convertToTrading(Date d){
+        Calendar newCal = Calendar.getInstance();
+        newCal.setTime(d);
+        while(isWeekend(newCal)){
+            newCal.add(Calendar.DATE, 1);
+        }
+        return newCal.getTime();
     }
     
     
