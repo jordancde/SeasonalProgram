@@ -16,6 +16,7 @@ public class Trade {
     public Security from;
     public Security to;
     public double percentage;
+    public Trade sell;
 
     public Trade(Date date, Security from,Security to, double percentage){
         this.date = date;
@@ -31,5 +32,8 @@ public class Trade {
     }
     public Trade(Date date){
         this.date = date;
+    }
+    public void setSellTrade(Trade t){
+        sell = t;
     }
 }

@@ -6,8 +6,6 @@
 package SeasonalProgram;
 
 import java.text.DateFormat;
-import java.text.Format;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,19 +19,21 @@ import java.util.Map;
  */
 public class Portfolio {
     
-    public Map<Security, Double[]> holdings = new HashMap<Security, Double[]>();
-    public ArrayList<Security> securities;
-    public Map<Date, Map<Security, Double[]>> historicalPortfolio = new HashMap<Date, Map<Security, Double[]>>();
-    public ArrayList<Trade> trades = new ArrayList<Trade>();
-    ArrayList<TradingDay> tradingDays;
+    SimpleDateFormat sm = new SimpleDateFormat("yyyy/MM/dd");
     
+    //for constructor
     public Date startDate;
     public Date endDate;
-    
     public Calendar calendar;
-    
     public Security cash;
-        
+    public ArrayList<Security> securities;
+    public double portfolioValue;
+    
+    public ArrayList<TradingDay> days = new ArrayList<TradingDay>();
+    public ArrayList<Trade> trades = new ArrayList<Trade>();
+    public Map<Security, Double[]> holdings = new HashMap<Security, Double[]>();
+    
+    public boolean weekend = false;
     
     public Portfolio(ArrayList<Security> securities, Date startDate, Date endDate){
         this.securities = securities;
@@ -41,72 +41,191 @@ public class Portfolio {
         this.endDate = endDate;
         calendar = Calendar.getInstance();
         calendar.setTime(startDate);
+        portfolioValue = 100;
         
         
         //creates cash at 100% with value of 1 and adds to holdings
+        //Uses buy and sell dates of Core position, swapped for Cash
         cash = new Core("Cash",getCore(securities).sellDate,getCore(securities).buyDate,100);
         securities.add(0,cash);
-        Double[] cashStats = new Double[4];
+        
+        Double[] cashStats = new Double[3];
         //percent of portfolio
         cashStats[0] = 100.00;
         //value
         cashStats[1] = 1.0;
         //buyValue
         cashStats[2] = 1.0;
-        //initial allocation
-        cashStats[3] = 100.00;
         holdings.put(cash, cashStats);
+        
+        runPortfolio();
+        
+        
     }
     
     public void runPortfolio(){
+        days.add(new TradingDay(calendar.getTime(),holdings,portfolioValue));
+        setDates(calendar.getTime());
         while(calendar.getTime().before(endDate)){
-            setDates(calendar.getTime());
-            Security base = new Security();
-            //Determine the bank
-            for(Security s:holdings.keySet()){
-                if(s instanceof Core){
-                    base = s;
-                    break;
+            if(isWeekend(calendar)){
+                calendar.add(Calendar.DATE, 1);
+                weekend = true;
+                continue;
+            }
+            
+            updatePortfolio(calendar.getTime());
+            
+            for(Security s: securities){
+                if(!holdings.containsKey(s)){
+                    if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
+                        buy(s,s.allocation);
+                        setDate(calendar,s);
+                    }
+                }else{
+                    if(calendar.getTime().after(s.sellDate)||calendar.getTime().equals(s.sellDate)){
+                        sell(s);
+                        setDate(calendar,s);
+                        trades.add(new Trade(calendar.getTime()));
+                    }
                 }
             }
             
-            for(Security s:securities){
-                //Security not held
-                if(s instanceof Sector){
-                    if(!holdings.containsKey(s)){
-                       
-                       if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
-                           updatePortfolio(new Trade(calendar.getTime(),base,s,s.allocation));
-                       }
-                    //Security held
-                    }else{
-                       if(calendar.getTime().after(s.sellDate)||calendar.getTime().equals(s.sellDate)){
-                           updatePortfolio(new Trade(calendar.getTime(),s,base,s.allocation));
-                       }
-                    }
-                    
-                }else if(s instanceof Core){
-                    ///only buy, don't sell, they have swapped buy/sell dates so only buys take care of both
-                    if(!holdings.containsKey(s)){
-                        if(calendar.getTime().after(s.buyDate)||calendar.getTime().equals(s.buyDate)){
-                            updatePortfolio(new Trade(calendar.getTime(),base,s,holdings.get(base)[0]));
-                            //update the base
-                            base = s;
-                        }
-                        
-                    }
-                }
-                
-            }
-            updateHoldingValues(calendar.getTime());
-            savePortfolio(calendar.getTime());
+            
+            days.add(new TradingDay(calendar.getTime(),new HashMap<Security, Double[]>(holdings),portfolioValue));
             calendar.add(Calendar.DATE, 1);
-            if(calendar.get(Calendar.DAY_OF_MONTH)==1){
-                printUpdate(calendar.getTime(),holdings);
+            if(calendar.get(Calendar.DATE) == calendar.getActualMaximum(Calendar.DATE)){
+                printUpdate(calendar.getTime());
+            }
+        }   
+    }
+    
+    public void printHoldings(){
+        for(Security s:holdings.keySet()){
+            double growth = (holdings.get(s)[1]-holdings.get(s)[2])/holdings.get(s)[2];
+            growth = round(growth*100);
+            System.out.println(s.name+" (Bought "+round(holdings.get(s)[2])+"): Price "+round(holdings.get(s)[1])+", "+growth+"% growth, "+round(holdings.get(s)[0])+" value, "+round(100*holdings.get(s)[0]/portfolioValue)+"% of Portfolio");
+        }
+    }
+    
+    public void printUpdate(Date d){
+        System.out.println("");
+        System.out.println(sm.format(d));
+        printHoldings();
+        System.out.println("Portfolio Value "+round(portfolioValue));
+    }
+    
+    public void printPreTransaction(){
+        System.out.println("");
+        System.out.println(sm.format(calendar.getTime()));
+        System.out.println("Initial Portfolio");
+        printHoldings();
+        System.out.println("Transactions");
+    }
+    
+
+    //UPDATE ALLOCATION % BASED ON TOTAL VALUE
+    public void updatePortfolio(Date timeNow){
+        TradingDay yesterday = days.get(days.size()-1);
+        
+        for(Security s:holdings.keySet()){
+            double dailyGrowth = (getValue(timeNow,s)-getValue(yesterday.d,s))/getValue(yesterday.d,s);
+            Double[] newStats = {holdings.get(s)[0]*(1+dailyGrowth),getValue(timeNow,s),holdings.get(s)[2]};
+            holdings.put(s, newStats);
+        }
+        double sum = 0;
+        for(Security s:holdings.keySet()){
+            sum+=holdings.get(s)[0];
+        }
+        
+        portfolioValue = sum;
+    }
+    
+    
+    
+    
+    public void buy(Security s, double allocationPercent){
+        
+        //prevents double call of core swap
+        if(s instanceof Core){
+            return;
+        } 
+
+        printPreTransaction();
+        double realAllocation = portfolioValue*allocationPercent/100;
+        Security core = getHoldingsCore();
+        Double[] currentCoreStats = holdings.get(core);
+        currentCoreStats[0] -= realAllocation;
+        holdings.put(core,currentCoreStats);
+        
+        double newSecurityValue = getValue(calendar.getTime(),s);
+        Double[] newSecurityStats = {realAllocation, newSecurityValue,newSecurityValue};
+        holdings.put(s, newSecurityStats);
+        trades.add(new Trade(calendar.getTime(),core,s));
+        
+        System.out.println("Sell "+core.name+" "+round(holdings.get(s)[0])+" ("+allocationPercent+"%), new value "+round(holdings.get(core)[0]));
+        System.out.println("Buy "+s.name+" "+round(holdings.get(s)[0])+" ("+allocationPercent+"%), price "+round(holdings.get(s)[1])+", new value "+round(holdings.get(s)[0]));
+        
+        System.out.println("End Portfolio");
+        printHoldings();
+        System.out.println("Portfolio Value "+round(portfolioValue));
+    }
+    
+    
+    public void sell(Security s){
+        if(s instanceof Core){
+            swapCores(s);
+            return;
+        }
+        printPreTransaction();
+        Security core = getHoldingsCore();
+        Double[] currentCoreStats = holdings.get(core);
+        currentCoreStats[0] += holdings.get(s)[0];
+        holdings.put(core,currentCoreStats);
+        trades.add(new Trade(calendar.getTime(),s,core));
+        
+        for(int i = 0;i<trades.size();i++){
+            if(trades.get(trades.size()-1).from==trades.get(trades.size()-1-i).to){
+                trades.get(trades.size()-1-i).setSellTrade(trades.get(trades.size()-1));
+                break;
             }
         }
         
+        System.out.println("Sell "+s.name+" "+round(holdings.get(s)[0])+", new value "+round(0));
+        double buyValue = getValue(calendar.getTime(),core);
+        System.out.println("Buy "+core.name+" "+round(holdings.get(s)[0])+", price "+round(buyValue)+", new value "+round(holdings.get(core)[0]));
+        holdings.remove(s);
+        System.out.println("End Portfolio");
+        printHoldings();
+        System.out.println("Portfolio Value "+round(portfolioValue));
     }
+    
+  
+    
+    public void swapCores(Security source){
+        printPreTransaction();
+        double allocation = holdings.get(source)[0];
+        System.out.println("Sell "+source.name+" "+round(allocation)+" ("+round(100*allocation/portfolioValue)+"%)");
+
+        holdings.remove(source);
+        for(Security s:securities){
+            if(s instanceof Core && !(s.equals(source))){
+                double currentValue = getValue(calendar.getTime(),s);
+                Double[] newCoreStats = {allocation,currentValue,currentValue};
+                holdings.put(s,newCoreStats);
+                trades.add(new Trade(calendar.getTime(),source,s));
+                
+                System.out.println("Buy "+s.name+" "+round(allocation)+", price "+round(currentValue)+", new value "+round(holdings.get(s)[0]));
+                break;
+            }
+        }
+        
+        
+        setDate(calendar,source);
+        System.out.println("End Portfolio");
+        printHoldings();
+        System.out.println("Portfolio Value "+round(portfolioValue));
+    }
+    
     
     public void setDates(Date dateNow){
         Calendar c = Calendar.getInstance();
@@ -130,7 +249,20 @@ public class Portfolio {
         //System.out.println("");
     }
     
-    //returns true if date 1 >= date 2
+    public void setDate(Calendar c, Security s){
+        if(compareDates(c.getTime(),s.buyDate)){
+                s.buyDate.setYear(c.getTime().getYear()+1);
+                
+            }else{
+                s.buyDate.setYear(c.getTime().getYear());
+            }
+            if(compareDates(c.getTime(),s.sellDate)){
+                s.sellDate.setYear(c.getTime().getYear()+1);
+            }else{
+                s.sellDate.setYear(c.getTime().getYear());
+            }
+    }
+    
     public boolean compareDates(Date date1,Date date2){
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(date1);
@@ -148,13 +280,6 @@ public class Portfolio {
         
     }
     
-    public void savePortfolio(Date date){
-        //System.out.println(date);
-        //printHoldings(holdings);
-        historicalPortfolio.put(date, new HashMap<Security,Double[]>(holdings));
-        
-    }
-    
     public Security getCore(ArrayList<Security> securities){
         for(Security s:securities){
             if(s instanceof Core){
@@ -166,78 +291,15 @@ public class Portfolio {
         return null;
     }
     
-    public void updatePortfolio(Trade trade){
-        System.out.println("");
-        System.out.println(DateFormat.getDateInstance().format(trade.date));
-        System.out.println("Initial Portfolio");
-        printHoldings(holdings);
-        System.out.println("Transactions");
-        
-        //subtract from base
- 
-        Double[] holdingFromStats = {holdings.get(trade.from)[0]-trade.percentage,getValue(trade.date,trade.from),holdings.get(trade.from)[2],holdings.get(trade.from)[0]-trade.percentage};
-        holdings.put(trade.from,holdingFromStats);
-        //remove base in the case of bank shift
-        if(holdings.get(trade.from)[0]<=0){
-            holdings.remove(trade.from);
-        }
-        
-        if(!holdings.containsKey(trade.to)){
-            Double[] holdingToStats = {trade.percentage,getValue(trade.date,trade.to),getValue(trade.date,trade.to),trade.percentage};
-            holdings.put(trade.to,holdingToStats);
-        }else{
-            Double[] holdingToStats = {holdings.get(trade.to)[0]+trade.percentage,getValue(trade.date,trade.to),getValue(trade.date,trade.to),holdings.get(trade.to)[3]};
-            holdings.put(trade.to,holdingToStats);
-        }
-        try{
-            System.out.println("Sell "+trade.from.name+" "+trade.percentage+"%, new value "+holdings.get(trade.from)[0]+"%");
-        }catch(Exception e){
-            System.out.println("Sell "+trade.from.name+" "+trade.percentage+"%, new value 0.00%");
-        }
-        System.out.println("Buy "+trade.to.name+" price "+getValue(trade.date,trade.to)+" new value "+holdings.get(trade.to)[0]+"%");
-        
-        System.out.println("End Portfolio");
-        printHoldings(holdings);
-        
-        System.out.println("Portfolio Value "+round(getPortfolioValue(trade.date)));
-        
-        if(allocationOver()){
-            System.out.println("Allocation over 100%, Error");
-        }
-        
-        trades.add(trade);
-    }
-    
-    public void updateHoldingValues(Date timeNow){
+    public Security getHoldingsCore(){
         for(Security s:holdings.keySet()){
-            Double[] newStats = {holdings.get(s)[0],getValue(timeNow,s),holdings.get(s)[2],holdings.get(s)[3]};
-            //newStats = updateStatsWeighting(newStats);
-            //s.allocation = newStats[0];
-            holdings.put(s, newStats);
-        }
-    }
-    //Idk what to do about this
-    public Double[] updateStatsWeighting(Double[] stats){
-        Double[] newStats = new Double[4];
-        double growth = (stats[1]-stats[2])/stats[2];
-        growth = 1+growth;
-        
-        newStats[0] = stats[3]*growth;
-        newStats[1] = stats[1];
-        newStats[2] = stats[2];
-        newStats[3] = stats[3];
-                
-        return newStats;
-    }
-    
-    public double getCoreValue(Date d){
-        for(Security s:securities){
-            if(s.name.equals("S&P 500")){
-                return getValue(d,s);
+            if(s instanceof Core){
+                return s;  
             }
         }
-        return 0;
+        return null;
     }
+    
     public double getValue(Date d,Security s){
         if(s.name.equals("Cash")){
             return 1;
@@ -246,131 +308,92 @@ public class Portfolio {
         for(int i = 0;i<dates.length;i++){
             if(dates[i].after(d)||dates[i].equals(d)){
                 //-1 for previous day close
-                return SeasonalProgram.data.getDataset(s.name).closes[i-1];
+                Calendar c = Calendar.getInstance();
+                c.setTime(d);
+                if(weekend||isWeekend(c)){
+                    weekend = false;
+                    return SeasonalProgram.data.getDataset(s.name).closes[i-1];
+                }else{
+                    return SeasonalProgram.data.getDataset(s.name).closes[i];
+                }
             }
         }
         return 0;
     }
     
-    public double getLastValue(Security s){
-        if(s.name.equals("Cash")){
-            return 1;
-        }
-        int length = SeasonalProgram.data.getDataset(s.name).closes.length;
-        return SeasonalProgram.data.getDataset(s.name).closes[length-1];
-    }
-    
-    
-    public void printUpdate(Date d,Map<Security, Double[]> map){
-        System.out.println("");
-        System.out.println(DateFormat.getDateInstance().format(d));
-        printHoldings(map);
-        System.out.println("Portfolio Value "+round(getPortfolioValue(d)));
-    }
-    
-    public void printHoldings(Map<Security, Double[]> map){
-        for(Security s:map.keySet()){
-            double growth = (map.get(s)[1]-map.get(s)[2])/map.get(s)[2];
-            growth = round(growth*100);
-            System.out.println(s.name+": Price "+round(map.get(s)[1])+", "+growth+"% growth, "+round(map.get(s)[0])+"% of Portfolio");
-        }
-    }
-    
-    //START HERE
-    public double getWeightedHoldingValue(Map<Security, Double[]> currentHoldings,Security s){
-        //??
-        return 0;
-    }
-       
-    public boolean allocationOver(){
-        double sum = 0;
-        for(Double[] d:holdings.values()){
-            sum+=d[0];
-        }
-        if(sum>100){
+    public boolean isWeekend(Calendar c){
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == Calendar.SUNDAY) { // If it's Friday so skip to Monday
             return true;
+        } else if (dayOfWeek == Calendar.SATURDAY) { // If it's Saturday skip to Monday
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
     
+    public double round(double d){
+        double factor = 1e4; // = 1 * 10^5 = 100000.
+        return Math.round(d * factor) / factor;
+    }
+    
+    //START OUTPUT STUFF
     public Map<Date, Double> getReturns(String settings){
         Map<Date,Double> data = new HashMap<Date,Double>();
-        tradingDays = new ArrayList<TradingDay>();
-        for(Date d:historicalPortfolio.keySet()){
-            double weightedGrowth = 0.00000000000;
-            //get previous day
-            Calendar c = Calendar.getInstance();
-            c.setTime(d);
-            c.add(Calendar.DATE, -1);
-            
-            if(historicalPortfolio.containsKey(c.getTime())){
-                
-                //get base stats
-                double coreGrowth = 0;
-                if(settings.equals("Relative Benchmark")){
-                    for(Security s:historicalPortfolio.get(d).keySet()){
-                        if(s instanceof Core){
-                            //get current values
-                            double coreValue = historicalPortfolio.get(d).get(s)[1];
-                            //get previous values
-                            double previousCoreValue = 0;
-                            //if the security was held yesterday
-
-                            //printHoldings(historicalPortfolio.get(c.getTime()));
-                            if(historicalPortfolio.get(c.getTime()).containsKey(s)){
-                                //double previousSecurityPercent = historicalPortfolio.get(c.getTime()).get(s)[0];
-                                previousCoreValue = historicalPortfolio.get(c.getTime()).get(s)[1];
-                            }else{
-                                //use current value for comparison if not held yesterday
-                                previousCoreValue = historicalPortfolio.get(d).get(s)[1];
-                            }
-                            //System.out.println(d+" | "+c.getTime());
-                            coreGrowth = (coreValue-previousCoreValue)/previousCoreValue;
-                            
-                            break;
-                        }
-                    }
-                }
-                
-                for(Security s: historicalPortfolio.get(d).keySet()){
-                    
-                    if(settings.equals("Benchmark")&&s instanceof Sector){
-                        continue;
-                    }
-                    if(settings.equals("Cash")&&!s.name.equals("Cash")){
-                        continue;
-                    }else if(settings.equals("Cash")&&s.name.equals("Cash")){
-                        weightedGrowth = historicalPortfolio.get(d).get(s)[0];
-                        break;
-                    }
-                    
-                    //get current values
-                    double securityPercent = historicalPortfolio.get(d).get(s)[0];
-                    double securityValue = historicalPortfolio.get(d).get(s)[1];
-                    //get previous values
-                    double previousSecurityValue = 0;
-                    //if the security was held yesterday
-                    
-                    //printHoldings(historicalPortfolio.get(c.getTime()));
-                    if(historicalPortfolio.get(c.getTime()).containsKey(s)){
-                        //double previousSecurityPercent = historicalPortfolio.get(c.getTime()).get(s)[0];
-                        previousSecurityValue = historicalPortfolio.get(c.getTime()).get(s)[1];
-                    }else{
-                        //use current value for comparison if not held yesterday
-                        previousSecurityValue = historicalPortfolio.get(d).get(s)[1];
-                    }
-                    //System.out.println(d+" | "+c.getTime());
-                    double growth = (securityValue-previousSecurityValue)/previousSecurityValue;
-                    weightedGrowth+=growth*(securityPercent/100);
-                    
-                }
-                //should be 0 if relative to core turned off
-                weightedGrowth-=coreGrowth;
+        for(TradingDay day:days){
+            Date date = day.d;
+            TradingDay previousDay;
+            try{
+                previousDay = days.get(days.indexOf(day)-1);
+            }catch(Exception e){
+                previousDay = day;
             }
-            tradingDays.add(new TradingDay(d,historicalPortfolio.get(d),weightedGrowth));
-            data.put(d, weightedGrowth);
-            //System.out.println(d+" | "+weightedGrowth);
-        }
+            
+            double portfolioGrowth = (day.portfolioValue-previousDay.portfolioValue)/previousDay.portfolioValue;
+            
+            Security previousCore = new Security();
+            Security core = new Security();
+            Security cash = new Security();
+            
+            for(Security s:previousDay.holdings.keySet()){
+                if(s instanceof Core){
+                    previousCore = s;
+                    break;
+                }
+            }
+            for(Security s:day.holdings.keySet()){
+                if(s instanceof Core){
+                    core = s;
+                    break;
+                }
+            }
+            double coreGrowth = (day.holdings.get(core)[0]-previousDay.holdings.get(previousCore)[0])/previousDay.holdings.get(previousCore)[0];
+            for(Security s:day.holdings.keySet()){
+                if(s instanceof Core&&s.name.equals("Cash")){
+                    cash = s;
+                    break;
+                }
+            }
+            
+            if(settings.equals("Full")){
+                data.put(date,portfolioGrowth);
+                
+            }else if(settings.equals("Benchmark")){
+                data.put(date,coreGrowth);
+            
+            }else if(settings.equals("Relative Benchmark")){
+                data.put(date,portfolioGrowth-coreGrowth);
+                
+            }else if(settings.equals("Cash")){
+                try{
+                    data.put(date,day.holdings.get(cash)[0]);
+                }catch(Exception e){
+                    data.put(date,0.0);
+                }
+            }
+            
+        }    
+            
         return data;
     }
     
@@ -426,29 +449,18 @@ public class Portfolio {
     }
     
     public ArrayList<Trade> getTrades(){
-        for(Date d:historicalPortfolio.keySet()){
-            Map<Security, Double[]> dailyHoldings = historicalPortfolio.get(d);
-            
-        }
         return trades;
     }
-
-    public double getPortfolioValue(Date date) {
-        getReturns("Full");
-        double portfolioValue = 100.00;
-        for(TradingDay d:tradingDays){
-            if(d.d.after(date)){break;}
-            portfolioValue+=d.growth*100;
+    
+    public double getCoreValue(Date d){
+        for(Security s:securities){
+            if(s.name.equals("S&P 500")){
+                return getValue(d,s);
+            }
         }
-        return portfolioValue;
+        return 0;
     }
     
-    public double round(double d){
-        double factor = 1e5; // = 1 * 10^5 = 100000.
-        return Math.round(d * factor) / factor;
-    }
     
- 
-
+    
 }
-    

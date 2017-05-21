@@ -51,9 +51,8 @@ public class StaticTradesTable extends Table {
         tableTitles[5] = "Difference";
         table.add(tableTitles);
         
-        ArrayList<Trade> checked = new ArrayList<Trade>();
         for(Trade buyTrade:data){
-            if(buyTrade.to instanceof Sector&&!checked.contains(buyTrade)){
+            if(buyTrade.to instanceof Sector){
                 String[] row = new String[tableColumns];
                 row[0] = buyTrade.to.name;
                 row[1] = buyTrade.date.toString();
@@ -62,33 +61,28 @@ public class StaticTradesTable extends Table {
                 double sectorSellValue = 0;
                 double coreBuyValue = 0;
                 double coreSellValue= 0;
-                for(Trade sellTrade:data){
-                    System.out.println(checked.size());
-                    if(sellTrade.from.equals(buyTrade.to)&&!checked.contains(sellTrade)){
-                        //Temp fix
-                        row[2] = sellTrade.date.toString();
-                                                
-                        sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
-                        sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
-                        coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
-                        coreSellValue = SeasonalProgram.portfolio.getCoreValue(sellTrade.date);
-                        //System.out.println(buyTrade.date+"Bought "+buyTrade.to.name+" at "+sectorBuyValue+", Sold at "+sectorSellValue);
-                        
-                        row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
-                        row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
-                        checked.add(buyTrade);
-                        checked.add(sellTrade);
-                        
-                        break;
-                    }
-                }
                 
-                if(row[3]==null){
+                Trade sellTrade = buyTrade.sell;
+        
+                if(sellTrade==null){
+                    System.out.println("Null");
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(endDate,buyTrade.to);//???
                     coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
                     coreSellValue = SeasonalProgram.portfolio.getCoreValue(endDate);
                     row[2] = endDate.toString();
+                    row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
+                    row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
+                }else{
+                    System.out.println("Not Null");
+
+                    row[2] = sellTrade.date.toString();
+                                                
+                    sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
+                    sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
+                    coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
+                    coreSellValue = SeasonalProgram.portfolio.getCoreValue(sellTrade.date);
+
                     row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
                     row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
                 }
