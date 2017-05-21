@@ -185,7 +185,7 @@ public class NewPortfolio {
         
         trades.add(new Trade(calendar.getTime(),s,core));
         
-        System.out.println("Sell "+s.name+" "+round(holdings.get(s)[0])+", new value "+round(holdings.get(s)[0]));
+        System.out.println("Sell "+s.name+" "+round(holdings.get(s)[0])+", new value "+round(0));
         double buyValue = getValue(calendar.getTime(),core);
         System.out.println("Buy "+core.name+" "+round(holdings.get(s)[0])+", price "+round(buyValue)+", new value "+round(holdings.get(core)[0]));
         holdings.remove(s);
