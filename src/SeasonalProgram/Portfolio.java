@@ -33,7 +33,7 @@ public class Portfolio {
     public ArrayList<Trade> trades = new ArrayList<Trade>();
     public Map<Security, Double[]> holdings = new HashMap<Security, Double[]>();
     
-    public boolean weekend = false;
+    //public boolean weekend = false;
     
     public Portfolio(ArrayList<Security> securities, Date startDate, Date endDate){
         this.securities = securities;
@@ -66,8 +66,10 @@ public class Portfolio {
     public void runPortfolio(){
         days.add(new TradingDay(calendar.getTime(),holdings,portfolioValue));
         setDates(calendar.getTime());
+        
+        //START HERE: IF WEEKEND PRINT NEXT TRADING DAY LABEL, THE REST SHOULD WORK JUST LOG
         while(calendar.getTime().before(endDate)){
-            if(isWeekend(calendar)){
+            /*if(isWeekend(calendar)){
                 calendar.add(Calendar.DATE, 1);
                 updatePortfolio(calendar.getTime());
                 
@@ -77,7 +79,7 @@ public class Portfolio {
                 }
                 weekend = true;
                 continue;
-            }
+            }*/
             
             updatePortfolio(calendar.getTime());
             
@@ -95,14 +97,14 @@ public class Portfolio {
                     }
                 }
             }
-            
+            if(calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){ 
+                printUpdate(calendar.getTime());
+            }
             
             days.add(new TradingDay(calendar.getTime(),new HashMap<Security, Double[]>(holdings),portfolioValue));
             calendar.add(Calendar.DATE, 1);
             
-            if(calendar.get(Calendar.DAY_OF_MONTH) == calendar.getActualMaximum(Calendar.DAY_OF_MONTH)){ 
-                printUpdate(calendar.getTime());
-            }
+            
         }   
     }
     
@@ -144,8 +146,11 @@ public class Portfolio {
         TradingDay yesterday = days.get(days.size()-1);
         
         for(Security s:holdings.keySet()){
-            double dailyGrowth = (getValue(timeNow,s)-getValue(yesterday.d,s))/getValue(yesterday.d,s);
-            Double[] newStats = {holdings.get(s)[0]*(1+dailyGrowth),getValue(timeNow,s),holdings.get(s)[2]};
+            double nowValue = getValue(timeNow,s);
+            double previousValue = getValue(yesterday.d,s);
+            
+            double dailyGrowth = (nowValue-previousValue)/previousValue;
+            Double[] newStats = {yesterday.holdings.get(s)[0]*(1+dailyGrowth),nowValue,holdings.get(s)[2]};
             holdings.put(s, newStats);
         }
         double sum = 0;
@@ -326,8 +331,7 @@ public class Portfolio {
                 //-1 for previous day close
                 Calendar c = Calendar.getInstance();
                 c.setTime(d);
-                if(weekend||isWeekend(c)){
-                    weekend = false;
+                if(isWeekend(c)){ 
                     return SeasonalProgram.data.getDataset(s.name).closes[i-1];
                 }else{
                     return SeasonalProgram.data.getDataset(s.name).closes[i];
