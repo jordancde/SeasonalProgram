@@ -192,6 +192,25 @@ public class Table {
         return year;
         
     }
+    public Date convertToTrading(Date d){
+        Calendar newCal = Calendar.getInstance();
+        newCal.setTime(d);
+        while(isWeekend(newCal)){
+            newCal.add(Calendar.DATE, 1);
+        }
+        return newCal.getTime();
+    }
+    
+    public boolean isWeekend(Calendar c){
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == Calendar.SUNDAY) { // If it's Friday so skip to Monday
+            return true;
+        } else if (dayOfWeek == Calendar.SATURDAY) { // If it's Saturday skip to Monday
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
     

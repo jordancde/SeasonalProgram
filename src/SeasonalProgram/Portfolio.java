@@ -65,7 +65,7 @@ public class Portfolio {
     
     public void runPortfolio(){
         days.add(new TradingDay(calendar.getTime(),holdings,portfolioValue));
-        setDates(calendar.getTime());
+        setInitDates(calendar.getTime());
         
         //START HERE: IF WEEKEND PRINT NEXT TRADING DAY LABEL, THE REST SHOULD WORK JUST LOG
         while(calendar.getTime().before(endDate)){
@@ -248,22 +248,37 @@ public class Portfolio {
     }
     
     
-    public void setDates(Date dateNow){
+    public void setInitDates(Date dateNow){
         Calendar c = Calendar.getInstance();
         c.setTime(dateNow);
         //System.out.println(dateNow);
         for(Security s:securities){
-            if(compareDates(c.getTime(),s.buyDate)){
-                s.buyDate.setYear(dateNow.getYear()+1);
-                
+            //Draw it out
+            if(compareDates(s.sellDate, s.buyDate)){
+                if(compareDates(s.buyDate, c.getTime())){
+                    s.buyDate.setYear(dateNow.getYear());
+                    s.sellDate.setYear(dateNow.getYear());
+                }else if(compareDates(c.getTime(),s.sellDate)){
+                    s.buyDate.setYear(dateNow.getYear()+1);
+                    s.sellDate.setYear(dateNow.getYear()+1);
+                }else{
+                    s.buyDate.setYear(dateNow.getYear());
+                    s.sellDate.setYear(dateNow.getYear());
+                }
             }else{
-                s.buyDate.setYear(dateNow.getYear());
+                if(compareDates(s.sellDate, c.getTime())){
+                    s.buyDate.setYear(dateNow.getYear()-1);
+                    s.sellDate.setYear(dateNow.getYear());
+                }else if(compareDates(c.getTime(),s.buyDate)){
+                    s.buyDate.setYear(dateNow.getYear());
+                    s.sellDate.setYear(dateNow.getYear()+1);
+                }else{
+                    s.buyDate.setYear(dateNow.getYear());
+                    s.sellDate.setYear(dateNow.getYear()+1);
+                }
             }
-            if(compareDates(c.getTime(),s.sellDate)){
-                s.sellDate.setYear(dateNow.getYear()+1);
-            }else{
-                s.sellDate.setYear(dateNow.getYear());
-            }
+            
+   
             
             //System.out.println(s.name+" | "+s.buyDate+" | "+s.sellDate);
         }

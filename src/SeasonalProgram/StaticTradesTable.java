@@ -58,7 +58,7 @@ public class StaticTradesTable extends Table {
             if(buyTrade.to instanceof Sector){
                 String[] row = new String[tableColumns];
                 row[0] = buyTrade.to.name;
-                row[1] = sm.format(buyTrade.date);
+                row[1] = sm.format(convertToTrading(buyTrade.date));
                 
                 double sectorBuyValue = 0;
                 double sectorSellValue = 0;
@@ -72,12 +72,12 @@ public class StaticTradesTable extends Table {
                     sectorSellValue = SeasonalProgram.portfolio.getValue(endDate,buyTrade.to);//???
                     coreBuyValue = SeasonalProgram.portfolio.getBenchmarkValue(buyTrade.date);
                     coreSellValue = SeasonalProgram.portfolio.getBenchmarkValue(endDate);
-                    row[2] = sm.format(endDate);
+                    row[2] = sm.format(convertToTrading(endDate));
                     row[3] = Double.toString(roundDouble((sectorSellValue-sectorBuyValue)/sectorBuyValue));
                     row[4] = Double.toString(roundDouble((coreSellValue-coreBuyValue)/coreBuyValue));
                 }else{
 
-                    row[2] = sm.format(sellTrade.date);
+                    row[2] = sm.format(convertToTrading(sellTrade.date));
                                                 
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
