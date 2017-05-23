@@ -13,6 +13,7 @@ import java.util.Map;
 import SeasonalProgram.Core;
 import SeasonalProgram.OutputTables.Table;
 import SeasonalProgram.Sector;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -25,6 +26,8 @@ public class StaticTradesTable extends Table {
         portfolioTable = makeTable(data);
     }
     
+    SimpleDateFormat sm = new SimpleDateFormat("yyyy/MM/dd");
+    
     public ArrayList<String[]> makeTable(ArrayList<Trade> data){
         ArrayList<String[]> table = new ArrayList<String[]>();
         
@@ -34,12 +37,12 @@ public class StaticTradesTable extends Table {
         
         String[] startDateRow = new String[tableColumns];
         startDateRow[0] = "Start Date";
-        startDateRow[1] = startDate.toString();
+        startDateRow[1] = sm.format(startDate);
         table.add(startDateRow);
         
         String[] endDateRow = new String[tableColumns];
         endDateRow[0] = "End Date";
-        endDateRow[1] = endDate.toString();
+        endDateRow[1] = sm.format(endDate);
         table.add(endDateRow);
         
         String[] tableTitles = new String[tableColumns];
@@ -55,7 +58,7 @@ public class StaticTradesTable extends Table {
             if(buyTrade.to instanceof Sector){
                 String[] row = new String[tableColumns];
                 row[0] = buyTrade.to.name;
-                row[1] = buyTrade.date.toString();
+                row[1] = sm.format(buyTrade.date);
                 
                 double sectorBuyValue = 0;
                 double sectorSellValue = 0;
@@ -67,25 +70,25 @@ public class StaticTradesTable extends Table {
                 if(sellTrade==null){
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(endDate,buyTrade.to);//???
-                    coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
-                    coreSellValue = SeasonalProgram.portfolio.getCoreValue(endDate);
-                    row[2] = endDate.toString();
-                    row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
-                    row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
+                    coreBuyValue = SeasonalProgram.portfolio.getBenchmarkValue(buyTrade.date);
+                    coreSellValue = SeasonalProgram.portfolio.getBenchmarkValue(endDate);
+                    row[2] = sm.format(endDate);
+                    row[3] = Double.toString(roundDouble((sectorSellValue-sectorBuyValue)/sectorBuyValue));
+                    row[4] = Double.toString(roundDouble((coreSellValue-coreBuyValue)/coreBuyValue));
                 }else{
 
-                    row[2] = sellTrade.date.toString();
+                    row[2] = sm.format(sellTrade.date);
                                                 
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
-                    coreBuyValue = SeasonalProgram.portfolio.getCoreValue(buyTrade.date);
-                    coreSellValue = SeasonalProgram.portfolio.getCoreValue(sellTrade.date);
+                    coreBuyValue = SeasonalProgram.portfolio.getBenchmarkValue(buyTrade.date);
+                    coreSellValue = SeasonalProgram.portfolio.getBenchmarkValue(sellTrade.date);
 
-                    row[3] = Double.toString((sectorSellValue-sectorBuyValue)/sectorBuyValue);
-                    row[4] = Double.toString((coreSellValue-coreBuyValue)/coreBuyValue);
+                    row[3] = Double.toString(roundDouble((sectorSellValue-sectorBuyValue)/sectorBuyValue));
+                    row[4] = Double.toString(roundDouble((coreSellValue-coreBuyValue)/coreBuyValue));
                 }
                 
-                row[5] = Double.toString(Double.parseDouble(row[3])-Double.parseDouble(row[4]));
+                row[5] = Double.toString(roundDouble(Double.parseDouble(row[3])-Double.parseDouble(row[4])));
                 table.add(row);
             }   
         }
@@ -98,7 +101,7 @@ public class StaticTradesTable extends Table {
             for(int j = 0;j<table.size()-4;j++){
                 sum += Double.parseDouble(table.get(j+4)[3+i]);
             }
-            avgRow[3+i] = Double.toString(sum/(table.size()-4));
+            avgRow[3+i] = Double.toString(roundDouble(sum/(table.size()-4)));
         }
         table.add(avgRow);
         
@@ -119,4 +122,5 @@ public class StaticTradesTable extends Table {
         return table;
         
     }
+    
 }

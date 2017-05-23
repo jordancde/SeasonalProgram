@@ -127,7 +127,7 @@ public class Portfolio {
     
     public void printUpdate(Date d){
         System.out.println("");
-        System.out.println(sm.format(convertToTrading(d)));
+        System.out.println(sm.format(d));
         printHoldings();
         System.out.println("Portfolio Value "+round(portfolioValue));
     }
@@ -387,7 +387,7 @@ public class Portfolio {
                     break;
                 }
             }
-            double coreGrowth = (day.holdings.get(core)[0]-previousDay.holdings.get(previousCore)[0])/previousDay.holdings.get(previousCore)[0];
+            double coreGrowth = (getBenchmarkValue(day.d)-getBenchmarkValue(previousDay.d))/getBenchmarkValue(previousDay.d);
             for(Security s:day.holdings.keySet()){
                 if(s instanceof Core&&s.name.equals("Cash")){
                     cash = s;
@@ -472,9 +472,9 @@ public class Portfolio {
         return trades;
     }
     
-    public double getCoreValue(Date d){
+    public double getBenchmarkValue(Date d){
         for(Security s:securities){
-            if(s.name.equals("S&P 500")){
+            if(s.name.equals(SeasonalProgram.seasonalModel.core.name)){
                 return getValue(d,s);
             }
         }

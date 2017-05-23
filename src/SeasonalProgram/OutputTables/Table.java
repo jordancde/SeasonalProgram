@@ -50,6 +50,11 @@ public class Table {
         return String.format("%.5f", d);
     }
     
+    public double roundDouble(double d){
+        double factor = 1e5; // = 1 * 10^5 = 100000.
+        return Math.round(d * factor) / factor;
+    }
+    
     //START HERE
     public double getTotal(String[] input){
         double total = 0;
