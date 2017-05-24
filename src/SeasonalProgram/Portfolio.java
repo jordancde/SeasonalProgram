@@ -371,7 +371,7 @@ public class Portfolio {
         double factor = 1e4; // = 1 * 10^5 = 100000.
         return Math.round(d * factor) / factor;
     }
-    
+    /*
     //START OUTPUT STUFF
     public Map<Date, Double> getReturns(String settings){
         Map<Date,Double> data = new HashMap<Date,Double>();
@@ -431,12 +431,96 @@ public class Portfolio {
             
         return data;
     }
-    
+    */
+    public Map<String, Double> getReturns(String settings, boolean useFrequency){
+        
+        Map<String,Double> data = new HashMap<String,Double>();
+
+        double closeValue = days.get(0).portfolioValue;
+        Calendar dayBefore = Calendar.getInstance();
+        dayBefore.setTime(days.get(0).d);
+        dayBefore.add(Calendar.DATE, -1);
+        double closeBenchmarkValue = getBenchmarkValue(dayBefore.getTime());
+        
+        for(int i = 0;i<days.size();i++){
+            
+            TradingDay startDay = days.get(i);
+            Calendar c = Calendar.getInstance();
+            c.setTime(startDay.d);
+  
+            //gets from previous month
+            double openValue = closeValue;
+            double openBenchmarkValue = closeBenchmarkValue;
+            
+            double cashSum = 0;
+            double tradingDayCount = 0;
+            
+            for(int j = i;j<days.size();j++){
+                TradingDay endDay = days.get(j);
+                Calendar c2 = Calendar.getInstance();
+                c2.setTime(endDay.d);
+                if(c2.get(Calendar.MONTH)!=c.get(Calendar.MONTH)){
+                    i = j; //-1???
+                    break;
+                }
+                tradingDayCount++;
+                
+                
+                for(Security s:days.get(j).holdings.keySet()){
+                    if(s instanceof Core&&s.name.equals("Cash")){
+                        cashSum+= days.get(j).holdings.get(s)[0]/days.get(j).portfolioValue;
+                        break;
+                    }
+                }
+       
+                closeValue = days.get(j).portfolioValue;
+                closeBenchmarkValue = getBenchmarkValue(days.get(j).d);
+            }
+            
+            double portfolioGrowth = (closeValue-openValue)/openValue;
+            double coreGrowth = (closeBenchmarkValue-openBenchmarkValue)/openBenchmarkValue;
+                        
+            String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
+
+            if(settings.equals("Full")){
+                data.put(monthString,portfolioGrowth);
+                
+            }else if(settings.equals("Benchmark")){
+                data.put(monthString,coreGrowth);
+            
+            }else if(settings.equals("Relative Benchmark")){
+                data.put(monthString,portfolioGrowth-coreGrowth);
+                
+            }else if(settings.equals("Cash")){
+                try{
+                    data.put(monthString,cashSum/tradingDayCount);
+                }catch(Exception e){
+                    data.put(monthString,0.0);
+                }
+            }
+        }
+        
+        if(useFrequency){
+            for(String s: data.keySet()){
+                if(data.get(s)>0){
+                   data.put(s,1.0);
+                }else{
+                   data.put(s,0.0);
+                }
+            }
+        }
+        
+        return data;
+    }
+        
+  /*
     public Map<String, Double> getMonthlyReturns(String preference, boolean useFrequency){
         Map<Date, Double> returns = getReturns(preference);
         Calendar c = Calendar.getInstance();
         Map<String, Double> monthlyReturns = new HashMap<String, Double>();
         Map<String,Integer> monthlyTradingDayCount = new HashMap<String,Integer>();
+        
+        
         for(Date d:returns.keySet()){
             c.setTime(d);
             String monthString = c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR);
@@ -466,7 +550,7 @@ public class Portfolio {
         }
         
         return monthlyReturns;
-    }
+    }*/
     
     public Map<String, Double> getMonthlyTrades(){
         Calendar c = Calendar.getInstance();
