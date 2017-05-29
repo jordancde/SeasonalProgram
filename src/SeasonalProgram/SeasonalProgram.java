@@ -6,8 +6,7 @@
 package SeasonalProgram;
 
 
-import SeasonalProgram.OutputTables.MonthlyStaticReturnsTable;
-import SeasonalProgram.OutputTables.Table;
+import SeasonalProgram.OutputTables.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.text.ParseException;
@@ -48,36 +47,36 @@ public class SeasonalProgram {
         portfolio = new Portfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
         portfolio.runPortfolio();
         
-        Map<String, Double> monthlyReturns = portfolio.getReturns("Full", false);
-        MonthlyStaticReturnsTable fullPortfolio = new MonthlyStaticReturnsTable("Static Seasonal Gains",monthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> monthlyReturns = portfolio.getReturns("Full", false);
+        MonthlyStaticTable fullPortfolio = new MonthlyStaticTable("Seasonal Portfolio % Monthly Gains",monthlyReturns,seasonalModel.startDate,seasonalModel.endDate,0);
         fullPortfolio.writeTable();
         
-        Map<String, Double> benchmarkMonthlyReturns = portfolio.getReturns("Benchmark", false);
-        MonthlyStaticReturnsTable benchmark = new MonthlyStaticReturnsTable("Benchmark Seasonal Gains",benchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> benchmarkMonthlyReturns = portfolio.getReturns("Benchmark", false);
+        MonthlyStaticTable benchmark = new MonthlyStaticTable("Benchmark Gains",benchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate,1);
         benchmark.writeTable();
         
-        Map<String, Double> relativeBenchmarkMonthlyReturns = portfolio.getReturns("Relative Benchmark", false);
-        MonthlyStaticReturnsTable relativeBenchmark = new MonthlyStaticReturnsTable("Relative Benchmark Seasonal Gains",relativeBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> relativeBenchmarkMonthlyReturns = portfolio.getReturns("Relative Benchmark", false);
+        MonthlyStaticTable relativeBenchmark = new MonthlyStaticTable("Seasonal Portfolio minus Benchmark",relativeBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate,2);
         relativeBenchmark.writeTable();
         
-        Map<String, Double> fqMonthlyReturns = portfolio.getReturns("Full", true);
-        MonthlyStaticReturnsTable fq = new MonthlyStaticReturnsTable("Seasonal Frequency Pos",fqMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> fqMonthlyReturns = portfolio.getReturns("Full", true);
+        MonthlyStaticTable fq = new MonthlyStaticTable("Seasonal Frequency Pos",fqMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate,3);
         fq.writeTable();
         
-        Map<String, Double> fqBenchmarkMonthlyReturns = portfolio.getReturns("Benchmark", true);
-        MonthlyStaticReturnsTable fqBenchmark = new MonthlyStaticReturnsTable("Seasonal Benchmark Frequency Pos",fqBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> fqBenchmarkMonthlyReturns = portfolio.getReturns("Benchmark", true);
+        MonthlyStaticTable fqBenchmark = new MonthlyStaticTable("Benchmark Frequency Pos",fqBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate,4);
         fqBenchmark.writeTable();
         
-        Map<String, Double> fqRelativeBenchmarkMonthlyReturns = portfolio.getReturns("Relative Benchmark", true);
-        MonthlyStaticReturnsTable fqRelativeBenchmark = new MonthlyStaticReturnsTable("Seasonal Relative Benchmark Frequency Pos",fqRelativeBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> fqRelativeBenchmarkMonthlyReturns = portfolio.getReturns("Relative Benchmark", true);
+        MonthlyStaticTable fqRelativeBenchmark = new MonthlyStaticTable("Seasonal Portfolio minus Benchmark Frequency Pos",fqRelativeBenchmarkMonthlyReturns,seasonalModel.startDate,seasonalModel.endDate,5);
         fqRelativeBenchmark.writeTable();
         
-        Map<String, Double> cash = portfolio.getReturns("Cash", false);
-        MonthlyStaticReturnsTable cashTable = new MonthlyStaticReturnsTable("Cash",cash,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> cash = portfolio.getReturns("Cash", false);
+        MonthlyStaticTable cashTable = new MonthlyStaticTable("Seasonal Portfolio Avg % Cash",cash,seasonalModel.startDate,seasonalModel.endDate,6);
         cashTable.writeTable();
         
-        Map<String, Double> trades = portfolio.getMonthlyTrades();
-        MonthlyStaticReturnsTable tradeTable = new MonthlyStaticReturnsTable("Number of Trades",trades,seasonalModel.startDate,seasonalModel.endDate);
+        Map<String, Double[]> trades = portfolio.getMonthlyTrades();
+        MonthlyStaticTable tradeTable = new MonthlyStaticTable("Seasonal Portfolio Number of Trades",trades,seasonalModel.startDate,seasonalModel.endDate,7);
         tradeTable.writeTable();
         
         ArrayList<Trade> tradeHistory = portfolio.getTrades();

@@ -36,9 +36,15 @@ public class Table {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
-        
-        
+  
     }
+    public Table(String name, Date startDate, Date endDate) throws IOException{
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+  
+    }
+    
     public Table(String name, ArrayList<Trade> data, Date startDate, Date endDate) throws IOException {
         this.name = name;
         this.startDate = startDate;
@@ -77,7 +83,7 @@ public class Table {
         return total/count;
     }
     
-    public int getFirstMonth(int year, Map<String,Double> data){
+    public int getFirstMonth(int year, Map<String,Double[]> data){
         ArrayList<String> datesInYear = new ArrayList<String>();
         for(String s:data.keySet()){
             if(Integer.parseInt(s.substring(s.lastIndexOf("/") + 1))==year){
@@ -97,7 +103,7 @@ public class Table {
         //System.out.println(year+"/"+minMonth);
         return minMonth;
     }
-    public int getLastMonth(int year, Map<String,Double> data){
+    public int getLastMonth(int year, Map<String,Double[]> data){
         ArrayList<String> datesInYear = new ArrayList<String>();
         for(String s:data.keySet()){
             if(Integer.parseInt(s.substring(s.lastIndexOf("/") + 1))==year){
@@ -211,7 +217,21 @@ public class Table {
             return false;
         }
     }
-
+    
+    public double getMonthlyTotal(ArrayList<Double> list){
+        double sum = 0;
+        for(Double d: list){
+            sum+=d;
+        }
+        return sum;
+    }
+    public double getCompoundedTotals(ArrayList<Double> values){
+        double sum = 1;
+        for(Double d: values){
+            sum*=(1+d);
+        }
+        return sum-1;
+    }
 
     
 }
