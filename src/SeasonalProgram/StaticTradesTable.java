@@ -23,7 +23,7 @@ public class StaticTradesTable extends Table {
 
     public StaticTradesTable(String name, ArrayList<Trade> data, Date startDate, Date endDate) throws IOException {
         super(name, data, startDate, endDate);
-        portfolioTable = makeTable(data);
+        table = makeTable(data);
     }
     
     SimpleDateFormat sm = new SimpleDateFormat("yyyy/MM/dd");

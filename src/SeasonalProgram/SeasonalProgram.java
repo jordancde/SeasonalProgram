@@ -38,7 +38,7 @@ public class SeasonalProgram {
         ui = new UI();
         ui.setVisible(true);
         
-
+        
  
     }
     
@@ -83,6 +83,9 @@ public class SeasonalProgram {
         StaticTradesTable tradeHistoryTable = new StaticTradesTable("Trade History",tradeHistory,seasonalModel.startDate,seasonalModel.endDate);
         tradeHistoryTable.writeTable();
         
+        ArrayList<Double[]> boxSizes = new ArrayList<Double[]>();
+        boxSizes.add(new Double[]{0.0,5000.0,10.0});
+        PointAndFigure pf = new PointAndFigure("PNF",data.getDataset("S&P 500"),seasonalModel.startDate,seasonalModel.endDate,boxSizes,3);
     }
 
     

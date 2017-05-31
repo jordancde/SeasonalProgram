@@ -5,6 +5,7 @@
  */
 package SeasonalProgram.OutputTables;
 
+import SeasonalProgram.Dataset;
 import SeasonalProgram.SeasonalProgram;
 import SeasonalProgram.SeasonalProgram;
 import SeasonalProgram.Trade;
@@ -27,11 +28,13 @@ import java.util.Map;
  */
 public class Table {
     public String name;
-    public ArrayList<String[]> portfolioTable;
+    public ArrayList<String[]> table;
     public int tableColumns = 17;
     public Date startDate;
     public Date endDate;
     public String outputName = "Out";
+    public Dataset data;
+    
     public Table(String name, Map<String,Double> data, Date startDate, Date endDate) throws IOException{
         this.name = name;
         this.startDate = startDate;
@@ -50,6 +53,14 @@ public class Table {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+    
+    public Table(String name, Dataset data, Date startDate, Date endDate) throws IOException {
+        this.name = name;
+        this.data = data;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+ 
  
     
     public String round(double d){
@@ -147,7 +158,7 @@ public class Table {
             PrintWriter out = new PrintWriter(bw))
         {      
             out.println("");
-            for(String[] row:portfolioTable){
+            for(String[] row:table){
                 for(String s: row){
                     if(s==null){
                         s = "";

@@ -34,7 +34,7 @@ public class MonthlyStaticTable extends Table {
     public MonthlyStaticTable(String name, Map<String, Double[]> data, Date startDate, Date endDate, int type) throws IOException {
         super(name, startDate, endDate);
         this.type = type;
-        portfolioTable = makeTable(data);
+        table = makeTable(data);
     }
     
     public ArrayList<String[]> makeTable(Map<String, Double[]> data){
