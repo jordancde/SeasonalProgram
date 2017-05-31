@@ -42,7 +42,7 @@ public class SeasonalProgram {
  
     }
     
-    public static void runModel() throws IOException{
+    public static void runModel() throws IOException, CloneNotSupportedException, ParseException{
         
         portfolio = new Portfolio(seasonalModel.getSecurities(),seasonalModel.startDate,seasonalModel.endDate);
         portfolio.runPortfolio();
@@ -84,8 +84,8 @@ public class SeasonalProgram {
         tradeHistoryTable.writeTable();
         
         ArrayList<Double[]> boxSizes = new ArrayList<Double[]>();
-        boxSizes.add(new Double[]{0.0,5000.0,10.0});
-        PointAndFigure pf = new PointAndFigure("PNF",data.getDataset("S&P 500"),seasonalModel.startDate,seasonalModel.endDate,boxSizes,3);
+        boxSizes.add(new Double[]{0.0,5000.0,50.0});
+        PointAndFigure2 pf = new PointAndFigure2("PNF",data.getDataset("S&P 500"),seasonalModel.startDate,seasonalModel.endDate,boxSizes,3);
     }
 
     

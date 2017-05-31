@@ -25,7 +25,17 @@ public class Dataset {
     public double[] closes;
     public double[] volumes;
     
+    public String[][] data;
+    public int setNum;
+    public int nameListPos;
+    public int dataColumnCount;
+    
     public Dataset(String[][] data,int setNum, int nameListPos, int dataColumnCount) throws ParseException{
+        this.data = data;
+        this.setNum = setNum;
+        this.nameListPos = nameListPos;
+        this.dataColumnCount = dataColumnCount;
+        
         String[] nameHeader = data[nameListPos];
         //how many rows after header data starts
         int rowOffset = 2;
@@ -80,7 +90,7 @@ public class Dataset {
 
     }
     
-    
+  
     
     public void trimData(Date startDate, Date endDate){
         int startDateIndex = 0;
@@ -112,6 +122,8 @@ public class Dataset {
         closes = tempCloses;
         volumes = tempVolumes;
     }
+    
+
     
     
 }
