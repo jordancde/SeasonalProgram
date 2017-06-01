@@ -96,11 +96,17 @@ public class PointAndFigure2 extends Table{
                 }
                 
                 if(goingUp&&column[i]-getValue(currentRow,boxes)>getBoxSize(column[i])){
-                    currentRow = getRow(column[i],boxes);
-                    filledBoxes.get(currentRow).add("X");
+                    int nextRow = getRow(column[i],boxes);
+                    while(nextRow<currentRow){
+                        filledBoxes.get(currentRow).add("X");
+                        currentRow--;
+                    }
                 }else if(goingDown&&getValue(currentRow,boxes)-column[i]>getBoxSize(column[i])){
-                    currentRow = getRow(column[i],boxes);
-                    filledBoxes.get(currentRow).add("O");
+                    int nextRow = getRow(column[i],boxes);
+                    while(nextRow>currentRow){
+                        filledBoxes.get(currentRow).add("O");
+                        currentRow++;
+                    }
                 }
                 
                 
