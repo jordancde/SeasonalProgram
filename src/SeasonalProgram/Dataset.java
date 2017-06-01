@@ -100,12 +100,20 @@ public class Dataset {
                 break;
             }
         }
-        Date[] tempDates = new Date[dates.length-startDateIndex-1];
-        double[] tempOpens = new double[dates.length-startDateIndex-1];
-        double[] tempHighs = new double[dates.length-startDateIndex-1];
-        double[] tempLows = new double[dates.length-startDateIndex-1];
-        double[] tempCloses = new double[dates.length-startDateIndex-1];
-        double[] tempVolumes = new double[dates.length-startDateIndex-1];
+        int endDateIndex = 0;
+        for(int i = 0;i<dates.length;i++){
+            if(dates[i].compareTo(endDate)>=0){
+                endDateIndex = i;
+                break;
+            }
+        }
+        
+        Date[] tempDates = new Date[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
+        double[] tempOpens = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
+        double[] tempHighs = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
+        double[] tempLows = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
+        double[] tempCloses = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
+        double[] tempVolumes = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
         
         for(int i = 0;i<tempDates.length;i++){
             tempDates[i] = dates[startDateIndex+i];

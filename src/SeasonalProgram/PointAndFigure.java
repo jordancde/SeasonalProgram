@@ -7,6 +7,7 @@ package SeasonalProgram;
 
 import SeasonalProgram.OutputTables.Table;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -20,142 +21,131 @@ public class PointAndFigure extends Table{
     public ArrayList<Double[]> boxSizes;
     public int reversalBoxes;
     
+    public double currentBoxLevel;
+    
     public PointAndFigure(String name, Dataset data, Date startDate, Date endDate, 
-            ArrayList<Double[]> boxSizes, int reversalBoxes) throws IOException{
+            ArrayList<Double[]> boxSizes, int reversalBoxes) throws IOException, CloneNotSupportedException, ParseException{
         super(name, data, startDate, endDate);
         
         this.boxSizes = boxSizes;
         this.reversalBoxes = reversalBoxes;
         
-        data.trimData(startDate, endDate);
+        this.data = data;
+        this.data = new Dataset(data.data,data.setNum,data.nameListPos,data.dataColumnCount);
+        this.data.trimData(startDate, endDate);
         
-        ArrayList<Integer> boxes = getBoxes();
-        
-        ArrayList<Integer> cleanedBoxes = cleanBoxes(boxes, reversalBoxes);
-        
-        table = makeTable(cleanedBoxes, boxSizes);
-        
-        writeTable();
-    }
-    
-    
-    public ArrayList<String[]> makeTable(ArrayList<Integer> cleanedBoxes, ArrayList<Double[]> boxSizes){
-        ArrayList<ArrayList<String>> boxes = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<Double>> boxes = new ArrayList<ArrayList<Double>>();
         double currentValue = 0;
+        
         while(currentValue<boxSizes.get(boxSizes.size()-1)[1]){
-            ArrayList<String> row = new ArrayList<String>();
-            row.add(Double.toString(currentValue));
+            ArrayList<Double> row = new ArrayList<Double>();
+            row.add(currentValue);
             boxes.add(row);
             currentValue+=getBoxSize(currentValue);
         }
         Collections.reverse(boxes);
+        
+        ArrayList<double[]> datasets = new ArrayList<double[]>();
+        datasets.add(this.data.opens);
+        datasets.add(this.data.highs);
+        datasets.add(this.data.lows);
+        datasets.add(this.data.closes);
+        
+        
+        
+        ArrayList<ArrayList<String>> graph = runPnF(boxes, datasets,reversalBoxes);
+        
+        table = convertToArray(graph);
+        
+        writeTable();
+        
+    }
 
-        int row = getRow(data.opens[0],boxes);
-        int column = 1;
+    
+    public ArrayList<ArrayList<String>> runPnF(ArrayList<ArrayList<Double>> boxes, ArrayList<double[]> datasets, int reversalBoxes){
         
-        for(Integer streak:cleanedBoxes){
-            if(streak>0){
-                for(int i = 0;i<streak;i++){
-                    boxes.get(row-i).add("x");
-                }
-                row-=streak;
+        ArrayList<ArrayList<String>> filledBoxes = new ArrayList<ArrayList<String>>();
+        for(ArrayList<Double> row:boxes){
+            ArrayList<String> stringRow = new ArrayList<String>();
+            stringRow.add(row.get(0).toString());
+            filledBoxes.add(stringRow);
+        }
+        
+        int currentRow = getRow(datasets.get(0)[0],boxes);
+        int currentColumn = 0;
+        
+        boolean goingUp = false;
+        boolean goingDown = false;
+        
+        for(int i = 0;i<datasets.get(0).length;i++){
+            for(double[] column:datasets){
                 
-            }else{
-                for(int i = streak;i<0;i++){
-                    boxes.get(row-i).add("o");
+                if(!goingUp&&column[i]-getValue(currentRow,boxes)>getBoxSize(column[i])*reversalBoxes){
+                    goingUp = true;
+                    goingDown = false;
+                    currentColumn++;
+                }else if(!goingDown&&getValue(currentRow,boxes)-column[i]>getBoxSize(column[i])*reversalBoxes){
+                    goingUp = false;
+                    goingDown = true;
+                    currentColumn++;
                 }
-                row-=streak;
+                for(ArrayList<String> row:filledBoxes){
+                    while(row.size()<currentColumn){
+                        row.add("");
+                    }
+                }
                 
-            }
-            column++;
-            for(ArrayList<String> stringRow:boxes){
-                while(stringRow.size()<column){
-                    stringRow.add("");
+                if(goingUp&&column[i]-getValue(currentRow,boxes)>getBoxSize(column[i])){
+                    int nextRow = getRow(column[i],boxes);
+                    while(nextRow<currentRow){
+                        filledBoxes.get(currentRow).add("X");
+                        currentRow--;
+                    }
+                }else if(goingDown&&getValue(currentRow,boxes)-column[i]>getBoxSize(column[i])){
+                    int nextRow = getRow(column[i],boxes);
+                    while(nextRow>currentRow){
+                        filledBoxes.get(currentRow).add("O");
+                        currentRow++;
+                    }
                 }
+                
+                
             }
         }
         
-        ArrayList<String[]> table = new ArrayList<String[]>();
-        for(ArrayList<String> stringRow:boxes){
-            String[] rawRow = new String[stringRow.size()];
-            for(int i = 0;i<stringRow.size();i++){
-                rawRow[i] = stringRow.get(i);
-            }
-            table.add(rawRow);
-        }
-        return table;
+        return filledBoxes;
         
     }
     
-    public int getRow(double value,ArrayList<ArrayList<String>> boxes){
+
+    
+    public int getRow(double value,ArrayList<ArrayList<Double>> boxes){
 
         int index = 0;
-        for(ArrayList<String> row:boxes){
-            if(value<Double.parseDouble(row.get(0))){
-                index = boxes.indexOf(row);            
+        for(ArrayList<Double> row:boxes){
+            System.out.println(value+" "+row.get(0));
+            if(value>row.get(0)){
+                index = boxes.indexOf(row);
+                break;
             }
         }
         return index;
     }
     
-    public ArrayList<Integer> cleanBoxes(ArrayList<Integer> boxes, int reversalBoxes){
-        ArrayList<Integer> cleanedBoxes = new ArrayList<Integer>();
-       
-        for(int i = 0;i<boxes.size()-1;i++){
-            int addedIndex = 0;
-            while(boxes.get(i)==boxes.get(i+addedIndex)){
-                addedIndex++;
+    public ArrayList<String[]> convertToArray(ArrayList<ArrayList<String>> input){
+        ArrayList<String[]> output = new ArrayList<String[]>();
+        for(ArrayList<String> row: input){
+            String[] stringRow = new String[row.size()];
+            for(int i = 0;i<row.size();i++){
+                stringRow[i] = row.get(i);
             }
-            if(boxes.get(i)==1){
-                cleanedBoxes.add(addedIndex);
-            }else{
-                cleanedBoxes.add(-1*addedIndex);
-            }
-            
-            i = i+addedIndex-1;
+            output.add(stringRow);
         }
-        return cleanedBoxes;
+        return output;
     }
     
-    public ArrayList<Integer> getBoxes(){
-        ArrayList<Integer> boxes = new ArrayList<Integer>();
-        ArrayList<double[]> datasets = new ArrayList<double[]>();
-        datasets.add(data.opens);
-        datasets.add(data.highs);
-        datasets.add(data.lows);
-        datasets.add(data.closes);
-        
-        double lastBoxValue = data.opens[0];
-        for(int i = 0;i<data.dates.length;i++){
-            for(double[] column: datasets){
-               
-                if(Math.abs(column[i]-lastBoxValue)>=getBoxSize(column[i])){
-                    if(column[i]-lastBoxValue>0){
-                        int numBoxes = (int)Math.floor((column[i]-lastBoxValue)/getBoxSize(column[i]));
-                        for(int j = 0;j<numBoxes;j++){
-                            boxes.add(1);
-                        }
-                    }else{
-                        int numBoxes = (int)Math.floor((lastBoxValue-column[i])/getBoxSize(column[i]));
-                        for(int j = 0;j<numBoxes;j++){
-                            boxes.add(0);
-                        }
-                    }
-                    lastBoxValue = column[i];
-                }
-            } 
-        }
-        return boxes;
-    }
-    
-    public double getMax(double[] values){
-        double max = Double.MIN_VALUE;
-        for(double d:values){
-            if(d>max){
-                max = d;
-            }
-        }
-        return max;
+    public double getValue(int row,ArrayList<ArrayList<Double>> boxes){
+        return boxes.get(row).get(0);
     }
     
     public double getBoxSize(double value){
@@ -167,6 +157,4 @@ public class PointAndFigure extends Table{
         }
         return -1;
     }
-    
-  
 }
