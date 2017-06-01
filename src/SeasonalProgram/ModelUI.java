@@ -70,7 +70,7 @@ public class ModelUI extends JPanel {
         public JButton addSector;
         public JButton addTrigger;
         
-        public String[] triggerNames = {"Relative Strength","Moving Averages","RSI","Brooke Thackray RS"};
+        public String[] triggerNames = {"Relative Strength","Moving Averages","RSI","PnF"};
         public String[] options = {"Exponential","Simple"};
 
     
@@ -546,45 +546,45 @@ public class ModelUI extends JPanel {
                 jtb4.setText(preset.get(2)[4+i*5]);
             }
             try{
-            int lengthOfTrigger = triggersInput.get(0).length;
-            int numTriggers = (int)preset.get(3).length/lengthOfTrigger;
-            
-            for(int i = 0;i<preset.get(3).length;i+=lengthOfTrigger){
-                if(triggersInput.size()<i/lengthOfTrigger){
-                    JComponent[] components = new JComponent[5];
+                int lengthOfTrigger = 5;//Fix
+                int numTriggers = (int)preset.get(3).length/lengthOfTrigger;
 
-                    components[0] = new JComboBox(triggerNames);
-                    components[1] = new JComboBox(options);
-                    components[2] = new JTextField(4);
-                    components[3] = new JComboBox(options);
-                    components[4] = new JTextField(4);
+                for(int i = 0;i<preset.get(3).length;i+=lengthOfTrigger){
+                    if(triggersInput.size()<i/lengthOfTrigger){
+                        JComponent[] components = new JComponent[5];
 
-                    triggersInput.add(components);
-                    for(JComponent jc:components){
-                        four.add(jc);
+                        components[0] = new JComboBox(triggerNames);
+                        components[1] = new JComboBox(options);
+                        components[2] = new JTextField(4);
+                        components[3] = new JComboBox(options);
+                        components[4] = new JTextField(4);
+
+                        triggersInput.add(components);
+                        for(JComponent jc:components){
+                            four.add(jc);
+                        }
+
+                        four.remove(addTrigger);
+                        for(JComponent jc:components){
+                            four.add(jc);
+                        }
+                        four.add(addTrigger);
+                        four.revalidate();
                     }
-                    
-                    four.remove(addTrigger);
-                    for(JComponent jc:components){
-                        four.add(jc);
-                    }
-                    four.add(addTrigger);
-                    four.revalidate();
                 }
-            }
-            
-            for(int i = 0;i<triggersInput.size();i++){
-                JComboBox jcb = (JComboBox)triggersInput.get(i)[0];
-                JComboBox jcb2 = (JComboBox)triggersInput.get(i)[1];
-                JTextField jtf1 = (JTextField)triggersInput.get(i)[2];
-                JComboBox jcb3 = (JComboBox)triggersInput.get(i)[3];
-                JTextField jtf2 = (JTextField)triggersInput.get(i)[4];
-                jcb.setSelectedItem(preset.get(3)[0+i*5]);
-                jcb2.setSelectedItem(preset.get(3)[1+i*5]);
-                jtf1.setText(preset.get(3)[2+i*5]);
-                jcb3.setSelectedItem(preset.get(3)[3+i*5]);
-                jtf2.setText(preset.get(3)[4+i*5]);
-            } 
+
+                for(int i = 0;i<triggersInput.size();i++){
+                    JComboBox jcb = (JComboBox)triggersInput.get(i)[0];
+                    JComboBox jcb2 = (JComboBox)triggersInput.get(i)[1];
+                    JTextField jtf1 = (JTextField)triggersInput.get(i)[2];
+                    JComboBox jcb3 = (JComboBox)triggersInput.get(i)[3];
+                    JTextField jtf2 = (JTextField)triggersInput.get(i)[4];
+                    jcb.setSelectedItem(preset.get(3)[0+i*5]);
+                    jcb2.setSelectedItem(preset.get(3)[1+i*5]);
+                    jtf1.setText(preset.get(3)[2+i*5]);
+                    jcb3.setSelectedItem(preset.get(3)[3+i*5]);
+                    jtf2.setText(preset.get(3)[4+i*5]);
+                } 
             }catch(Exception e){System.out.println("No triggers in Preset");}
             
         }

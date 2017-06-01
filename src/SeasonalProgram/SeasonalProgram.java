@@ -86,8 +86,12 @@ public class SeasonalProgram {
         ArrayList<Double[]> boxSizes = new ArrayList<Double[]>();
         boxSizes.add(new Double[]{0.0,3000.0,50.0});
         
+        for(Trigger t:seasonalModel.triggers){
+            if(t.name.equals("PnF")){
+                PointAndFigure pf = new PointAndFigure("PNF",data.getDataset("S&P 500"),seasonalModel.startDate,seasonalModel.endDate,boxSizes,seasonalModel.triggers.get(0).param1);
+            }
+        }
         
-        PointAndFigure pf = new PointAndFigure("PNF",data.getDataset("S&P 500"),seasonalModel.startDate,seasonalModel.endDate,boxSizes,2);
     }
 
     
