@@ -58,7 +58,6 @@ public class Portfolio {
         cashStats[2] = 1.0;
         holdings.put(cash, cashStats);
         */
-        runPortfolio();
         
         
     }

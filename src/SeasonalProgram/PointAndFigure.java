@@ -71,7 +71,7 @@ public class PointAndFigure extends Table{
             filledBoxes.add(stringRow);
         }
         
-        int currentRow = getRow(datasets.get(0)[0],boxes);
+        double currentValue = datasets.get(0)[0];
         int currentColumn = 0;
         
         boolean goingUp = false;
@@ -80,14 +80,16 @@ public class PointAndFigure extends Table{
         for(int i = 0;i<datasets.get(0).length;i++){
             for(double[] column:datasets){
                 
-                if(!goingUp&&column[i]-getValue(currentRow,boxes)>getBoxSize(column[i])*reversalBoxes){
+                if(!goingUp&&column[i]-currentValue>getBoxSize(column[i])*reversalBoxes){
                     goingUp = true;
                     goingDown = false;
                     currentColumn++;
-                }else if(!goingDown&&getValue(currentRow,boxes)-column[i]>getBoxSize(column[i])*reversalBoxes){
+                    
+                }else if(!goingDown&&currentValue-column[i]>getBoxSize(column[i])*reversalBoxes){
                     goingUp = false;
                     goingDown = true;
                     currentColumn++;
+                    
                 }
                 for(ArrayList<String> row:filledBoxes){
                     while(row.size()<currentColumn){
@@ -95,17 +97,21 @@ public class PointAndFigure extends Table{
                     }
                 }
                 
-                if(goingUp&&column[i]-getValue(currentRow,boxes)>getBoxSize(column[i])){
-                    int nextRow = getRow(column[i],boxes);
-                    while(nextRow<currentRow){
-                        filledBoxes.get(currentRow).add("X");
-                        currentRow--;
+                if(goingUp&&column[i]-currentValue>getBoxSize(column[i])){
+                    
+                    while(column[i]>currentValue){
+                        currentValue+=getBoxSize(column[i]);
+                        filledBoxes.get(getRow(currentValue,boxes)).add("X");
+                        
                     }
-                }else if(goingDown&&getValue(currentRow,boxes)-column[i]>getBoxSize(column[i])){
+                }else if(goingDown&&currentValue-column[i]>getBoxSize(column[i])){
                     int nextRow = getRow(column[i],boxes);
-                    while(nextRow>currentRow){
-                        filledBoxes.get(currentRow).add("O");
-                        currentRow++;
+                    
+                    while(column[i]<currentValue){
+                        currentValue-=getBoxSize(column[i]);
+                        filledBoxes.get(getRow(currentValue,boxes)).add("O");
+                        
+                        
                     }
                 }
                 
@@ -124,7 +130,7 @@ public class PointAndFigure extends Table{
         int index = 0;
         for(ArrayList<Double> row:boxes){
             System.out.println(value+" "+row.get(0));
-            if(value>row.get(0)){
+            if(value>=row.get(0)){
                 index = boxes.indexOf(row);
                 break;
             }
