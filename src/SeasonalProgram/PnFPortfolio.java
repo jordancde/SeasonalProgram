@@ -45,14 +45,11 @@ public class PnFPortfolio extends Portfolio{
                 
                 
             if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
-                buy(s,s.allocation, false);
-                setDate(calendar,s);
+                buyRemainingSectors();
             //checks for month before buy Date
             }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
-                
-            }
-            
-            if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
+                buyTriggered();
+            }else if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
                 sell(s);
                 setDate(calendar,s);
             }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
@@ -72,6 +69,7 @@ public class PnFPortfolio extends Portfolio{
             
         } 
     }
+    
     //ordered highest to lowest
     public ArrayList<Security> getTopSectors(){
         HashMap<Security, HashMap<Security, Double> > matrix = makeMatrix();
@@ -137,4 +135,17 @@ public class PnFPortfolio extends Portfolio{
         }
         return sum;
     }
+    
+    
+    //has to buy all sectors not bought, and increase position size of majors up to 90%
+    private void buyRemainingSectors() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //setDate(calendar,s);
+    }
+    //Has to buy triggered sectors at premature trigger positions
+    private void buyTriggered() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+
 }
