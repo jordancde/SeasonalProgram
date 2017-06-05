@@ -16,6 +16,8 @@ import java.util.HashMap;
  */
 public class PnFPortfolio extends Portfolio{
     
+    public boolean inSeasonal = false;
+    
     public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate){
         super(securities,startDate,endDate);
         
@@ -43,17 +45,21 @@ public class PnFPortfolio extends Portfolio{
             monthBefore.setTime(SP.sellDate);
             monthBefore.add(Calendar.MONTH, 1);
                 
-                
-            if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
-                buyRemainingSectors();
-            //checks for month before buy Date
-            }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
-                buyTriggered();
-            }else if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
-                sell(s);
-                setDate(calendar,s);
-            }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
-            
+            if(!inSeasonal){   
+                if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
+                    buyRemainingSectors();
+                    inSeasonal = true;
+                //checks for month before buy Date
+                }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
+                    buyTriggered();
+                }
+            }else{
+                if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
+                    sellRemainingSectors();
+                    inSeasonal = false;
+                }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
+                    sellTriggered();
+                }
             }
             
             //Modified logic end
@@ -120,13 +126,7 @@ public class PnFPortfolio extends Portfolio{
         return null;
     }
     
-    public ArrayList<Security> getPossibleBuys() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private Double compareSectors(Security s, Security t) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
 
     private Double sumDifferences(HashMap<Security, Double> row) {
         double sum = 0;
@@ -137,6 +137,16 @@ public class PnFPortfolio extends Portfolio{
     }
     
     
+    //All sectors that pass buy criteria
+    public ArrayList<Security> getPossibleBuys() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    //compare two secotrs based on either PnF or Core performance
+    private Double compareSectors(Security s, Security t) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     //has to buy all sectors not bought, and increase position size of majors up to 90%
     private void buyRemainingSectors() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -144,6 +154,17 @@ public class PnFPortfolio extends Portfolio{
     }
     //Has to buy triggered sectors at premature trigger positions
     private void buyTriggered() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    //has to sell all sectors not sold
+    private void sellRemainingSectors() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //setDate(calendar,s);
+    }
+    
+    //Has to buy triggered sectors at premature trigger positions
+    private void sellTriggered() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -12,7 +12,9 @@ import java.util.Date;
  * @author jordandearsley
  */
 public class Sector extends Security{
-    public Sector(String name, Date buyDate, Date sellDate, double allocation, double leverage){
+    public String type;
+    public Sector(String name, String type, Date buyDate, Date sellDate, double allocation, double leverage){
         super(name, buyDate, sellDate, allocation);
+        this.type = type;
     }
 }
