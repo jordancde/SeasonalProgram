@@ -46,10 +46,10 @@ public class PointAndFigure extends Table{
         Collections.reverse(boxes);
         
         ArrayList<double[]> datasets = new ArrayList<double[]>();
-        datasets.add(this.data.opens);
+        //datasets.add(this.data.opens);
         datasets.add(this.data.highs);
         datasets.add(this.data.lows);
-        datasets.add(this.data.closes);
+        //datasets.add(this.data.closes);
         
         
         
@@ -129,7 +129,6 @@ public class PointAndFigure extends Table{
 
         int index = 0;
         for(ArrayList<Double> row:boxes){
-            System.out.println(value+" "+row.get(0));
             if(value>=row.get(0)){
                 index = boxes.indexOf(row);
                 break;
