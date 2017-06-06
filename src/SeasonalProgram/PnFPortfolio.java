@@ -47,18 +47,18 @@ public class PnFPortfolio extends Portfolio{
                 
             if(!inSeasonal){   
                 if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
-                    buyRemainingSectors();
+                    buyRemainingSectors(calendar.getTime());
                     inSeasonal = true;
                 //checks for month before buy Date
                 }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
-                    buyTriggered();
+                    buyTriggered(calendar.getTime());
                 }
             }else{
                 if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
                     sellRemainingSectors();
                     inSeasonal = false;
                 }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
-                    sellTriggered();
+                    sellTriggered(calendar.getTime());
                 }
             }
             
@@ -124,9 +124,7 @@ public class PnFPortfolio extends Portfolio{
             }
         }
         return null;
-    }
-    
-    
+    } 
 
     private Double sumDifferences(HashMap<Security, Double> row) {
         double sum = 0;
@@ -137,7 +135,85 @@ public class PnFPortfolio extends Portfolio{
     }
     
     
-    //All sectors that pass buy criteria
+    
+    
+    //has to buy all sectors not bought, and increase position size of majors up to 90%
+    private void buyRemainingSectors(Date d) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        
+        for(Security s:holdings.keySet()){
+            if(s instanceof Sector){
+                if(((Sector) s).type.equals("Major")){
+                    if(holdings.get(s)[0]/getPortfolioValue(d)<10){
+                        doublePosition(s,d);
+                        setDate(c,s);
+                    }
+                }
+            }
+        }
+        
+        for(Security s:securities){
+            if(s instanceof Sector&&!holdings.containsKey(s)){
+                if(((Sector) s).type.equals("Major")){
+                    buy(s,10,false);
+                }else if(((Sector) s).type.equals("Minor")){
+                    buy(s,5,false);
+                }
+                setDate(c,s);
+            }
+        }
+        
+    }
+    
+    //Has to buy triggered sectors at premature trigger positions
+    private void buyTriggered(Date d) {
+        ArrayList<Security> topSectors = getTopSectors();
+        
+        for(Security s:topSectors){
+            if(s instanceof Sector){
+                double allocation = 0;
+                if(((Sector) s).type.equals("Major")){
+                    allocation = 10;
+                }else if(((Sector) s).type.equals("Minor")){
+                    allocation = 5;
+                }
+                
+                if(!overAllocation(d,allocation)){
+                    if(sectorBuyTriggered(d, s)){
+                        buy(s,allocation,false);
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    //Has to sell triggered sectors at premature trigger positions
+    private void sellTriggered(Date d) {
+        for(Security s:holdings.keySet()){
+            if(s instanceof Sector){
+                
+                if(((Sector) s).sellType.equals("Regular")){
+                    if(sectorSellTriggered(d, s)){
+                        halfPosition(s,d);
+                    }
+                }
+  
+            }
+        }    
+    }
+    
+    //has to sell all sectors not sold
+    private void sellRemainingSectors() {
+        for(Security s:holdings.keySet()){
+            if(s instanceof Sector){
+                sell(s);
+            }
+        }
+    }
+    
+    //All sectors that pass initial buy criteria
     public ArrayList<Security> getPossibleBuys() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -147,24 +223,25 @@ public class PnFPortfolio extends Portfolio{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    //has to buy all sectors not bought, and increase position size of majors up to 90%
-    private void buyRemainingSectors() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        //setDate(calendar,s);
-    }
-    //Has to buy triggered sectors at premature trigger positions
-    private void buyTriggered() {
+    
+    
+    //checks if sector sell is triggered
+    private boolean sectorSellTriggered(Date d, Security s) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    //has to sell all sectors not sold
-    private void sellRemainingSectors() {
+    //checks if sector buy is triggered
+    private boolean sectorBuyTriggered(Date d, Security s) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        //setDate(calendar,s);
     }
     
-    //Has to buy triggered sectors at premature trigger positions
-    private void sellTriggered() {
+    //doubles the position size
+    private void doublePosition(Security s, Date d) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    //half the position size
+    private void halfPosition(Security s, Date d) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

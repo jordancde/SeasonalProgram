@@ -13,8 +13,10 @@ import java.util.Date;
  */
 public class Sector extends Security{
     public String type;
-    public Sector(String name, String type, Date buyDate, Date sellDate, double allocation, double leverage){
+    public String sellType;
+    public Sector(String name, String type, String sellType, Date buyDate, Date sellDate, double allocation, double leverage){
         super(name, buyDate, sellDate, allocation);
         this.type = type;
+        this.sellType = sellType;
     }
 }

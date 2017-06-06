@@ -599,6 +599,22 @@ public class Portfolio {
         return 0;
     }
     
+    public boolean overAllocation(Date d){
+        double sum = 0;
+        for(Security s:holdings.keySet()){
+            sum+=holdings.get(s)[0]/getPortfolioValue(d);  
+        }
+        return(sum>100);
+    }
+    public boolean overAllocation(Date d, double toBeAdded){
+        double sum = 0;
+        for(Security s:holdings.keySet()){
+            sum+=holdings.get(s)[0]/getPortfolioValue(d);  
+        }
+        return(sum+toBeAdded>100);
+    }
+    
+    
     public Date convertToTrading(Calendar c, boolean sell){
         Calendar newCal = Calendar.getInstance();
         newCal.setTime(c.getTime());

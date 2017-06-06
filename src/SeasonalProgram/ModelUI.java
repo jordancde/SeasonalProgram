@@ -175,7 +175,7 @@ public class ModelUI extends JPanel {
         //Creates Grid to [][] array
             
             
-            int columns = 6;
+            int columns = 7;
             GridLayout gl = new GridLayout(0,columns);
             
             JPanel secThree = new JPanel(gl);
@@ -183,19 +183,21 @@ public class ModelUI extends JPanel {
             //Row One 
             secThree.add(new JLabel("Sector"));
             secThree.add(new JLabel("Type"));
+            secThree.add(new JLabel("Sell Type"));
             secThree.add(new JLabel("Start (mm/dd)"));
             secThree.add(new JLabel("Stop (mm/dd)"));
             secThree.add(new JLabel("Allocation %"));
             secThree.add(new JLabel("Lev %"));
             
-            JComponent[] components = new JComponent[6];
+            JComponent[] components = new JComponent[7];
        
             components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
             components[1] = new JComboBox(new String[]{"Major","Minor"});
-            components[2] = new JTextField(20);
+            components[2] = new JComboBox(new String[]{"Regular","Hard"});
             components[3] = new JTextField(20);
             components[4] = new JTextField(20);
             components[5] = new JTextField(20);
+            components[6] = new JTextField(20);
             
             sectorsInput.add(components);
             for(JComponent jc:components){
@@ -208,14 +210,15 @@ public class ModelUI extends JPanel {
             addSector.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JComponent[] components = new JComponent[6];
+                    JComponent[] components = new JComponent[7];
 
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
                     components[1] = new JComboBox(new String[]{"Major","Minor"});
-                    components[2] = new JTextField(20);
+                    components[2] = new JComboBox(new String[]{"Regular","Hard"});
                     components[3] = new JTextField(20);
                     components[4] = new JTextField(20);
                     components[5] = new JTextField(20);
+                    components[6] = new JTextField(20);
 
                     sectorsInput.add(components);
                     for(JComponent jc:components){
@@ -457,11 +460,12 @@ public class ModelUI extends JPanel {
             for(JComponent[] component:sectorsInput){
                 JComboBox jcb = (JComboBox)component[0];
                 JComboBox jcb2 = (JComboBox)component[1];
-                JTextField jtb1 = (JTextField)component[2];
-                JTextField jtb2 = (JTextField)component[3];
-                JTextField jtb3 = (JTextField)component[4];
-                JTextField jtb4 = (JTextField)component[5];
-                System.out.println(jcb.getSelectedItem().toString()+", "+jcb2.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText()+", "+jtb4.getText());
+                JComboBox jcb3 = (JComboBox)component[2];
+                JTextField jtb1 = (JTextField)component[3];
+                JTextField jtb2 = (JTextField)component[4];
+                JTextField jtb3 = (JTextField)component[5];
+                JTextField jtb4 = (JTextField)component[6];
+                System.out.println(jcb.getSelectedItem().toString()+", "+jcb2.getSelectedItem().toString()+", "+jcb3.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText()+", "+jtb4.getText());
             }
            
             System.out.println("--------------------------------");     
@@ -515,14 +519,15 @@ public class ModelUI extends JPanel {
             
             for(int i = 0;i<preset.get(2).length;i+=lengthOfSector){
                 if(sectorsInput.size()<i/lengthOfSector){
-                    JComponent[] components = new JComponent[6];
+                    JComponent[] components = new JComponent[7];
 
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
                     components[1] = new JComboBox(new String[]{"Major","Minor"});
-                    components[2] = new JTextField(20);
+                    components[2] = new JComboBox(new String[]{"Regular","Hard"});
                     components[3] = new JTextField(20);
                     components[4] = new JTextField(20);
                     components[5] = new JTextField(20);
+                    components[6] = new JTextField(20);
 
                     sectorsInput.add(components);
                     for(JComponent jc:components){
@@ -541,16 +546,18 @@ public class ModelUI extends JPanel {
             for(int i = 0;i<sectorsInput.size();i++){
                 JComboBox jcb = (JComboBox)sectorsInput.get(i)[0];
                 JComboBox jcb2 = (JComboBox)sectorsInput.get(i)[1];
-                JTextField jtb1 = (JTextField)sectorsInput.get(i)[2];
-                JTextField jtb2 = (JTextField)sectorsInput.get(i)[3];
-                JTextField jtb3 = (JTextField)sectorsInput.get(i)[4];
-                JTextField jtb4 = (JTextField)sectorsInput.get(i)[5];
+                JComboBox jcb3 = (JComboBox)sectorsInput.get(i)[2];
+                JTextField jtb1 = (JTextField)sectorsInput.get(i)[3];
+                JTextField jtb2 = (JTextField)sectorsInput.get(i)[4];
+                JTextField jtb3 = (JTextField)sectorsInput.get(i)[5];
+                JTextField jtb4 = (JTextField)sectorsInput.get(i)[6];
                 jcb.setSelectedItem(preset.get(2)[0+i*lengthOfSector]);
                 jcb2.setSelectedItem(preset.get(2)[1+i*lengthOfSector]);
-                jtb1.setText(preset.get(2)[2+i*lengthOfSector]);
-                jtb2.setText(preset.get(2)[3+i*lengthOfSector]);
-                jtb3.setText(preset.get(2)[4+i*lengthOfSector]);
-                jtb4.setText(preset.get(2)[5+i*lengthOfSector]);
+                jcb3.setSelectedItem(preset.get(2)[2+i*lengthOfSector]);
+                jtb1.setText(preset.get(2)[3+i*lengthOfSector]);
+                jtb2.setText(preset.get(2)[4+i*lengthOfSector]);
+                jtb3.setText(preset.get(2)[5+i*lengthOfSector]);
+                jtb4.setText(preset.get(2)[6+i*lengthOfSector]);
             }
             try{
                 int lengthOfTrigger = 5;//Fix
@@ -658,12 +665,14 @@ public class ModelUI extends JPanel {
                     for(JComponent[] c:sectorsInput){
                         JComboBox jcb = (JComboBox)c[0];
                         JComboBox jcb2 = (JComboBox)c[1];
-                        JTextField jtb1 = (JTextField)c[2];
-                        JTextField jtb2 = (JTextField)c[3];
-                        JTextField jtb3 = (JTextField)c[4];
-                        JTextField jtb4 = (JTextField)c[5];
+                        JComboBox jcb3 = (JComboBox)c[2];
+                        JTextField jtb1 = (JTextField)c[3];
+                        JTextField jtb2 = (JTextField)c[4];
+                        JTextField jtb3 = (JTextField)c[5];
+                        JTextField jtb4 = (JTextField)c[6];
                         out.print(jcb.getSelectedItem().toString()+",");
                         out.print(jcb2.getSelectedItem().toString()+",");
+                        out.print(jcb3.getSelectedItem().toString()+",");
                         out.print(jtb1.getText()+",");
                         out.print(jtb2.getText()+",");
                         out.print(jtb3.getText()+",");

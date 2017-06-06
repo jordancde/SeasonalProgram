@@ -69,11 +69,12 @@ class Model {
         for(JComponent[] component:sectorsInput){
             JComboBox jcb = (JComboBox)component[0];
             JComboBox jcb2 = (JComboBox)component[1];
-            JTextField jtb1 = (JTextField)component[2];
-            JTextField jtb2 = (JTextField)component[3];
-            JTextField jtb3 = (JTextField)component[4];
-            JTextField jtb4 = (JTextField)component[5];
-            sectors.add(new Sector(jcb.getSelectedItem().toString(),jcb.getSelectedItem().toString(),monthsdf.parse(jtb1.getText()),monthsdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText()),Double.parseDouble(jtb4.getText())));
+            JComboBox jcb3 = (JComboBox)component[2];
+            JTextField jtb1 = (JTextField)component[3];
+            JTextField jtb2 = (JTextField)component[4];
+            JTextField jtb3 = (JTextField)component[5];
+            JTextField jtb4 = (JTextField)component[6];
+            sectors.add(new Sector(jcb.getSelectedItem().toString(),jcb2.getSelectedItem().toString(),jcb3.getSelectedItem().toString(),monthsdf.parse(jtb1.getText()),monthsdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText()),Double.parseDouble(jtb4.getText())));
         }
 
         for(JComponent[] component:triggersInput){
