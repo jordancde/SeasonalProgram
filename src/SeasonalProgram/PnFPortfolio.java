@@ -16,11 +16,11 @@ import java.util.HashMap;
  */
 public class PnFPortfolio extends Portfolio{
     
-    public boolean inSeasonal = false;
+    public boolean inSeasonal;
     
     public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate){
         super(securities,startDate,endDate);
-        
+        inSeasonal = false;
         
     }
     
@@ -37,28 +37,53 @@ public class PnFPortfolio extends Portfolio{
             updatePortfolio(calendar.getTime());
             
             //Modified logic start
+            
             Core SP = (Core)getBenchmark();
             Calendar monthBefore = Calendar.getInstance();
             monthBefore.setTime(SP.buyDate);
             monthBefore.add(Calendar.MONTH, -1);
+            
             Calendar monthAfter = Calendar.getInstance();
-            monthBefore.setTime(SP.sellDate);
-            monthBefore.add(Calendar.MONTH, 1);
+            monthAfter.setTime(SP.sellDate);
+            monthAfter.add(Calendar.MONTH, 1);
+            
+            Calendar twoWeeksBeforeSell = Calendar.getInstance();
+            twoWeeksBeforeSell.setTime(SP.sellDate);
+            twoWeeksBeforeSell.add(Calendar.DATE, -14);
                 
             if(!inSeasonal){   
                 if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
+                    if(getHoldingsCore().name.equals("Cash")){
+                        buyRemainingCore(calendar.getTime());
+                    }
                     buyRemainingSectors(calendar.getTime());
+                    
+                    
+                    
                     inSeasonal = true;
                 //checks for month before buy Date
                 }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
                     buyTriggered(calendar.getTime());
+                    if(coreBuyTriggered(calendar.getTime(),getHoldingsCore())){
+                        buyCoreEarly();
+                    }
                 }
             }else{
                 if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
+                    
+                    if(getHoldingsCore().name.equals("S&P 500")){
+                        swapCores(getHoldingsCore());
+                    }
+                    
                     sellRemainingSectors();
+
                     inSeasonal = false;
                 }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
                     sellTriggered(calendar.getTime());
+                }else if(calendar.getTime().after(twoWeeksBeforeSell.getTime())||calendar.getTime().equals(twoWeeksBeforeSell.getTime())){
+                    if(coreSellTriggered(calendar.getTime(),getHoldingsCore())){
+                        sellCoreEarly();
+                    }
                 }
             }
             
@@ -133,9 +158,7 @@ public class PnFPortfolio extends Portfolio{
         }
         return sum;
     }
-    
-    
-    
+
     
     //has to buy all sectors not bought, and increase position size of majors up to 90%
     private void buyRemainingSectors(Date d) {
@@ -146,7 +169,7 @@ public class PnFPortfolio extends Portfolio{
             if(s instanceof Sector){
                 if(((Sector) s).type.equals("Major")){
                     if(holdings.get(s)[0]/getPortfolioValue(d)<10){
-                        doublePosition(s,d);
+                        increasePosition(s,d,10.0);
                         setDate(c,s);
                     }
                 }
@@ -196,7 +219,7 @@ public class PnFPortfolio extends Portfolio{
                 
                 if(((Sector) s).sellType.equals("Regular")){
                     if(sectorSellTriggered(d, s)){
-                        halfPosition(s,d);
+                        decreasePosition(s,d,5.0);
                     }
                 }
   
@@ -213,6 +236,87 @@ public class PnFPortfolio extends Portfolio{
         }
     }
     
+    
+    
+    
+    //increases the position size
+    private void increasePosition(Security s, Date d, double increaseTo) {
+        printPreTransaction(false);
+        
+        double currentAllocationPercent = 100*holdings.get(s)[0]/portfolioValue;
+        double increase = increaseTo-currentAllocationPercent;
+        
+        double realIncrease = portfolioValue*increase/100;
+        double realAllocation = portfolioValue*increaseTo/100;
+        
+        Security core = getHoldingsCore();
+        Double[] currentCoreStats = holdings.get(core);
+        currentCoreStats[0] -= realIncrease;
+        holdings.put(core,currentCoreStats);
+        
+        double newSecurityValue = getValue(calendar.getTime(),s);
+        Double[] newSecurityStats = {realAllocation, newSecurityValue,newSecurityValue};
+        holdings.put(s, newSecurityStats);
+        
+        
+        //trades.add(new Trade(calendar.getTime(),core,s));
+
+        System.out.println("Sell "+core.name+" "+realIncrease+" ("+increase+"%), new value "+round(holdings.get(core)[0]));
+        System.out.println("Buy "+s.name+" "+realIncrease+" ("+increase+"%), price "+round(holdings.get(s)[1])+", new value "+round(holdings.get(s)[0]));
+
+        System.out.println("End Portfolio");
+        printHoldings();
+        System.out.println("Portfolio Value "+round(portfolioValue));
+        
+    }
+    
+    //half the position size
+    private void decreasePosition(Security s, Date d, double decreaseTo) {
+        printPreTransaction(true);
+        
+        double currentAllocationPercent = 100*holdings.get(s)[0]/portfolioValue;
+        double decrease = currentAllocationPercent-decreaseTo;
+        
+        double realDecrease = portfolioValue*decrease/100;
+        double realAllocation = portfolioValue*decreaseTo/100;
+        
+        Security core = getHoldingsCore();
+        Double[] currentCoreStats = holdings.get(core);
+        currentCoreStats[0] += realDecrease;
+        holdings.put(core,currentCoreStats);
+        
+        /*trades.add(new Trade(calendar.getTime(),s,core));
+        
+        for(int i = 0;i<trades.size();i++){
+            if(trades.get(trades.size()-1).from==trades.get(trades.size()-1-i).to){
+                trades.get(trades.size()-1-i).setSellTrade(trades.get(trades.size()-1));
+                break;
+            }
+        }*/
+        
+        System.out.println("Sell "+s.name+" "+round(realDecrease)+", new value "+round(realAllocation));
+        double buyValue = getValue(calendar.getTime(),core);
+        System.out.println("Buy "+core.name+" "+round(realDecrease)+", price "+round(buyValue)+", new value "+round(holdings.get(core)[0]));
+        
+        Double[] currentSectorStats = holdings.get(s);
+        currentSectorStats[0] -= realDecrease;
+        holdings.put(s,currentSectorStats);
+        
+        System.out.println("End Portfolio");
+        printHoldings();
+        System.out.println("Portfolio Value "+round(portfolioValue));
+    }
+
+    
+    //buys SP500 or increases to replace all cash
+    private void buyRemainingCore(Date d) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    //sells SP500, NOT NEEDED YET, USES SWAPCORES
+    private void sellRemainingCore(Date d) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     //All sectors that pass initial buy criteria
     public ArrayList<Security> getPossibleBuys() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -222,7 +326,6 @@ public class PnFPortfolio extends Portfolio{
     private Double compareSectors(Security s, Security t) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
     
     
     //checks if sector sell is triggered
@@ -235,15 +338,27 @@ public class PnFPortfolio extends Portfolio{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    //doubles the position size
-    private void doublePosition(Security s, Date d) {
+    //check if S&P 500 has a sell PnF
+    private boolean coreSellTriggered(Date time, Security holdingsCore) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    //If S&P 500 registers a buy signal 
+    private boolean coreBuyTriggered(Date time, Security holdingsCore) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    //half the position size
-    private void halfPosition(Security s, Date d) {
+    
+    //Up to two weeks before seasonal end date, if S&P 500 has a sell PnF, then sell an amount that brings the total holdings in portfolio to 50%
+    private void sellCoreEarly() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    //purchase S&P 500 up to 50% equity, subtracting equity sectors
+    private void buyCoreEarly() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 
 
 }
