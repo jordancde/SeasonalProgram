@@ -19,7 +19,7 @@ public class UI extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setDefaultLookAndFeelDecorated(true);
-        getContentPane().setPreferredSize(new Dimension(400,400));
+        getContentPane().setPreferredSize(new Dimension(400,800));
         
         
         

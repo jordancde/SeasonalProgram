@@ -67,6 +67,7 @@ public class Data {
         }
         return data;
     }
+    
     public double getValue(Date d,Security s){
         if(s.name.equals("Cash")){
             return 1;

@@ -462,9 +462,16 @@ public class PnFPortfolio extends Portfolio{
         System.out.println(sm.format(d));
         printHoldings();
         System.out.println("Portfolio Value "+round(portfolioValue));
+        
         try {
             printMatrix();
-        } catch (Exception e){System.out.println(e);}
+        } catch (ParseException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        }
         try {
             printSignals();
         } catch (Exception e){
@@ -513,6 +520,7 @@ public class PnFPortfolio extends Portfolio{
     public ArrayList<Security> getPossibleBuys() throws IOException, CloneNotSupportedException, ParseException {
         ArrayList<Security> possibleBuyList = new ArrayList<Security>();
         for(Security s: securities){
+            if(s instanceof Core){continue;}
             Dataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(getBenchmark().name));
             PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
             if(pf.buySignal()){

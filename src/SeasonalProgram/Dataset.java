@@ -60,7 +60,7 @@ public class Dataset {
         
         //count rows
         //Under the dataset name list by two rows starts the data
-        int lastRow = data.length;
+        int lastRow = data.length-1;
         for(int i = nameListPos+rowOffset;i<data.length;i++){
             if("".equals(data[i][startColumn])){
                 lastRow = i;
@@ -76,7 +76,7 @@ public class Dataset {
         highs = new double[lastRow-rowOffset-nameListPos];
         lows = new double[lastRow-rowOffset-nameListPos];
         closes = new double[lastRow-rowOffset-nameListPos];
-        volumes = new double[lastRow-rowOffset-nameListPos];
+        //volumes = new double[lastRow-rowOffset-nameListPos];
         
         //Under the dataset name list by two rows starts the data
         for(int i = 0;i<lastRow-nameListPos-rowOffset;i++){
@@ -85,7 +85,7 @@ public class Dataset {
             highs[i]=Double.parseDouble(data[lastRow-i-1][startColumn+2]);
             lows[i]=Double.parseDouble(data[lastRow-i-1][startColumn+3]);
             closes[i]=Double.parseDouble(data[lastRow-i-1][startColumn+4]);
-            volumes[i] = Double.parseDouble(data[lastRow-i-1][startColumn+5]);
+            //volumes[i] = Double.parseDouble(data[lastRow-i-1][startColumn+5]);
         }
 
     }
@@ -107,29 +107,31 @@ public class Dataset {
         int lastRow = data.length;
 
         //initialize arrays
-        dates = new Date[lastRow-nameListPos-rowOffset];
-        opens = new double[lastRow-rowOffset-nameListPos];
-        highs = new double[lastRow-rowOffset-nameListPos];
-        lows = new double[lastRow-rowOffset-nameListPos];
-        closes = new double[lastRow-rowOffset-nameListPos];
+        dates = new Date[data.length];
+        opens = new double[data.length];
+        highs = new double[data.length];
+        lows = new double[data.length];
+        closes = new double[data.length];
         
         //Under the dataset name list by two rows starts the data
-        for(int i = 0;i<lastRow-nameListPos-rowOffset;i++){
-            dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[lastRow-i-1][startColumn]);
-            opens[i]=Double.parseDouble(data[lastRow-i-1][startColumn+1]);
-            highs[i]=Double.parseDouble(data[lastRow-i-1][startColumn+2]);
-            lows[i]=Double.parseDouble(data[lastRow-i-1][startColumn+3]);
-            closes[i]=Double.parseDouble(data[lastRow-i-1][startColumn+4]);
+        for(int i = 0;i<lastRow-1;i++){
+            
+            dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[i][0]);
+            opens[i]=Double.parseDouble(data[i][1]);
+            highs[i]=Double.parseDouble(data[i][2]);
+            lows[i]=Double.parseDouble(data[i][3]);
+            closes[i]=Double.parseDouble(data[i][4]);
         }
 
     }
     
     public Dataset compareTo(Dataset s) throws ParseException{
- 
+         System.out.println("test");
+
         int arrayLength = Math.min(s.dates.length, dates.length);
         String[][] newData = new String[arrayLength+1][5];
 
-        
+
         for(int i = dates.length-1;i>=0;i--){
             newData[i][0] = new SimpleDateFormat("yyyy/MM/dd").format(dates[i]);
             newData[i][1] = Double.toString(opens[i]/s.opens[i]);
@@ -137,8 +139,8 @@ public class Dataset {
             newData[i][3] = Double.toString(lows[i]/s.lows[i]);
             newData[i][4] = Double.toString(closes[i]/s.closes[i]);
         }
-        
         Dataset d = new Dataset(newData);
+        
         return d;
     }
     

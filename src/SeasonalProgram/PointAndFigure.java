@@ -38,9 +38,9 @@ public class PointAndFigure extends Table{
         this.data.trimData(startDate, endDate);
         
         ArrayList<ArrayList<Double>> boxes = new ArrayList<ArrayList<Double>>();
-        double currentValue = 0;
-        
-        while(currentValue<boxSizes.get(boxSizes.size()-1).max){
+        double currentValue = getMin();
+        System.out.println("1");
+        while(currentValue<getMax()){
             ArrayList<Double> row = new ArrayList<Double>();
             row.add(currentValue);
             boxes.add(row);
@@ -55,12 +55,10 @@ public class PointAndFigure extends Table{
         //datasets.add(this.data.closes);
         
         
-        
         ArrayList<ArrayList<String>> graph = runPnF(boxes, datasets,reversalBoxes);
-        
         table = convertToArray(graph);
         
-        writeTable();
+        //writeTable();
         
     }
 
@@ -121,7 +119,7 @@ public class PointAndFigure extends Table{
                 
             }
         }
-        
+        System.out.println("ranPnF");
         return filledBoxes;
         
     }
@@ -164,6 +162,28 @@ public class PointAndFigure extends Table{
             }
         }
         return -1;
+    }
+    
+    public double getMax(){
+        double max = Integer.MIN_VALUE;
+        for(double d: data.highs){
+            if(d>max){
+                max = d;
+            }
+        
+        }
+        return max+100;
+    }
+    
+    public double getMin(){
+        double min = Integer.MAX_VALUE;
+        for(double d: data.lows){
+            if(d<min){
+                min = d;
+            }
+        
+        }
+        return min-100;
     }
     
     public boolean buySignal(){
