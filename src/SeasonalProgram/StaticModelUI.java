@@ -1,11 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package SeasonalProgram;
 
-import SeasonalProgram.Model;
+import SeasonalProgram.RSModel;
 import SeasonalProgram.SeasonalProgram;
 import static SeasonalProgram.Data.FILEPATH;
 import java.awt.BasicStroke;
@@ -26,7 +21,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -50,7 +44,7 @@ import javax.swing.JTextField;
  *
  * @author jordandearsley
  */
-public class ModelUI extends JPanel {
+public class StaticModelUI extends JPanel {
         
         public JTextField startDateText;
         public JTextField endDateText;
@@ -60,21 +54,15 @@ public class ModelUI extends JPanel {
         public JPanel two;
         public JPanel three;
         public JPanel four;
-        public JPanel five;
         
         public ArrayList<JComponent[]> coresInput = new ArrayList<JComponent[]>();
         public ArrayList<JComponent[]> sectorsInput = new ArrayList<JComponent[]>();
-        public ArrayList<JComponent[]> triggersInput = new ArrayList<JComponent[]>();
         
         public JButton addCore;
         public JButton addSector;
-        public JButton addTrigger;
         
-        public String[] triggerNames = {"Relative Strength","Moving Averages","RSI","PnF"};
-        public String[] options = {"Exponential","Simple"};
-
     
-        public ModelUI(){
+        public StaticModelUI(){
             
             
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -83,12 +71,10 @@ public class ModelUI extends JPanel {
             two = sectionTwo();
             three = sectionThree();
             four = sectionFour();
-            five = sectionFive();
             add(one);
             add(two);
             add(three);
             add(four);
-            add(five);
             
   
         }
@@ -175,29 +161,25 @@ public class ModelUI extends JPanel {
         //Creates Grid to [][] array
             
             
-            int columns = 7;
+            int columns = 5;
             GridLayout gl = new GridLayout(0,columns);
             
             JPanel secThree = new JPanel(gl);
             
             //Row One 
             secThree.add(new JLabel("Sector"));
-            secThree.add(new JLabel("Type"));
-            secThree.add(new JLabel("Sell Type"));
             secThree.add(new JLabel("Start (mm/dd)"));
             secThree.add(new JLabel("Stop (mm/dd)"));
             secThree.add(new JLabel("Allocation %"));
             secThree.add(new JLabel("Lev %"));
             
-            JComponent[] components = new JComponent[7];
+            JComponent[] components = new JComponent[5];
        
             components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
-            components[1] = new JComboBox(new String[]{"Major","Minor"});
-            components[2] = new JComboBox(new String[]{"Regular","Hard"});
+            components[1] = new JTextField(20);
+            components[2] = new JTextField(20);
             components[3] = new JTextField(20);
             components[4] = new JTextField(20);
-            components[5] = new JTextField(20);
-            components[6] = new JTextField(20);
             
             sectorsInput.add(components);
             for(JComponent jc:components){
@@ -210,15 +192,13 @@ public class ModelUI extends JPanel {
             addSector.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JComponent[] components = new JComponent[7];
+                    JComponent[] components = new JComponent[5];
 
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
-                    components[1] = new JComboBox(new String[]{"Major","Minor"});
-                    components[2] = new JComboBox(new String[]{"Regular","Hard"});
+                    components[1] = new JTextField(20);
+                    components[2] = new JTextField(20);
                     components[3] = new JTextField(20);
                     components[4] = new JTextField(20);
-                    components[5] = new JTextField(20);
-                    components[6] = new JTextField(20);
 
                     sectorsInput.add(components);
                     for(JComponent jc:components){
@@ -239,57 +219,9 @@ public class ModelUI extends JPanel {
             return secThree;
         }
         
-        public JPanel sectionFour(){
-            
-            int columns = 5;
-            GridLayout gl = new GridLayout(0,columns);
-            
-            JPanel secFour = new JPanel(gl);
-            
-            //Row One 
-            secFour.add(new JLabel("Triggers"));
-            secFour.add(new JLabel("Type"));
-            secFour.add(new JLabel("Param"));
-            secFour.add(new JLabel("Type"));
-            secFour.add(new JLabel("Param"));
-            
-            
-            
-            
-            addTrigger = new JButton("Add Trigger");
-            secFour.add(addTrigger);
-
-            addTrigger.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JComponent[] components = new JComponent[5];
-
-                    components[0] = new JComboBox(triggerNames);
-                    components[1] = new JComboBox(options);
-                    components[2] = new JTextField(4);
-                    components[3] = new JComboBox(options);
-                    components[4] = new JTextField(4);
-
-                    triggersInput.add(components);
-                    for(JComponent jc:components){
-                        secFour.add(jc);
-                    }
-                    
-                    secFour.remove(addTrigger);
-                    for(JComponent jc:components){
-                        secFour.add(jc);
-                    }
-                    secFour.add(addTrigger);
-                    secFour.revalidate();
-                }
-            });
-           
-            secFour.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
-
-            return secFour;
-        }
         
-        public JPanel sectionFive(){   
+        
+        public JPanel sectionFour(){   
             JPanel secFive = new JPanel();
             //
             JButton submitButton = new JButton("Submit");
@@ -305,7 +237,7 @@ public class ModelUI extends JPanel {
                     int sectorAllocationSum = 0;
                     try{
                         for(JComponent[] core:sectorsInput){
-                            JTextField jtf = (JTextField)core[4];
+                            JTextField jtf = (JTextField)core[3];
                             sectorAllocationSum+=Double.parseDouble(jtf.getText());
                         }
                         
@@ -319,29 +251,23 @@ public class ModelUI extends JPanel {
                         return;
                     }
                     try {
-                        SeasonalProgram.seasonalModel = new Model(
+                        SeasonalProgram.staticModel = new StaticModel(
                             startDateText,
                             endDateText,
                             /*model,
                             individual,*/
                             coresInput,
-                            sectorsInput,
-                            triggersInput      
+                            sectorsInput
                         );
-                        logInputs(startDateText,
-                            endDateText,
-                            coresInput,
-                            sectorsInput,
-                            triggersInput);
                         //IMPORTANTTT*******
-                        SeasonalProgram.runModel();
+                        SeasonalProgram.runStaticModel();
                         
                         status.setForeground(Color.green);
                         status.setText("Model ran successfully");
                     } catch (Exception ex) {
                         status.setForeground(Color.red);
                         status.setText("Error: Check date format or empty field");
-                        Logger.getLogger(ModelUI.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(StaticModelUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }              
             });
@@ -355,10 +281,10 @@ public class ModelUI extends JPanel {
                         try {
                             loadPreset(loadPresets());
                         } catch (IOException ex) {
-                            Logger.getLogger(ModelUI.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(StaticModelUI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } catch (URISyntaxException ex) {
-                        Logger.getLogger(ModelUI.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(StaticModelUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }              
             });
@@ -371,7 +297,7 @@ public class ModelUI extends JPanel {
                     try {
                         savePresets();
                     } catch (IOException ex) {
-                        Logger.getLogger(ModelUI.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(StaticModelUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }              
             });
@@ -385,10 +311,10 @@ public class ModelUI extends JPanel {
                         try {
                             deletePreset(loadPresets());
                         } catch (IOException ex) {
-                            Logger.getLogger(ModelUI.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(StaticModelUI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } catch (URISyntaxException ex) {
-                        Logger.getLogger(ModelUI.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(StaticModelUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }              
             });
@@ -433,44 +359,6 @@ public class ModelUI extends JPanel {
             
         }
         
-        public void logInputs(JTextField startDateText,
-            JTextField endDateText,
-            ArrayList<JComponent[]> coresInput,
-            ArrayList<JComponent[]> sectorsInput,
-            ArrayList<JComponent[]> triggersInput){
-            System.out.println("--------------------------------");     
-
-            System.out.println("Start Date: "+startDateText.getText());
-            System.out.println("End Date: "+endDateText.getText());
-            
-            System.out.println("");
-            System.out.println("Core Inputs");
-            
-            for(JComponent[] component:coresInput){
-                JComboBox jcb = (JComboBox)component[0];
-                JTextField jtb1 = (JTextField)component[1];
-                JTextField jtb2 = (JTextField)component[2];
-                JTextField jtb3 = (JTextField)component[3];
-                System.out.println(jcb.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText());
-            }
-            
-            System.out.println("");
-            System.out.println("Sector Inputs");
-            
-            for(JComponent[] component:sectorsInput){
-                JComboBox jcb = (JComboBox)component[0];
-                JComboBox jcb2 = (JComboBox)component[1];
-                JComboBox jcb3 = (JComboBox)component[2];
-                JTextField jtb1 = (JTextField)component[3];
-                JTextField jtb2 = (JTextField)component[4];
-                JTextField jtb3 = (JTextField)component[5];
-                JTextField jtb4 = (JTextField)component[6];
-                System.out.println(jcb.getSelectedItem().toString()+", "+jcb2.getSelectedItem().toString()+", "+jcb3.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText()+", "+jtb4.getText());
-            }
-           
-            System.out.println("--------------------------------");     
-        }
-        
         public void loadPreset(String path) throws IOException{
             
             ArrayList<String[]> preset = readFile(path);
@@ -505,10 +393,10 @@ public class ModelUI extends JPanel {
                 JTextField jtb1 = (JTextField)coresInput.get(i)[1];
                 JTextField jtb2 = (JTextField)coresInput.get(i)[2];
                 JTextField jtb3 = (JTextField)coresInput.get(i)[3];
-                jcb.setSelectedItem(preset.get(1)[0+i*lengthOfCore]);
-                jtb1.setText(preset.get(1)[1+i*lengthOfCore]);
-                jtb2.setText(preset.get(1)[2+i*lengthOfCore]);
-                jtb3.setText(preset.get(1)[3+i*lengthOfCore]);
+                jcb.setSelectedItem(preset.get(1)[0+i*4]);
+                jtb1.setText(preset.get(1)[1+i*4]);
+                jtb2.setText(preset.get(1)[2+i*4]);
+                jtb3.setText(preset.get(1)[3+i*4]);
                 
             }
               
@@ -519,15 +407,13 @@ public class ModelUI extends JPanel {
             
             for(int i = 0;i<preset.get(2).length;i+=lengthOfSector){
                 if(sectorsInput.size()<i/lengthOfSector){
-                    JComponent[] components = new JComponent[7];
+                    JComponent[] components = new JComponent[5];
 
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
-                    components[1] = new JComboBox(new String[]{"Major","Minor"});
-                    components[2] = new JComboBox(new String[]{"Regular","Hard"});
+                    components[1] = new JTextField(20);
+                    components[2] = new JTextField(20);
                     components[3] = new JTextField(20);
                     components[4] = new JTextField(20);
-                    components[5] = new JTextField(20);
-                    components[6] = new JTextField(20);
 
                     sectorsInput.add(components);
                     for(JComponent jc:components){
@@ -545,61 +431,19 @@ public class ModelUI extends JPanel {
             
             for(int i = 0;i<sectorsInput.size();i++){
                 JComboBox jcb = (JComboBox)sectorsInput.get(i)[0];
-                JComboBox jcb2 = (JComboBox)sectorsInput.get(i)[1];
-                JComboBox jcb3 = (JComboBox)sectorsInput.get(i)[2];
-                JTextField jtb1 = (JTextField)sectorsInput.get(i)[3];
-                JTextField jtb2 = (JTextField)sectorsInput.get(i)[4];
-                JTextField jtb3 = (JTextField)sectorsInput.get(i)[5];
-                JTextField jtb4 = (JTextField)sectorsInput.get(i)[6];
-                jcb.setSelectedItem(preset.get(2)[0+i*lengthOfSector]);
-                jcb2.setSelectedItem(preset.get(2)[1+i*lengthOfSector]);
-                jcb3.setSelectedItem(preset.get(2)[2+i*lengthOfSector]);
-                jtb1.setText(preset.get(2)[3+i*lengthOfSector]);
-                jtb2.setText(preset.get(2)[4+i*lengthOfSector]);
-                jtb3.setText(preset.get(2)[5+i*lengthOfSector]);
-                jtb4.setText(preset.get(2)[6+i*lengthOfSector]);
+                JTextField jtb1 = (JTextField)sectorsInput.get(i)[1];
+                JTextField jtb2 = (JTextField)sectorsInput.get(i)[2];
+                JTextField jtb3 = (JTextField)sectorsInput.get(i)[3];
+                JTextField jtb4 = (JTextField)sectorsInput.get(i)[4];
+                jcb.setSelectedItem(preset.get(2)[0+i*5]);
+                jtb1.setText(preset.get(2)[1+i*5]);
+                jtb2.setText(preset.get(2)[2+i*5]);
+                jtb3.setText(preset.get(2)[3+i*5]);
+                jtb4.setText(preset.get(2)[4+i*5]);
             }
-            try{
-                int lengthOfTrigger = 5;//Fix
-                int numTriggers = (int)preset.get(3).length/lengthOfTrigger;
-
-                for(int i = 0;i<preset.get(3).length;i+=lengthOfTrigger){
-                    if(triggersInput.size()<i/lengthOfTrigger){
-                        JComponent[] components = new JComponent[5];
-
-                        components[0] = new JComboBox(triggerNames);
-                        components[1] = new JComboBox(options);
-                        components[2] = new JTextField(4);
-                        components[3] = new JComboBox(options);
-                        components[4] = new JTextField(4);
-
-                        triggersInput.add(components);
-                        for(JComponent jc:components){
-                            four.add(jc);
-                        }
-
-                        four.remove(addTrigger);
-                        for(JComponent jc:components){
-                            four.add(jc);
-                        }
-                        four.add(addTrigger);
-                        four.revalidate();
-                    }
-                }
-
-                for(int i = 0;i<triggersInput.size();i++){
-                    JComboBox jcb = (JComboBox)triggersInput.get(i)[0];
-                    JComboBox jcb2 = (JComboBox)triggersInput.get(i)[1];
-                    JTextField jtf1 = (JTextField)triggersInput.get(i)[2];
-                    JComboBox jcb3 = (JComboBox)triggersInput.get(i)[3];
-                    JTextField jtf2 = (JTextField)triggersInput.get(i)[4];
-                    jcb.setSelectedItem(preset.get(3)[0+i*lengthOfTrigger]);
-                    jcb2.setSelectedItem(preset.get(3)[1+i*lengthOfTrigger]);
-                    jtf1.setText(preset.get(3)[2+i*lengthOfTrigger]);
-                    jcb3.setSelectedItem(preset.get(3)[3+i*lengthOfTrigger]);
-                    jtf2.setText(preset.get(3)[4+i*lengthOfTrigger]);
-                } 
-            }catch(Exception e){System.out.println("No triggers in Preset");}
+            
+            
+           
             
         }
         
@@ -664,34 +508,18 @@ public class ModelUI extends JPanel {
                     out.println("");
                     for(JComponent[] c:sectorsInput){
                         JComboBox jcb = (JComboBox)c[0];
-                        JComboBox jcb2 = (JComboBox)c[1];
-                        JComboBox jcb3 = (JComboBox)c[2];
-                        JTextField jtb1 = (JTextField)c[3];
-                        JTextField jtb2 = (JTextField)c[4];
-                        JTextField jtb3 = (JTextField)c[5];
-                        JTextField jtb4 = (JTextField)c[6];
+                        JTextField jtb1 = (JTextField)c[1];
+                        JTextField jtb2 = (JTextField)c[2];
+                        JTextField jtb3 = (JTextField)c[3];
+                        JTextField jtb4 = (JTextField)c[4];
                         out.print(jcb.getSelectedItem().toString()+",");
-                        out.print(jcb2.getSelectedItem().toString()+",");
-                        out.print(jcb3.getSelectedItem().toString()+",");
                         out.print(jtb1.getText()+",");
                         out.print(jtb2.getText()+",");
                         out.print(jtb3.getText()+",");
                         out.print(jtb4.getText()+",");
                     }
                     out.println("");
-                    for(JComponent[] c:triggersInput){
-                        JComboBox jcb = (JComboBox)c[0];
-                        JComboBox jcb2 = (JComboBox)c[1];
-                        JTextField jtf1 = (JTextField)c[2];
-                        JComboBox jcb3 = (JComboBox)c[3];
-                        JTextField jtf2 = (JTextField)c[4];
-                        out.print(jcb.getSelectedItem().toString()+",");
-                        out.print(jcb2.getSelectedItem().toString()+",");
-                        out.print(jtf1.getText()+",");
-                        out.print(jcb3.getSelectedItem().toString()+",");
-                        out.print(jtf2.getText()+",");
-                    }
-                    out.println("");
+                    
 
                 } catch (IOException e) {
                     System.out.println(e);

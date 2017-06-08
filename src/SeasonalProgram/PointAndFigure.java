@@ -18,18 +18,21 @@ import java.util.Date;
  */
 public class PointAndFigure extends Table{
     
-    public ArrayList<Double[]> boxSizes;
+    public ArrayList<BoxSize> boxSizes;
     public int reversalBoxes;
+    public int signalBoxes;
     
     public double currentBoxLevel;
+    public ArrayList<Integer> columns;
     
     public PointAndFigure(String name, Dataset data, Date startDate, Date endDate, 
-            ArrayList<Double[]> boxSizes, int reversalBoxes) throws IOException, CloneNotSupportedException, ParseException{
+            ArrayList<BoxSize> boxSizes, int reversalBoxes, int signalBoxes) throws IOException, CloneNotSupportedException, ParseException{
         super(name, data, startDate, endDate);
         
+        columns = new ArrayList<Integer>();
         this.boxSizes = boxSizes;
         this.reversalBoxes = reversalBoxes;
-        
+        this.signalBoxes = signalBoxes;
         this.data = data;
         this.data = new Dataset(data.data,data.setNum,data.nameListPos,data.dataColumnCount);
         this.data.trimData(startDate, endDate);
@@ -37,7 +40,7 @@ public class PointAndFigure extends Table{
         ArrayList<ArrayList<Double>> boxes = new ArrayList<ArrayList<Double>>();
         double currentValue = 0;
         
-        while(currentValue<boxSizes.get(boxSizes.size()-1)[1]){
+        while(currentValue<boxSizes.get(boxSizes.size()-1).max){
             ArrayList<Double> row = new ArrayList<Double>();
             row.add(currentValue);
             boxes.add(row);
@@ -84,12 +87,12 @@ public class PointAndFigure extends Table{
                     goingUp = true;
                     goingDown = false;
                     currentColumn++;
-                    
+                    columns.add(0);
                 }else if(!goingDown&&currentValue-column[i]>getBoxSize(column[i])*reversalBoxes){
                     goingUp = false;
                     goingDown = true;
                     currentColumn++;
-                    
+                    columns.add(0);
                 }
                 for(ArrayList<String> row:filledBoxes){
                     while(row.size()<currentColumn){
@@ -102,7 +105,7 @@ public class PointAndFigure extends Table{
                     while(column[i]>currentValue){
                         currentValue+=getBoxSize(column[i]);
                         filledBoxes.get(getRow(currentValue,boxes)).add("X");
-                        
+                        columns.set(columns.size()-1, columns.get(columns.size()-1)+1);
                     }
                 }else if(goingDown&&currentValue-column[i]>getBoxSize(column[i])){
                     int nextRow = getRow(column[i],boxes);
@@ -110,7 +113,7 @@ public class PointAndFigure extends Table{
                     while(column[i]<currentValue){
                         currentValue-=getBoxSize(column[i]);
                         filledBoxes.get(getRow(currentValue,boxes)).add("O");
-                        
+                        columns.set(columns.size()-1, columns.get(columns.size()-1)-1);
                         
                     }
                 }
@@ -155,11 +158,28 @@ public class PointAndFigure extends Table{
     
     public double getBoxSize(double value){
         
-        for(Double[] range:boxSizes){
-            if(value>range[0]&&value<=range[1]||value==0&&value==range[0]){
-                return range[2];
+        for(BoxSize range:boxSizes){
+            if(value>range.min&&value<=range.max||value==0&&value==range.min){
+                return range.value;
             }
         }
         return -1;
+    }
+    
+    public boolean buySignal(){
+        if(columns.get(columns.size()-1)>=signalBoxes){
+            if(columns.get(columns.size()-1)>columns.get(columns.size()-3)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean sellSignal(){
+        if(columns.get(columns.size()-1)<=signalBoxes*(-1)){
+            if(columns.get(columns.size()-1)<columns.get(columns.size()-3)){
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -5,10 +5,14 @@
  */
 package SeasonalProgram;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,11 +21,18 @@ import java.util.HashMap;
 public class PnFPortfolio extends Portfolio{
     
     public boolean inSeasonal;
+    public ArrayList<BoxSize> boxSizes;
+    public int reversalBoxes;
+    public int signalBoxes;
     
-    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate){
+    
+    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,ArrayList<BoxSize> boxSizes,int reversalBoxes, int signalBoxes ){
         super(securities,startDate,endDate);
         inSeasonal = false;
-        
+        this.boxSizes = boxSizes;
+        this.reversalBoxes = reversalBoxes;
+        this.signalBoxes = signalBoxes;
+       
     }
     
     @Override
@@ -63,10 +74,9 @@ public class PnFPortfolio extends Portfolio{
                     inSeasonal = true;
                 //checks for month before buy Date
                 }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
-                    buyTriggered(calendar.getTime());
-                    if(coreBuyTriggered(calendar.getTime(),getHoldingsCore())){
-                        buyCoreEarly(calendar.getTime());
-                    }
+                    try {
+                        buyTriggered(calendar.getTime());
+                    } catch (Exception ex) {}
                 }
             }else{
                 if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
@@ -79,11 +89,15 @@ public class PnFPortfolio extends Portfolio{
 
                     inSeasonal = false;
                 }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
-                    sellTriggered(calendar.getTime());
+                    try {
+                        sellTriggered(calendar.getTime());
+                    } catch (Exception e){}
                 }else if(calendar.getTime().after(twoWeeksBeforeSell.getTime())||calendar.getTime().equals(twoWeeksBeforeSell.getTime())){
-                    if(coreSellTriggered(calendar.getTime(),getHoldingsCore())){
-                        sellCoreEarly(calendar.getTime());
-                    }
+                    try {
+                        if(sellTriggered(calendar.getTime(),(Security)getHoldingsCore())){
+                            sellCoreEarly(calendar.getTime());
+                        }
+                    } catch (Exception e){}
                 }
             }
             
@@ -144,7 +158,7 @@ public class PnFPortfolio extends Portfolio{
     
     public Security getBenchmark(){
         for(Security s:securities){
-            if(s.name.equals(SeasonalProgram.seasonalModel.core.name)){
+            if(s.name.equals(SeasonalProgram.RSModel.core.name)){
                 return s;
             }
         }
@@ -198,7 +212,7 @@ public class PnFPortfolio extends Portfolio{
     }
     
     //Has to buy triggered sectors at premature trigger positions
-    private void buyTriggered(Date d) {
+    private void buyTriggered(Date d) throws IOException, ParseException, CloneNotSupportedException {
         ArrayList<Security> topSectors = getTopSectors();
         
         for(Security s:topSectors){
@@ -211,7 +225,7 @@ public class PnFPortfolio extends Portfolio{
                 }
                 
                 if(!overAllocation(d,allocation)){
-                    if(sectorBuyTriggered(d, s)){
+                    if(buyTriggered(d, s)){
                         buy(s,allocation,false);
                     }
                 }
@@ -221,12 +235,12 @@ public class PnFPortfolio extends Portfolio{
     }
     
     //Has to sell triggered sectors at premature trigger positions
-    private void sellTriggered(Date d) {
+    private void sellTriggered(Date d) throws IOException, ParseException, CloneNotSupportedException {
         for(Security s:holdings.keySet()){
             if(s instanceof Sector){
                 
                 if(((Sector) s).sellType.equals("Regular")){
-                    if(sectorSellTriggered(d, s)){
+                    if(sellTriggered(d, s)){
                         decreasePosition(s,d,5.0,(Core)getBenchmark());
                     }
                 }
@@ -397,37 +411,47 @@ public class PnFPortfolio extends Portfolio{
         
     }
     
+        //checks if sector sell is triggered
+    //O exceedes previous PnF O row
+    //Mame variable minimum how many in a Row 
+    private boolean sellTriggered(Date d, Security s) throws IOException, ParseException, CloneNotSupportedException {
+        PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+        return(pf.sellSignal());    
+    }
+    
+    //checks if sector buy is triggered
+    //X exceedes previous PnF X row
+    //Mame variable minimum how many in a Row 
+    private boolean buyTriggered(Date d, Security s) throws IOException, CloneNotSupportedException, ParseException {
+        PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+        return(pf.buySignal());
+    }
     
     
     //All sectors that pass initial buy criteria
+    //X exceedes previous PnF X row
+    //Mame minimum how many in a Row 
+    //Make Seperate UI tab
+    //Sector/SP500, In array
+    //Create PnF from this data
+    //Brooke to come back to me on that
     public ArrayList<Security> getPossibleBuys() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     //compare two sectors based on either PnF or Core performance
+    //sector x/y, Counting Xs
+    //Brooke to come back to me on that
     private Double compareSectors(Security s, Security t) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+  
     
-    //checks if sector sell is triggered
-    private boolean sectorSellTriggered(Date d, Security s) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    //checks if sector buy is triggered
-    private boolean sectorBuyTriggered(Date d, Security s) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
-    //check if S&P 500 has a sell PnF
-    private boolean coreSellTriggered(Date time, Security holdingsCore) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    //If S&P 500 registers a buy signal 
-    private boolean coreBuyTriggered(Date time, Security holdingsCore) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void printStats(){
+        //Monthly bases list
+        //list matrix
+        //Sector Buys/Sells Signals
     }
     
     

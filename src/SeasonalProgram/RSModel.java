@@ -5,7 +5,6 @@
  */
 package SeasonalProgram;
 
-import static SeasonalProgram.SeasonalProgram.seasonalModel;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,7 +20,7 @@ import javax.swing.JTextField;
  *
  * @author jordandearsley
  */
-class Model {
+class RSModel {
 
     public Date startDate;
     public Date endDate;
@@ -31,12 +30,15 @@ class Model {
    
     public ArrayList<Sector> sectors = new ArrayList<Sector>();
     
-    public ArrayList<Trigger> triggers = new ArrayList<Trigger>();
+    public ArrayList<BoxSize> sizes = new ArrayList<BoxSize>();
+    
+    public int reversalBoxes;
+    public int signalBoxes;
     
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
     public SimpleDateFormat monthsdf = new SimpleDateFormat("MM/dd");
    
-    public Model(
+    public RSModel(
          JTextField startDateText,
          JTextField endDateText,
          /*JRadioButton model,
@@ -46,7 +48,7 @@ class Model {
         
          ArrayList<JComponent[]> sectorsInput,
         
-         ArrayList<JComponent[]> triggersInput
+         ArrayList<JComponent[]> sizesInput
          ) throws ParseException {
     
         startDate = sdf.parse(startDateText.getText());
@@ -63,7 +65,10 @@ class Model {
             JTextField jtb1 = (JTextField)component[1];
             JTextField jtb2 = (JTextField)component[2];
             JTextField jtb3 = (JTextField)component[3];
-            core = (new Core(jcb.getSelectedItem().toString(),monthsdf.parse(jtb1.getText()),monthsdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
+            reversalBoxes = Integer.parseInt(jtb2.getText());
+            signalBoxes = Integer.parseInt(jtb3.getText());
+            
+            core = (new Core(jcb.getSelectedItem().toString(),startDate,endDate,Double.parseDouble(jtb1.getText())));
         }
         
         for(JComponent[] component:sectorsInput){
@@ -71,19 +76,17 @@ class Model {
             JComboBox jcb2 = (JComboBox)component[1];
             JComboBox jcb3 = (JComboBox)component[2];
             JTextField jtb1 = (JTextField)component[3];
-            JTextField jtb2 = (JTextField)component[4];
-            JTextField jtb3 = (JTextField)component[5];
-            JTextField jtb4 = (JTextField)component[6];
-            sectors.add(new Sector(jcb.getSelectedItem().toString(),jcb2.getSelectedItem().toString(),jcb3.getSelectedItem().toString(),monthsdf.parse(jtb1.getText()),monthsdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText()),Double.parseDouble(jtb4.getText())));
+
+            sectors.add(new Sector(jcb.getSelectedItem().toString(),jcb2.getSelectedItem().toString(),jcb3.getSelectedItem().toString(),startDate,endDate,Double.parseDouble((jtb1.getText()))));
         }
 
-        for(JComponent[] component:triggersInput){
-            JComboBox jcb = (JComboBox)component[0];
-            JComboBox jcb2 = (JComboBox)component[1];
-            JTextField jtf1 = (JTextField)component[2];
-            JComboBox jcb3 = (JComboBox)component[3];
-            JTextField jtf2 = (JTextField)component[4];
-            triggers.add(new Trigger(jcb.getSelectedItem().toString(),checkCombo(jcb2),Integer.parseInt(jtf1.getText()),checkCombo(jcb3),Integer.parseInt(jtf2.getText())));
+        for(JComponent[] component:sizesInput){
+
+            JTextField jtf1 = (JTextField)component[0];
+            JTextField jtf2 = (JTextField)component[1];
+            JTextField jtf3 = (JTextField)component[2];
+
+            sizes.add(new BoxSize(Double.parseDouble(jtf1.getText()),Double.parseDouble(jtf2.getText()),Double.parseDouble(jtf3.getText())));
         }    
     
     }

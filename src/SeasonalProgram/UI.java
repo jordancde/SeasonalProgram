@@ -25,8 +25,11 @@ public class UI extends JFrame {
         
         JTabbedPane tabbedPane = new JTabbedPane();
         
-        ModelUI model = new ModelUI();
-        tabbedPane.addTab("Model", model);
+        StaticModelUI Smodel = new StaticModelUI();
+        tabbedPane.addTab("Static Model", Smodel);
+        
+        RSModelUI RSmodel = new RSModelUI();
+        tabbedPane.addTab("RS Model", RSmodel);
         
         MonthSummaryUI month = new MonthSummaryUI();
         tabbedPane.addTab("Month Summary", month);
