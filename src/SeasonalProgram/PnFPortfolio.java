@@ -77,7 +77,7 @@ public class PnFPortfolio extends Portfolio{
                 }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
                     try {
                         buyTriggered(calendar.getTime());
-                    } catch (Exception ex) {}
+                    } catch (Exception ex) {System.out.println(ex);}
                 }
             }else{
                 if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
@@ -92,13 +92,13 @@ public class PnFPortfolio extends Portfolio{
                 }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
                     try {
                         sellTriggered(calendar.getTime());
-                    } catch (Exception e){}
+                    } catch (Exception ex){System.out.println(ex);}
                 }else if(calendar.getTime().after(twoWeeksBeforeSell.getTime())||calendar.getTime().equals(twoWeeksBeforeSell.getTime())){
                     try {
                         if(sellTriggered(calendar.getTime(),(Security)getHoldingsCore())){
                             sellCoreEarly(calendar.getTime());
                         }
-                    } catch (Exception e){}
+                    } catch (Exception ex){System.out.println(ex);}
                 }
             }
             
@@ -224,9 +224,13 @@ public class PnFPortfolio extends Portfolio{
                 }else if(((Sector) s).type.equals("Minor")){
                     allocation = 5;
                 }
-                
-                if(!overAllocation(d,allocation)){
-                    if(buyTriggered(d, s)){
+                if(buyTriggered(d,s)){
+                    if(!overAllocation(d,allocation)){
+                        buy(s,allocation,false);
+                    }else{
+                        while(overAllocation(d,allocation)){
+                            dropLowestSector();
+                        }
                         buy(s,allocation,false);
                     }
                 }
@@ -278,7 +282,7 @@ public class PnFPortfolio extends Portfolio{
         //in the case that it isn't already bought
         try{
             currentAllocationPercent = 100*holdings.get(s)[0]/portfolioValue;
-        }catch(Exception e){}
+        }catch(Exception e){System.out.println(e);}
         
         double increase = increaseTo-currentAllocationPercent;
         
@@ -424,7 +428,7 @@ public class PnFPortfolio extends Portfolio{
         
     }
     
-        //checks if sector sell is triggered
+    //checks if sector sell is triggered
     //O exceedes previous PnF O row
     //Mame variable minimum how many in a Row 
     private boolean sellTriggered(Date d, Security s) throws IOException, ParseException, CloneNotSupportedException {
@@ -438,6 +442,64 @@ public class PnFPortfolio extends Portfolio{
     private boolean buyTriggered(Date d, Security s) throws IOException, CloneNotSupportedException, ParseException {
         PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
         return(pf.buySignal());
+    }
+    
+    private void dropLowestSector(){
+        ArrayList<Security> topSectors = getTopSectors();
+        int worst = 0;
+        for(Security s:holdings.keySet()){
+            if(topSectors.indexOf(s)>worst){
+                worst = topSectors.indexOf(s);
+            }
+        }
+        Security lowestSector = topSectors.get(worst);
+        sell(lowestSector);
+    }
+
+    @Override
+    public void printUpdate(Date d){
+        System.out.println("");
+        System.out.println(sm.format(d));
+        printHoldings();
+        System.out.println("Portfolio Value "+round(portfolioValue));
+        printMatrix();
+        try {
+            printSignals();
+        } catch (Exception e){
+            System.out.println("Error in printSignals");
+        }
+    }
+    
+    private void printMatrix() {
+        System.out.println("Matrix:");
+        HashMap<Security, HashMap<Security, Double>> matrix = makeMatrix();
+        for(Security s: matrix.keySet()){
+            System.out.print(s.name+"|");
+        }
+        System.out.println("");
+        
+        for(Security s: matrix.keySet()){
+            System.out.print(s.name+"|");
+            for(Security t:matrix.get(s).keySet()){
+                System.out.print(matrix.get(s).get(t)+"|");
+            }
+            System.out.println("");
+        }
+    }
+
+    private void printSignals() throws IOException, CloneNotSupportedException, ParseException {
+        System.out.println("Signals:");
+        for(Security s:securities){
+            PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+            if(pf.buySignal()){
+                System.out.println(s.name+": Buy");
+            }else if(pf.sellSignal()){
+                System.out.println(s.name+": Sell");
+            }else{
+                System.out.println(s.name+": ---");
+            }
+        }
+        System.out.println("");
     }
     
     
@@ -458,17 +520,6 @@ public class PnFPortfolio extends Portfolio{
     private Double compareSectors(Security s, Security t) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    private void dropLowestSector(){
-        
-    }
-    
-    private void printStats(){
-        //Monthly bases list
-        //list matrix
-        //Sector Buys/Sells Signals
-    }
-    
     
 
     

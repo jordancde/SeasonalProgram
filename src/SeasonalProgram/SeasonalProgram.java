@@ -43,9 +43,12 @@ public class SeasonalProgram {
         
  
     }
+    
     public static void runRSModel(){
         PnFportfolio = new PnFPortfolio(RSModel.getSecurities(),RSModel.startDate,RSModel.endDate,RSModel.sizes,RSModel.reversalBoxes,RSModel.signalBoxes, RSModel.minCoreAllocation);
+        PnFportfolio.runPortfolio();
     }
+    
     public static void runStaticModel() throws IOException, CloneNotSupportedException, ParseException{
         
         portfolio = new Portfolio(staticModel.getSecurities(),staticModel.startDate,staticModel.endDate);
