@@ -117,7 +117,7 @@ public class PnFPortfolio extends Portfolio{
     }
     
     //ordered highest to lowest
-    public ArrayList<Security> getTopSectors(){
+    public ArrayList<Security> getTopSectors() throws ParseException, IOException, CloneNotSupportedException{
         HashMap<Security, HashMap<Security, Double> > matrix = makeMatrix();
         HashMap<Security, Double> relativePerformances = new HashMap<Security, Double>();
         for(Security s: matrix.keySet()){
@@ -139,7 +139,7 @@ public class PnFPortfolio extends Portfolio{
         return topSectors;
     }
     
-    public HashMap<Security, HashMap<Security, Double> > makeMatrix(){
+    public HashMap<Security, HashMap<Security, Double> > makeMatrix() throws ParseException, IOException, CloneNotSupportedException{
         HashMap<Security, HashMap<Security, Double> > matrix = new HashMap<Security, HashMap<Security, Double> >();
         ArrayList<Security> securities = getPossibleBuys();
         for(Security s:securities){
@@ -444,7 +444,7 @@ public class PnFPortfolio extends Portfolio{
         return(pf.buySignal());
     }
     
-    private void dropLowestSector(){
+    private void dropLowestSector() throws ParseException, IOException, CloneNotSupportedException{
         ArrayList<Security> topSectors = getTopSectors();
         int worst = 0;
         for(Security s:holdings.keySet()){
@@ -462,15 +462,17 @@ public class PnFPortfolio extends Portfolio{
         System.out.println(sm.format(d));
         printHoldings();
         System.out.println("Portfolio Value "+round(portfolioValue));
-        printMatrix();
+        try {
+            printMatrix();
+        } catch (Exception e){System.out.println(e);}
         try {
             printSignals();
         } catch (Exception e){
-            System.out.println("Error in printSignals");
+            System.out.println(e);
         }
     }
     
-    private void printMatrix() {
+    private void printMatrix() throws ParseException, IOException, CloneNotSupportedException {
         System.out.println("Matrix:");
         HashMap<Security, HashMap<Security, Double>> matrix = makeMatrix();
         for(Security s: matrix.keySet()){
@@ -505,20 +507,34 @@ public class PnFPortfolio extends Portfolio{
     
     //All sectors that pass initial buy criteria
     //X exceedes previous PnF X row
-    //Mame minimum how many in a Row 
-    //Make Seperate UI tab
     //Sector/SP500, In array
     //Create PnF from this data
     //Brooke to come back to me on that
-    public ArrayList<Security> getPossibleBuys() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public ArrayList<Security> getPossibleBuys() throws IOException, CloneNotSupportedException, ParseException {
+        ArrayList<Security> possibleBuyList = new ArrayList<Security>();
+        for(Security s: securities){
+            Dataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(getBenchmark().name));
+            PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+            if(pf.buySignal()){
+                possibleBuyList.add(s);
+            }
+        }
+        return possibleBuyList;
     }
 
     //compare two sectors based on either PnF or Core performance
     //sector x/y, Counting Xs
     //Brooke to come back to me on that
-    private Double compareSectors(Security s, Security t) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private Double compareSectors(Security s, Security t) throws ParseException, IOException, CloneNotSupportedException {
+        Dataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(t.name));
+        PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+        if(pf.buySignal()){
+            return 1.0;
+        }else if(pf.sellSignal()){
+            return -1.0;
+        }else{
+            return 0.0;
+        }
     }
     
 
