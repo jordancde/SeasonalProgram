@@ -228,6 +228,11 @@ public class Portfolio {
         for(Security s:securities){
             if(s instanceof Core && !(s.equals(source))){
                 double currentValue = getValue(calendar.getTime(),s);
+                
+                //to account for if both cores are held at once
+                if(holdings.containsKey(s)){
+                    allocation+=holdings.get(s)[0];
+                }
                 Double[] newCoreStats = {allocation,currentValue,currentValue};
                 holdings.put(s,newCoreStats);
                 trades.add(new Trade(calendar.getTime(),source,s));
