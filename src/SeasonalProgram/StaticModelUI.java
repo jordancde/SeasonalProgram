@@ -333,7 +333,7 @@ public class StaticModelUI extends JPanel {
             
             int numPresets = 0;
             for(int i = 0; i < listOfFiles.length; i++){
-                if(listOfFiles[i].getName().contains("PRESET")){
+                if(listOfFiles[i].getName().contains("STATICPRESET")){
                     numPresets++;
                 }
             }
@@ -341,9 +341,9 @@ public class StaticModelUI extends JPanel {
             //current position in fileNames
             int currentPos = 0;
             for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].isFile()&&listOfFiles[i].getName().contains("PRESET")) {
+                if (listOfFiles[i].isFile()&&listOfFiles[i].getName().contains("STATICPRESET")) {
                   String fileName = listOfFiles[i].getName();
-                  fileName = fileName.replace("PRESET", "");
+                  fileName = fileName.replace("STATICPRESET", "");
                   fileName = fileName.replace(".csv", "");
                   fileNames[currentPos] = fileName;
                   currentPos++;
@@ -353,7 +353,7 @@ public class StaticModelUI extends JPanel {
             String input = (String) JOptionPane.showInputDialog(null, "Select Preset",
             "Presets", JOptionPane.QUESTION_MESSAGE, null, fileNames,fileNames[0]);
             
-            String path = location.getFile()+"PRESET"+input+".csv";
+            String path = location.getFile()+"STATICPRESET"+input+".csv";
             return path;
             
             
@@ -474,7 +474,7 @@ public class StaticModelUI extends JPanel {
             
             URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
 
-            String path = location.getFile()+"PRESET"+presetName+".csv";
+            String path = location.getFile()+"STATICPRESET"+presetName+".csv";
             int result = 0;
             if(!(new File(path).canRead())){
                 (new File(path)).createNewFile();

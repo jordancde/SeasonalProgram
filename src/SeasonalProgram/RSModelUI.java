@@ -397,7 +397,7 @@ public class RSModelUI extends JPanel {
             
             int numPresets = 0;
             for(int i = 0; i < listOfFiles.length; i++){
-                if(listOfFiles[i].getName().contains("PRESET")){
+                if(listOfFiles[i].getName().contains("RSPRESET")){
                     numPresets++;
                 }
             }
@@ -405,9 +405,9 @@ public class RSModelUI extends JPanel {
             //current position in fileNames
             int currentPos = 0;
             for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].isFile()&&listOfFiles[i].getName().contains("PRESET")) {
+                if (listOfFiles[i].isFile()&&listOfFiles[i].getName().contains("RSPRESET")) {
                   String fileName = listOfFiles[i].getName();
-                  fileName = fileName.replace("PRESET", "");
+                  fileName = fileName.replace("RSPRESET", "");
                   fileName = fileName.replace(".csv", "");
                   fileNames[currentPos] = fileName;
                   currentPos++;
@@ -417,7 +417,7 @@ public class RSModelUI extends JPanel {
             String input = (String) JOptionPane.showInputDialog(null, "Select Preset",
             "Presets", JOptionPane.QUESTION_MESSAGE, null, fileNames,fileNames[0]);
             
-            String path = location.getFile()+"PRESET"+input+".csv";
+            String path = location.getFile()+"RSPRESET"+input+".csv";
             return path;
             
             
@@ -609,7 +609,7 @@ public class RSModelUI extends JPanel {
             
             URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
 
-            String path = location.getFile()+"PRESET"+presetName+".csv";
+            String path = location.getFile()+"RSPRESET"+presetName+".csv";
             int result = 0;
             if(!(new File(path).canRead())){
                 (new File(path)).createNewFile();
