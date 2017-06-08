@@ -24,15 +24,16 @@ public class PnFPortfolio extends Portfolio{
     public ArrayList<BoxSize> boxSizes;
     public int reversalBoxes;
     public int signalBoxes;
+    public double minCoreAllocation;
     
     
-    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,ArrayList<BoxSize> boxSizes,int reversalBoxes, int signalBoxes ){
+    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,ArrayList<BoxSize> boxSizes,int reversalBoxes, int signalBoxes, double minCoreAllocation ){
         super(securities,startDate,endDate);
         inSeasonal = false;
         this.boxSizes = boxSizes;
         this.reversalBoxes = reversalBoxes;
         this.signalBoxes = signalBoxes;
-       
+        this.minCoreAllocation = minCoreAllocation;
     }
     
     @Override
@@ -233,6 +234,18 @@ public class PnFPortfolio extends Portfolio{
             }
         }
     }
+    
+    @Override
+    public boolean overAllocation(Date d, double toBeAdded){
+        double sum = 0;
+        for(Security s:holdings.keySet()){
+            if(!s.equals(getBenchmark())){
+                sum+=holdings.get(s)[0]/getPortfolioValue(d);  
+            }
+        }
+        sum+=toBeAdded;
+        return(100-sum<minCoreAllocation);
+    };
     
     //Has to sell triggered sectors at premature trigger positions
     private void sellTriggered(Date d) throws IOException, ParseException, CloneNotSupportedException {
@@ -446,7 +459,9 @@ public class PnFPortfolio extends Portfolio{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-  
+    private void dropLowestSector(){
+        
+    }
     
     private void printStats(){
         //Monthly bases list

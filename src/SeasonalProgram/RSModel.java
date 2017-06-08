@@ -34,6 +34,7 @@ class RSModel {
     
     public int reversalBoxes;
     public int signalBoxes;
+    public double minCoreAllocation;
     
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
     public SimpleDateFormat monthsdf = new SimpleDateFormat("MM/dd");
@@ -65,6 +66,8 @@ class RSModel {
             JTextField jtb1 = (JTextField)component[1];
             JTextField jtb2 = (JTextField)component[2];
             JTextField jtb3 = (JTextField)component[3];
+            
+            minCoreAllocation = Double.parseDouble(jtb1.getText());
             reversalBoxes = Integer.parseInt(jtb2.getText());
             signalBoxes = Integer.parseInt(jtb3.getText());
             
