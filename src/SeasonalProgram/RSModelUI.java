@@ -658,9 +658,9 @@ public class RSModelUI extends JPanel {
                     out.println("");
                     for(JComponent[] c:sizesInput){
 
-                        JTextField jtf1 = (JTextField)c[2];
-                        JTextField jtf2 = (JTextField)c[4];
-                        JTextField jtf3 = (JTextField)c[4];
+                        JTextField jtf1 = (JTextField)c[0];
+                        JTextField jtf2 = (JTextField)c[1];
+                        JTextField jtf3 = (JTextField)c[2];
 
                         out.print(jtf1.getText()+",");
                         out.print(jtf2.getText()+",");
