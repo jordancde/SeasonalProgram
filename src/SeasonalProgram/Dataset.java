@@ -25,6 +25,13 @@ public class Dataset {
     public double[] closes;
     public double[] volumes;
     
+    public Date[] trimdates;
+    public double[] trimopens;
+    public double[] trimhighs;
+    public double[] trimlows;
+    public double[] trimcloses;
+    public double[] trimvolumes;
+    
     public String[][] data;
     public int setNum;
     public int nameListPos;
@@ -87,12 +94,13 @@ public class Dataset {
             closes[i]=Double.parseDouble(data[lastRow-i-1][startColumn+4]);
             //volumes[i] = Double.parseDouble(data[lastRow-i-1][startColumn+5]);
         }
+        
+        
 
     }
     public Dataset(String[][] data) throws ParseException{
         this.data = data;
         
-        String[] nameHeader = data[0];
         //how many rows after header data starts
         int rowOffset = 0;
         int columns = data[0].length;
@@ -114,30 +122,29 @@ public class Dataset {
         closes = new double[data.length];
         
         //Under the dataset name list by two rows starts the data
-        for(int i = 0;i<lastRow-1;i++){
+        for(int i = 0;i<lastRow;i++){
             
-            dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[i][0]);
-            opens[i]=Double.parseDouble(data[i][1]);
-            highs[i]=Double.parseDouble(data[i][2]);
-            lows[i]=Double.parseDouble(data[i][3]);
-            closes[i]=Double.parseDouble(data[i][4]);
+            dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[lastRow-i-1][0]);
+            opens[i]=Double.parseDouble(data[lastRow-i-1][1]);
+            highs[i]=Double.parseDouble(data[lastRow-i-1][2]);
+            lows[i]=Double.parseDouble(data[lastRow-i-1][3]);
+            closes[i]=Double.parseDouble(data[lastRow-i-1][4]);
         }
 
     }
     
     public Dataset compareTo(Dataset s) throws ParseException{
-         System.out.println("test");
 
         int arrayLength = Math.min(s.dates.length, dates.length);
-        String[][] newData = new String[arrayLength+1][5];
+        String[][] newData = new String[arrayLength][5];
 
 
-        for(int i = dates.length-1;i>=0;i--){
-            newData[i][0] = new SimpleDateFormat("yyyy/MM/dd").format(dates[i]);
-            newData[i][1] = Double.toString(opens[i]/s.opens[i]);
-            newData[i][2] = Double.toString(highs[i]/s.highs[i]);
-            newData[i][3] = Double.toString(lows[i]/s.lows[i]);
-            newData[i][4] = Double.toString(closes[i]/s.closes[i]);
+        for(int i = 0;i<arrayLength;i++){
+            newData[i][0] = new SimpleDateFormat("yyyy/MM/dd").format(dates[dates.length-1-i]);
+            newData[i][1] = Double.toString(opens[opens.length-1-i]/s.opens[s.opens.length-1-i]);
+            newData[i][2] = Double.toString(highs[highs.length-1-i]/s.highs[s.highs.length-1-i]);
+            newData[i][3] = Double.toString(lows[lows.length-1-i]/s.lows[s.lows.length-1-i]);
+            newData[i][4] = Double.toString(closes[closes.length-1-i]/s.closes[s.closes.length-1-i]);
         }
         Dataset d = new Dataset(newData);
         
@@ -160,12 +167,12 @@ public class Dataset {
             }
         }
         
-        Date[] tempDates = new Date[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
-        double[] tempOpens = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
-        double[] tempHighs = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
-        double[] tempLows = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
-        double[] tempCloses = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
-        double[] tempVolumes = new double[dates.length-startDateIndex-1 - (dates.length-endDateIndex-1)];
+        Date[] tempDates = new Date[endDateIndex-startDateIndex];
+        double[] tempOpens = new double[endDateIndex-startDateIndex];
+        double[] tempHighs = new double[endDateIndex-startDateIndex];
+        double[] tempLows = new double[endDateIndex-startDateIndex];
+        double[] tempCloses = new double[endDateIndex-startDateIndex];
+        double[] tempVolumes = new double[endDateIndex-startDateIndex];
         
         for(int i = 0;i<tempDates.length;i++){
             tempDates[i] = dates[startDateIndex+i];
@@ -173,17 +180,17 @@ public class Dataset {
             tempHighs[i] = highs[startDateIndex+i];
             tempLows[i] = lows[startDateIndex+i];
             tempCloses[i] = closes[startDateIndex+i];
-            tempVolumes[i] = volumes[startDateIndex+i];
+//            tempVolumes[i] = volumes[startDateIndex+i];
         }
-        dates = tempDates;
-        opens = tempOpens;
-        highs = tempHighs;
-        lows = tempLows;
-        closes = tempCloses;
-        volumes = tempVolumes;
+        trimdates = tempDates;
+        trimopens = tempOpens;
+        trimhighs = tempHighs;
+        trimlows = tempLows;
+        trimcloses = tempCloses;
+        trimvolumes = tempVolumes;
     }
     
-
+    
     
     
 }

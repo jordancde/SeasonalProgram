@@ -53,8 +53,8 @@ class RSModel {
          ) throws ParseException {
     
         startDate = sdf.parse(startDateText.getText());
+        
         endDate = sdf.parse(endDateText.getText());
-
         /*if(model.isSelected()){
             isModel = true;
         }else if(individual.isSelected()){
@@ -66,12 +66,14 @@ class RSModel {
             JTextField jtb1 = (JTextField)component[1];
             JTextField jtb2 = (JTextField)component[2];
             JTextField jtb3 = (JTextField)component[3];
+            JTextField jtb4 = (JTextField)component[4];
+            JTextField jtb5 = (JTextField)component[5];
             
-            minCoreAllocation = Double.parseDouble(jtb1.getText());
-            reversalBoxes = Integer.parseInt(jtb2.getText());
-            signalBoxes = Integer.parseInt(jtb3.getText());
+            minCoreAllocation = Double.parseDouble(jtb3.getText());
+            reversalBoxes = Integer.parseInt(jtb4.getText());
+            signalBoxes = Integer.parseInt(jtb5.getText());
             
-            core = (new Core(jcb.getSelectedItem().toString(),startDate,endDate,Double.parseDouble(jtb1.getText())));
+            core = (new Core(jcb.getSelectedItem().toString(),monthsdf.parse(jtb1.getText()),monthsdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
         }
         
         for(JComponent[] component:sectorsInput){
@@ -80,7 +82,7 @@ class RSModel {
             JComboBox jcb3 = (JComboBox)component[2];
             JTextField jtb1 = (JTextField)component[3];
 
-            sectors.add(new Sector(jcb.getSelectedItem().toString(),jcb2.getSelectedItem().toString(),jcb3.getSelectedItem().toString(),startDate,endDate,Double.parseDouble((jtb1.getText()))));
+            sectors.add(new Sector(jcb.getSelectedItem().toString(),jcb2.getSelectedItem().toString(),jcb3.getSelectedItem().toString(),Double.parseDouble((jtb1.getText()))));
         }
 
         for(JComponent[] component:sizesInput){

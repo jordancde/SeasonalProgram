@@ -142,23 +142,26 @@ public class RSModelUI extends JPanel {
             JPanel secTwo = new JPanel(new GridLayout());
             
             
-            GridLayout gl = new GridLayout(0,4);
+            GridLayout gl = new GridLayout(0,6);
             secTwo.setLayout(gl);
             //Row One 
             secTwo.add(new JLabel("Core"));
-
+            secTwo.add(new JLabel("Buy Date (mm/dd)"));
+            secTwo.add(new JLabel("Sell Date (mm/dd)"));
             secTwo.add(new JLabel("Allocation %"));
             secTwo.add(new JLabel("Reversal Boxes"));
             secTwo.add(new JLabel("Signal Boxes"));
             
             //Row Two
             //JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            JComponent[] components = new JComponent[4];
+            JComponent[] components = new JComponent[6];
        
             components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
-            components[1] = new JTextField(20);
-            components[2] = new JTextField(4);
-            components[3] = new JTextField(4);
+            components[1] = new JTextField(5);
+            components[2] = new JTextField(5);
+            components[3] = new JTextField(5);
+            components[4] = new JTextField(4);
+            components[5] = new JTextField(4);
  
             coresInput.add(components);
             for(JComponent jc:components){
@@ -439,7 +442,10 @@ public class RSModelUI extends JPanel {
             for(JComponent[] component:coresInput){
                 JComboBox jcb = (JComboBox)component[0];
                 JTextField jtb1 = (JTextField)component[1];
-                System.out.println(jcb.getSelectedItem().toString()+", "+jtb1.getText());
+                JTextField jtb2 = (JTextField)component[2];
+                JTextField jtb3 = (JTextField)component[3];
+                JTextField jtb4 = (JTextField)component[4];
+                System.out.println(jcb.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText()+", "+jtb4.getText());
             }
             
             System.out.println("");
@@ -476,6 +482,8 @@ public class RSModelUI extends JPanel {
                     components[1] = new JTextField(20);
                     components[2] = new JTextField(20);
                     components[3] = new JTextField(20);
+                    components[4] = new JTextField(20);
+                    components[5] = new JTextField(20);
 
                     coresInput.add(components);
                     two.remove(addCore);
@@ -492,10 +500,14 @@ public class RSModelUI extends JPanel {
                 JTextField jtb1 = (JTextField)coresInput.get(i)[1];
                 JTextField jtb2 = (JTextField)coresInput.get(i)[2];
                 JTextField jtb3 = (JTextField)coresInput.get(i)[3];
+                JTextField jtb4 = (JTextField)coresInput.get(i)[4];
+                JTextField jtb5 = (JTextField)coresInput.get(i)[5];
                 jcb.setSelectedItem(preset.get(1)[0+i*lengthOfCore]);
                 jtb1.setText(preset.get(1)[1+i*lengthOfCore]);
                 jtb2.setText(preset.get(1)[2+i*lengthOfCore]);
                 jtb3.setText(preset.get(1)[3+i*lengthOfCore]);
+                jtb4.setText(preset.get(1)[4+i*lengthOfCore]);
+                jtb5.setText(preset.get(1)[5+i*lengthOfCore]);
 
             }
               
@@ -635,11 +647,15 @@ public class RSModelUI extends JPanel {
                         JTextField jtb1 = (JTextField)c[1];
                         JTextField jtb2 = (JTextField)c[2];
                         JTextField jtb3 = (JTextField)c[3];
+                        JTextField jtb4 = (JTextField)c[4];
+                        JTextField jtb5 = (JTextField)c[5];
 
                         out.print(jcb.getSelectedItem().toString()+",");
                         out.print(jtb1.getText()+",");
                         out.print(jtb2.getText()+",");
                         out.print(jtb3.getText()+",");
+                        out.print(jtb4.getText()+",");
+                        out.print(jtb5.getText()+",");
 
                     }  
                     out.println("");

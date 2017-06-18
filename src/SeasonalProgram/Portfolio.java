@@ -289,13 +289,13 @@ public class Portfolio {
     
     public void loadInitialHoldings(Calendar start){
         for(Security s:securities){
-            if(start.getTime().after(s.buyDate)&&start.getTime().before(s.sellDate)){
-                if(s instanceof Core){
+            if(s instanceof Core){
+                if(start.getTime().after(s.buyDate)&&start.getTime().before(s.sellDate)){
+
                     Double[] stats = new Double[]{100.00, getValue(start.getTime(),s),getValue(start.getTime(),s)};
                     holdings.put(s, stats);
-                }
-                else if(s instanceof Sector){
-                    buy(s,s.allocation,true);
+
+
                 }
             }
         }

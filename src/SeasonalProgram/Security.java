@@ -26,6 +26,12 @@ public class Security {
         dataset = SeasonalProgram.data.getDataset(name);
         //dataset.trimData(buyDate, sellDate);
     }
+    public Security(String name,  double allocation){
+        this.name = name;
+        this.allocation = allocation;
+        dataset = SeasonalProgram.data.getDataset(name);
+        //dataset.trimData(buyDate, sellDate);
+    }
     public Security(){}
     
     
