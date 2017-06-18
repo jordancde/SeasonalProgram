@@ -21,16 +21,16 @@ import java.util.logging.Logger;
 public class PnFPortfolio extends Portfolio{
     
     public boolean inSeasonal;
-    public ArrayList<BoxSize> boxSizes;
     public int reversalBoxes;
     public int signalBoxes;
     public double minCoreAllocation;
+    public double boxSizePercent;
     
     
-    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,ArrayList<BoxSize> boxSizes,int reversalBoxes, int signalBoxes, double minCoreAllocation ){
+    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,double boxSizePercent,int reversalBoxes, int signalBoxes, double minCoreAllocation ){
         super(securities,startDate,endDate);
         inSeasonal = false;
-        this.boxSizes = boxSizes;
+        this.boxSizePercent = boxSizePercent;
         this.reversalBoxes = reversalBoxes;
         this.signalBoxes = signalBoxes;
         this.minCoreAllocation = minCoreAllocation;
@@ -454,7 +454,7 @@ public class PnFPortfolio extends Portfolio{
     //O exceedes previous PnF O row
     //Mame variable minimum how many in a Row 
     private boolean sellTriggered(Date d, Security s) throws IOException, ParseException, CloneNotSupportedException {
-        PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+        PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
         return(pf.sellSignal());    
     }
     
@@ -462,7 +462,7 @@ public class PnFPortfolio extends Portfolio{
     //X exceedes previous PnF X row
     //Mame variable minimum how many in a Row 
     private boolean buyTriggered(Date d, Security s) throws IOException, CloneNotSupportedException, ParseException {
-        PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+        PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
         return(pf.buySignal());
     }
     
@@ -530,7 +530,7 @@ public class PnFPortfolio extends Portfolio{
         System.out.println("Signals (Not over Benchmark):");
         for(Security s:securities){
             if(s.name.equals("Cash")){continue;};
-            PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+            PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
             if(pf.buySignal()){
                 System.out.println(s.name+": Buy");
             }else if(pf.sellSignal()){
@@ -553,7 +553,7 @@ public class PnFPortfolio extends Portfolio{
         for(Security s: securities){
             if(s instanceof Core){continue;}
             Dataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(getBenchmark().name));
-            PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+            PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
             if(pf.buySignal()){
                 possibleBuyList.add(s);
             }
@@ -566,7 +566,7 @@ public class PnFPortfolio extends Portfolio{
     //Brooke to come back to me on that
     private Double compareSectors(Security s, Security t) throws ParseException, IOException, CloneNotSupportedException {
         Dataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(t.name));
-        PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizes,reversalBoxes,signalBoxes);
+        PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
         if(s.equals(t)){
             return 0.0;
         }

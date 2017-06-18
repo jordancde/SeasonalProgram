@@ -45,7 +45,7 @@ public class SeasonalProgram {
     }
     
     public static void runRSModel(){
-        PnFportfolio = new PnFPortfolio(RSModel.getSecurities(),RSModel.startDate,RSModel.endDate,RSModel.sizes,RSModel.reversalBoxes,RSModel.signalBoxes, RSModel.minCoreAllocation);
+        PnFportfolio = new PnFPortfolio(RSModel.getSecurities(),RSModel.startDate,RSModel.endDate,RSModel.boxSizePercent,RSModel.reversalBoxes,RSModel.signalBoxes, RSModel.minCoreAllocation);
         PnFportfolio.runPortfolio();
     }
     

@@ -18,36 +18,42 @@ import java.util.Date;
  * @author jordandearsley
  */
 public class PointAndFigure extends Table{
-    
-    public ArrayList<BoxSize> boxSizes;
     public int reversalBoxes;
     public int signalBoxes;
     
     public double currentBoxLevel;
     public ArrayList<Integer> columns;
     
+    public ArrayList<ArrayList<Double>> boxes;
+    
     public PointAndFigure(String name, Dataset data, Date startDate, Date endDate, 
-            ArrayList<BoxSize> boxSizes, int reversalBoxes, int signalBoxes) throws IOException, CloneNotSupportedException, ParseException{
+            double boxSizePercent, int reversalBoxes, int signalBoxes) throws IOException, CloneNotSupportedException, ParseException{
         super(name, data, startDate, endDate);
         
         columns = new ArrayList<Integer>();
-        this.boxSizes = boxSizes;
         this.reversalBoxes = reversalBoxes;
         this.signalBoxes = signalBoxes;
         this.data = data;
         
         data.trimData(data.dates[0],endDate);
         
-        ArrayList<ArrayList<Double>> boxes = new ArrayList<ArrayList<Double>>();
+        boxes = new ArrayList<ArrayList<Double>>();
+        
         double currentValue = getMin(data.trimlows);
         double maxValue = getMax(data.trimhighs);
+        double increment = Math.log(1+boxSizePercent/100);
         while(currentValue<maxValue){
+            double lnOfValue = Math.log(currentValue);
+            
             ArrayList<Double> row = new ArrayList<Double>();
             row.add(currentValue);
             boxes.add(row);
-            currentValue+=getBoxSize(currentValue);
+            
+            lnOfValue+=increment;
+            currentValue=Math.exp(lnOfValue);
         }
         Collections.reverse(boxes);
+        
         
         ArrayList<double[]> datasets = new ArrayList<double[]>();
         //datasets.add(this.data.opens);
@@ -55,7 +61,7 @@ public class PointAndFigure extends Table{
         //datasets.add(this.data.lows);
         datasets.add(data.trimcloses);
         
-        ArrayList<ArrayList<String>> graph = runPnF(boxes, datasets,reversalBoxes);
+        ArrayList<ArrayList<String>> graph = runPnF(datasets,reversalBoxes);
         table = convertToArray(graph);
         
         //writeTable();
@@ -63,7 +69,7 @@ public class PointAndFigure extends Table{
     }
 
     
-    public ArrayList<ArrayList<String>> runPnF(ArrayList<ArrayList<Double>> boxes, ArrayList<double[]> datasets, int reversalBoxes){
+    public ArrayList<ArrayList<String>> runPnF(ArrayList<double[]> datasets, int reversalBoxes){
         
         ArrayList<ArrayList<String>> filledBoxes = new ArrayList<ArrayList<String>>();
         for(ArrayList<Double> row:boxes){
@@ -80,12 +86,12 @@ public class PointAndFigure extends Table{
         
         for(int i = 0;i<datasets.get(0).length;i++){
             for(double[] column:datasets){
-                if(!goingUp&&column[i]-currentValue>getBoxSize(column[i])*reversalBoxes){
+                if(!goingUp&&getCrossedBoxes(column[i],currentValue)>=reversalBoxes){
                     goingUp = true;
                     goingDown = false;
                     currentColumn++;
                     columns.add(0);
-                }else if(!goingDown&&currentValue-column[i]>getBoxSize(column[i])*reversalBoxes){
+                }else if(!goingDown&&getCrossedBoxes(currentValue,column[i])>=reversalBoxes){
                     goingUp = false;
                     goingDown = true;
                     currentColumn++;
@@ -97,19 +103,19 @@ public class PointAndFigure extends Table{
                     }
                 }
                 
-                if(goingUp&&column[i]-currentValue>getBoxSize(column[i])){
+                if(goingUp&&getCrossedBoxes(currentValue,column[i])>=1){
                     
                     while(column[i]>currentValue){
-                        currentValue+=getBoxSize(column[i]);
-                        filledBoxes.get(getRow(currentValue,boxes)).add("X");
+                        currentValue=getNextBox(true,currentValue);
+                        filledBoxes.get(getRow(currentValue)).add("X");
                         columns.set(columns.size()-1, columns.get(columns.size()-1)+1);
                     }
-                }else if(goingDown&&currentValue-column[i]>getBoxSize(column[i])){
-                    int nextRow = getRow(column[i],boxes);
+                }else if(goingDown&&getCrossedBoxes(currentValue,column[i])>=1){
+                    int nextRow = getRow(column[i]);
                     
                     while(column[i]<currentValue){
-                        currentValue-=getBoxSize(column[i]);
-                        filledBoxes.get(getRow(currentValue,boxes)).add("O");
+                        currentValue=getNextBox(false,currentValue);
+                        filledBoxes.get(getRow(currentValue)).add("O");
                         columns.set(columns.size()-1, columns.get(columns.size()-1)-1);
                         
                     }
@@ -124,7 +130,7 @@ public class PointAndFigure extends Table{
     
 
     
-    public int getRow(double value,ArrayList<ArrayList<Double>> boxes){
+    public int getRow(double value){
 
         int index = 0;
         for(ArrayList<Double> row:boxes){
@@ -148,17 +154,46 @@ public class PointAndFigure extends Table{
         return output;
     }
     
-    public double getValue(int row,ArrayList<ArrayList<Double>> boxes){
+    public double getValue(int row){
         return boxes.get(row).get(0);
     }
-    
-    public double getBoxSize(double value){
-        
-        for(BoxSize range:boxSizes){
-            if(value>range.min&&value<=range.max||value==0&&value==range.min){
-                return range.value;
+    //START HERE
+    public int getCrossedBoxes(double startValue, double endValue){
+        int crossedBoxes = 0;
+     
+        for(ArrayList<Double> row:boxes){
+            if(startValue>=row.get(0)){
+                
+                if(endValue>startValue){
+                    while(startValue<endValue){
+                        startValue = boxes.get(boxes.indexOf(row)-1).get(0);
+                        crossedBoxes++;
+                    }
+                }else if(endValue<startValue){
+                    while(endValue<startValue){
+                        startValue = boxes.get(boxes.indexOf(row)+1).get(0);
+                        crossedBoxes++;
+                    }
+                }
+                return crossedBoxes;
             }
         }
+            
+        
+        return 0;
+    }
+    
+    public double getNextBox(boolean upOrDown, double currentValue){
+        for(ArrayList<Double> row:boxes){
+            if(currentValue>=row.get(0)){
+                if(upOrDown){
+                    return boxes.get(boxes.indexOf(row)-1).get(0);
+                }else{
+                    return boxes.get(boxes.indexOf(row)+1).get(0);
+                }
+            }
+        }
+ 
         return -1;
     }
     
@@ -170,7 +205,7 @@ public class PointAndFigure extends Table{
             }
         
         }
-        return max+100;
+        return max;
     }
     
     public double getMin(double[] trimlows){

@@ -60,15 +60,12 @@ public class RSModelUI extends JPanel {
         public JPanel two;
         public JPanel three;
         public JPanel four;
-        public JPanel five;
         
         public ArrayList<JComponent[]> coresInput = new ArrayList<JComponent[]>();
         public ArrayList<JComponent[]> sectorsInput = new ArrayList<JComponent[]>();
-        public ArrayList<JComponent[]> sizesInput = new ArrayList<JComponent[]>();
         
         public JButton addCore;
         public JButton addSector;
-        public JButton addSize;
         
         public String[] sizeNames = {"Relative Strength","Moving Averages","RSI","PnF"};
         public String[] options = {"Exponential","Simple"};
@@ -83,12 +80,10 @@ public class RSModelUI extends JPanel {
             two = sectionTwo();
             three = sectionThree();
             four = sectionFour();
-            five = sectionFive();
             add(one);
             add(two);
             add(three);
             add(four);
-            add(five);
             
   
         }
@@ -142,7 +137,7 @@ public class RSModelUI extends JPanel {
             JPanel secTwo = new JPanel(new GridLayout());
             
             
-            GridLayout gl = new GridLayout(0,6);
+            GridLayout gl = new GridLayout(0,7);
             secTwo.setLayout(gl);
             //Row One 
             secTwo.add(new JLabel("Core"));
@@ -151,10 +146,11 @@ public class RSModelUI extends JPanel {
             secTwo.add(new JLabel("Allocation %"));
             secTwo.add(new JLabel("Reversal Boxes"));
             secTwo.add(new JLabel("Signal Boxes"));
+            secTwo.add(new JLabel("Box Size (%)"));
             
             //Row Two
             //JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            JComponent[] components = new JComponent[6];
+            JComponent[] components = new JComponent[7];
        
             components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
             components[1] = new JTextField(5);
@@ -162,6 +158,7 @@ public class RSModelUI extends JPanel {
             components[3] = new JTextField(5);
             components[4] = new JTextField(4);
             components[5] = new JTextField(4);
+            components[6] = new JTextField(4);
  
             coresInput.add(components);
             for(JComponent jc:components){
@@ -235,54 +232,9 @@ public class RSModelUI extends JPanel {
             return secThree;
         }
         
-        public JPanel sectionFour(){
-            
-            int columns = 3;
-            GridLayout gl = new GridLayout(0,columns);
-            
-            JPanel secFour = new JPanel(gl);
-            
-            //Row One 
-            secFour.add(new JLabel("Box Size Min"));
-            secFour.add(new JLabel("Box Size Max"));
-            secFour.add(new JLabel("Box Size"));
-            
-
-            addSize = new JButton("Add Box Size");
-            secFour.add(addSize);
-            
-            
-
-            addSize.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JComponent[] components = new JComponent[3];
-
-                    components[0] = new JTextField(7);
-                    components[1] = new JTextField(7);
-                    components[2] = new JTextField(7);
-
-
-                    sizesInput.add(components);
-                    for(JComponent jc:components){
-                        secFour.add(jc);
-                    }
-                    
-                    secFour.remove(addSize);
-                    for(JComponent jc:components){
-                        secFour.add(jc);
-                    }
-                    secFour.add(addSize);
-                    secFour.revalidate();
-                }
-            });
-           
-            secFour.setBorder(BorderFactory.createStrokeBorder(new BasicStroke(1.0f)));
-
-            return secFour;
-        }
         
-        public JPanel sectionFive(){   
+        
+        public JPanel sectionFour(){   
             JPanel secFive = new JPanel();
             //
             JButton submitButton = new JButton("Submit");
@@ -318,14 +270,14 @@ public class RSModelUI extends JPanel {
                             /*model,
                             individual,*/
                             coresInput,
-                            sectorsInput,
-                            sizesInput      
+                            sectorsInput
+                                  
                         );
                         logInputs(startDateText,
                             endDateText,
                             coresInput,
-                            sectorsInput,
-                            sizesInput);
+                            sectorsInput
+                            );
                         //IMPORTANTTT*******
                         SeasonalProgram.runRSModel();
                         
@@ -429,8 +381,7 @@ public class RSModelUI extends JPanel {
         public void logInputs(JTextField startDateText,
             JTextField endDateText,
             ArrayList<JComponent[]> coresInput,
-            ArrayList<JComponent[]> sectorsInput,
-            ArrayList<JComponent[]> sizesInput){
+            ArrayList<JComponent[]> sectorsInput){
             System.out.println("--------------------------------");     
 
             System.out.println("Start Date: "+startDateText.getText());
@@ -445,7 +396,9 @@ public class RSModelUI extends JPanel {
                 JTextField jtb2 = (JTextField)component[2];
                 JTextField jtb3 = (JTextField)component[3];
                 JTextField jtb4 = (JTextField)component[4];
-                System.out.println(jcb.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText()+", "+jtb4.getText());
+                JTextField jtb5 = (JTextField)component[5];
+                JTextField jtb6 = (JTextField)component[6];
+                System.out.println(jcb.getSelectedItem().toString()+", "+jtb1.getText()+", "+jtb2.getText()+", "+jtb3.getText()+", "+jtb4.getText()+", "+jtb5.getText()+", "+jtb6.getText());
             }
             
             System.out.println("");
@@ -477,13 +430,14 @@ public class RSModelUI extends JPanel {
             
             for(int i = 0;i<preset.get(1).length;i+=lengthOfCore){
                 if(coresInput.size()<i/lengthOfCore){
-                    JComponent[] components = new JComponent[4];
+                    JComponent[] components = new JComponent[7];
                     components[0] = new JComboBox(SeasonalProgram.data.getDatasetNames());
                     components[1] = new JTextField(20);
                     components[2] = new JTextField(20);
                     components[3] = new JTextField(20);
                     components[4] = new JTextField(20);
                     components[5] = new JTextField(20);
+                    components[6] = new JTextField(20);
 
                     coresInput.add(components);
                     two.remove(addCore);
@@ -502,12 +456,14 @@ public class RSModelUI extends JPanel {
                 JTextField jtb3 = (JTextField)coresInput.get(i)[3];
                 JTextField jtb4 = (JTextField)coresInput.get(i)[4];
                 JTextField jtb5 = (JTextField)coresInput.get(i)[5];
+                JTextField jtb6 = (JTextField)coresInput.get(i)[6];
                 jcb.setSelectedItem(preset.get(1)[0+i*lengthOfCore]);
                 jtb1.setText(preset.get(1)[1+i*lengthOfCore]);
                 jtb2.setText(preset.get(1)[2+i*lengthOfCore]);
                 jtb3.setText(preset.get(1)[3+i*lengthOfCore]);
                 jtb4.setText(preset.get(1)[4+i*lengthOfCore]);
                 jtb5.setText(preset.get(1)[5+i*lengthOfCore]);
+                jtb6.setText(preset.get(1)[6+i*lengthOfCore]);
 
             }
               
@@ -552,45 +508,7 @@ public class RSModelUI extends JPanel {
                 jtb1.setText(preset.get(2)[3+i*lengthOfSector]);
 
             }
-            try{
-                int lengthOfSize = 3;//Fix
-                int numSizes = (int)preset.get(3).length/lengthOfSize;
-
-                for(int i = 0;i<preset.get(3).length;i+=lengthOfSize){
-                    if(sizesInput.size()<i/lengthOfSize){
-                        JComponent[] components = new JComponent[3];
-
-                        components[0] = new JTextField(4);
-                        components[1] = new JTextField(4);
-                        components[2] = new JTextField(4);
-                        
-
-                        sizesInput.add(components);
-                        for(JComponent jc:components){
-                            four.add(jc);
-                        }
-
-                        four.remove(addSize);
-                        for(JComponent jc:components){
-                            four.add(jc);
-                        }
-                        four.add(addSize);
-                        four.revalidate();
-                    }
-                }
-
-                for(int i = 0;i<sizesInput.size();i++){
-
-                    JTextField jtf1 = (JTextField)sizesInput.get(i)[0];
-                    JTextField jtf2 = (JTextField)sizesInput.get(i)[1];
-                    JTextField jtf3 = (JTextField)sizesInput.get(i)[2];
-
-                    jtf1.setText(preset.get(3)[0+i*lengthOfSize]);
-                    jtf2.setText(preset.get(3)[1+i*lengthOfSize]);
-                    jtf3.setText(preset.get(3)[2+i*lengthOfSize]);
-
-                } 
-            }catch(Exception e){System.out.println("No sizes in Preset");}
+            
             
         }
         
@@ -649,6 +567,7 @@ public class RSModelUI extends JPanel {
                         JTextField jtb3 = (JTextField)c[3];
                         JTextField jtb4 = (JTextField)c[4];
                         JTextField jtb5 = (JTextField)c[5];
+                        JTextField jtb6 = (JTextField)c[6];
 
                         out.print(jcb.getSelectedItem().toString()+",");
                         out.print(jtb1.getText()+",");
@@ -656,6 +575,7 @@ public class RSModelUI extends JPanel {
                         out.print(jtb3.getText()+",");
                         out.print(jtb4.getText()+",");
                         out.print(jtb5.getText()+",");
+                        out.print(jtb6.getText()+",");
 
                     }  
                     out.println("");
@@ -671,18 +591,7 @@ public class RSModelUI extends JPanel {
                         out.print(jtb1.getText()+",");
 
                     }
-                    out.println("");
-                    for(JComponent[] c:sizesInput){
-
-                        JTextField jtf1 = (JTextField)c[0];
-                        JTextField jtf2 = (JTextField)c[1];
-                        JTextField jtf3 = (JTextField)c[2];
-
-                        out.print(jtf1.getText()+",");
-                        out.print(jtf2.getText()+",");
-                        out.print(jtf3.getText()+",");
-                    }
-                    out.println("");
+                    
 
                 } catch (IOException e) {
                     System.out.println(e);

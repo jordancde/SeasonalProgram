@@ -30,7 +30,7 @@ class RSModel {
    
     public ArrayList<Sector> sectors = new ArrayList<Sector>();
     
-    public ArrayList<BoxSize> sizes = new ArrayList<BoxSize>();
+    public double boxSizePercent;
     
     public int reversalBoxes;
     public int signalBoxes;
@@ -47,9 +47,9 @@ class RSModel {
         
          ArrayList<JComponent[]> coreInput,
         
-         ArrayList<JComponent[]> sectorsInput,
+         ArrayList<JComponent[]> sectorsInput
         
-         ArrayList<JComponent[]> sizesInput
+  
          ) throws ParseException {
     
         startDate = sdf.parse(startDateText.getText());
@@ -68,10 +68,12 @@ class RSModel {
             JTextField jtb3 = (JTextField)component[3];
             JTextField jtb4 = (JTextField)component[4];
             JTextField jtb5 = (JTextField)component[5];
+            JTextField jtb6 = (JTextField)component[6];
             
             minCoreAllocation = Double.parseDouble(jtb3.getText());
             reversalBoxes = Integer.parseInt(jtb4.getText());
             signalBoxes = Integer.parseInt(jtb5.getText());
+            boxSizePercent = Double.parseDouble(jtb6.getText());
             
             core = (new Core(jcb.getSelectedItem().toString(),monthsdf.parse(jtb1.getText()),monthsdf.parse(jtb2.getText()),Double.parseDouble(jtb3.getText())));
         }
@@ -85,14 +87,7 @@ class RSModel {
             sectors.add(new Sector(jcb.getSelectedItem().toString(),jcb2.getSelectedItem().toString(),jcb3.getSelectedItem().toString(),Double.parseDouble((jtb1.getText()))));
         }
 
-        for(JComponent[] component:sizesInput){
-
-            JTextField jtf1 = (JTextField)component[0];
-            JTextField jtf2 = (JTextField)component[1];
-            JTextField jtf3 = (JTextField)component[2];
-
-            sizes.add(new BoxSize(Double.parseDouble(jtf1.getText()),Double.parseDouble(jtf2.getText()),Double.parseDouble(jtf3.getText())));
-        }    
+           
     
     }
     public boolean checkCombo(JComboBox cb){
