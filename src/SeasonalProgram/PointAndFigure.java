@@ -44,14 +44,24 @@ public class PointAndFigure extends Table{
         double increment = Math.log(1+boxSizePercent/100);
         while(currentValue<maxValue){
             double lnOfValue = Math.log(currentValue);
+            lnOfValue+=increment;
+            currentValue=Math.exp(lnOfValue);
             
             ArrayList<Double> row = new ArrayList<Double>();
             row.add(currentValue);
             boxes.add(row);
             
-            lnOfValue+=increment;
-            currentValue=Math.exp(lnOfValue);
+            
+            
+            /*//to account for value above last value in loop.
+            if(currentValue>maxValue){
+                row = new ArrayList<Double>();
+                row.add(currentValue);
+                boxes.add(row);
+            }*/
         }
+        
+        
         Collections.reverse(boxes);
         
         
@@ -163,15 +173,21 @@ public class PointAndFigure extends Table{
      
         for(ArrayList<Double> row:boxes){
             if(startValue>=row.get(0)){
-                
+                int rowIndex = boxes.indexOf(row);
                 if(endValue>startValue){
+                    
                     while(startValue<endValue){
-                        startValue = boxes.get(boxes.indexOf(row)-1).get(0);
+                        rowIndex--;
+                        startValue = boxes.get(rowIndex).get(0);
+                        
                         crossedBoxes++;
                     }
                 }else if(endValue<startValue){
+                    
                     while(endValue<startValue){
-                        startValue = boxes.get(boxes.indexOf(row)+1).get(0);
+                        rowIndex++;
+                        startValue = boxes.get(rowIndex).get(0);
+                        
                         crossedBoxes++;
                     }
                 }
