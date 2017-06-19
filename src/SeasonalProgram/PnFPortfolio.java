@@ -84,12 +84,21 @@ public class PnFPortfolio extends Portfolio{
                     
                     
                     inSeasonal = true;
+                    setCoreDates(calendar);
                 //checks for month before buy Date
                 }else if(calendar.getTime().after(monthBefore.getTime())||calendar.getTime().equals(monthBefore.getTime())){
+                    
                     try {
                         //System.out.println("Checking Triggered Sectors");
                         buyTriggered(calendar.getTime());
-                    } catch (Exception ex) {System.out.println(ex);}
+                    } catch (IOException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (CloneNotSupportedException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
                 }
             }else{
                 if(calendar.getTime().after(monthAfter.getTime())||calendar.getTime().equals(monthAfter.getTime())){
@@ -102,6 +111,7 @@ public class PnFPortfolio extends Portfolio{
                     sellRemainingSectors();
 
                     inSeasonal = false;
+                    setCoreDates(calendar);
                 }else if(calendar.getTime().after(SP.sellDate)||calendar.getTime().equals(SP.sellDate)){
                     try {
                         
@@ -161,6 +171,7 @@ public class PnFPortfolio extends Portfolio{
             HashMap<Security, Double> row = new HashMap<Security, Double>();
             for(Security t:securities){
                 if(s.equals(t)){
+                    row.put(t, 0.0);
                     continue;
                 }
                 row.put(t, compareSectors(s,t));
@@ -232,6 +243,7 @@ public class PnFPortfolio extends Portfolio{
     //Has to buy triggered sectors at premature trigger positions
     private void buyTriggered(Date d) throws IOException, ParseException, CloneNotSupportedException {
         ArrayList<Security> topSectors = getTopSectors();
+        if(topSectors.size()==0){return;}
         
         for(Security s:topSectors){
             if(s instanceof Sector){
@@ -260,7 +272,8 @@ public class PnFPortfolio extends Portfolio{
     public boolean overAllocation(Date d, double toBeAdded){
         double sum = 0;
         for(Security s:holdings.keySet()){
-            if(!s.equals(getBenchmark())){
+            //just changed, might want to check if cash needs min 10% allocation
+            if(!(s instanceof Core)){
                 sum+=holdings.get(s)[0]/getPortfolioValue(d);  
             }
         }
@@ -511,19 +524,26 @@ public class PnFPortfolio extends Portfolio{
         System.out.println("Matrix (In list if Sector/Benchmark is Buy):");
         HashMap<Security, HashMap<Security, Double>> matrix = makeMatrix();
         if(matrix.size()==0){System.out.println("No Possible Sector Buys");}
-        System.out.print("    ");
+        System.out.print("      ");
         for(Security s: matrix.keySet()){
-            System.out.print(s.name+"|");
+            System.out.print(s.name);
+            printSpaces(5-s.name.length());  
+            System.out.print("|");
         }
         System.out.println("");
         
         for(Security s: matrix.keySet()){
-            System.out.print(s.name+"|");
+            System.out.print(s.name);
+            printSpaces(5-s.name.length());  
+            System.out.print("|");
             for(Security t:matrix.get(s).keySet()){
-                System.out.print(matrix.get(s).get(t)+"|");
+                System.out.print(matrix.get(s).get(t));
+                printSpaces(5-matrix.get(s).get(t).toString().length()); 
+                System.out.print("|");
             }
             System.out.println("");
         }
+        System.out.println("");
     }
 
     private void printSignals() throws IOException, CloneNotSupportedException, ParseException {
@@ -579,13 +599,31 @@ public class PnFPortfolio extends Portfolio{
         }
     }
     
+    
+ 
+    
+    public void printSpaces(int num){
+        for(int i = 0;i<num;i++){
+            System.out.print(" ");
+        }
+    }
+    
+    public void setCoreDates(Calendar c){
+        for(Security s:securities){
+            if(s instanceof Core){
+                setDate(c,s);
+            }
+        }
+    }
+    
     @Override
     public void setInitDates(Date dateNow){
         Calendar c = Calendar.getInstance();
         c.setTime(dateNow);
+        
         //System.out.println(dateNow);
         for(Security s:securities){
-            if(s instanceof Sector){break;}
+            if(s instanceof Sector){continue;}
             //Draw it out
             if(compareDates(s.sellDate, s.buyDate)){
                 if(compareDates(s.buyDate, c.getTime())){
@@ -617,8 +655,6 @@ public class PnFPortfolio extends Portfolio{
         }
         //System.out.println("");
     }
-    
-    
 
 
 }

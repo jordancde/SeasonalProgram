@@ -39,26 +39,33 @@ public class PointAndFigure extends Table{
         
         boxes = new ArrayList<ArrayList<Double>>();
         
-        double currentValue = getMin(data.trimlows);
-        double maxValue = getMax(data.trimhighs);
+        double currentValue = getMin(data.closes);
+        double maxValue = getMax(data.closes);
         double increment = Math.log(1+boxSizePercent/100);
+        //equation to find box one below lowest value
+        double previousValue = Math.exp(Math.log(currentValue)-(increment));
+        ArrayList<Double> row = new ArrayList<Double>();
+        row.add(currentValue);
+        boxes.add(row);
+        
         while(currentValue<maxValue){
             double lnOfValue = Math.log(currentValue);
-            lnOfValue+=increment;
-            currentValue=Math.exp(lnOfValue);
             
-            ArrayList<Double> row = new ArrayList<Double>();
+            
+            row = new ArrayList<Double>();
             row.add(currentValue);
             boxes.add(row);
             
-            
-            
-            /*//to account for value above last value in loop.
+            lnOfValue+=increment;
+            currentValue=Math.exp(lnOfValue);
+
+                    
+            //to account for value above last value in loop.
             if(currentValue>maxValue){
                 row = new ArrayList<Double>();
                 row.add(currentValue);
                 boxes.add(row);
-            }*/
+            }
         }
         
         
@@ -96,12 +103,13 @@ public class PointAndFigure extends Table{
         
         for(int i = 0;i<datasets.get(0).length;i++){
             for(double[] column:datasets){
-                if(!goingUp&&getCrossedBoxes(column[i],currentValue)>=reversalBoxes){
+                int crossedBoxes = getCrossedBoxes(column[i],currentValue);
+                if(!goingUp&&column[i]>=currentValue&&crossedBoxes>=reversalBoxes){
                     goingUp = true;
                     goingDown = false;
                     currentColumn++;
                     columns.add(0);
-                }else if(!goingDown&&getCrossedBoxes(currentValue,column[i])>=reversalBoxes){
+                }else if(!goingDown&&column[i]<currentValue&&crossedBoxes>=reversalBoxes){
                     goingUp = false;
                     goingDown = true;
                     currentColumn++;
@@ -113,14 +121,14 @@ public class PointAndFigure extends Table{
                     }
                 }
                 
-                if(goingUp&&getCrossedBoxes(currentValue,column[i])>=1){
+                if(goingUp&&crossedBoxes>=1){
                     
                     while(column[i]>currentValue){
                         currentValue=getNextBox(true,currentValue);
                         filledBoxes.get(getRow(currentValue)).add("X");
                         columns.set(columns.size()-1, columns.get(columns.size()-1)+1);
                     }
-                }else if(goingDown&&getCrossedBoxes(currentValue,column[i])>=1){
+                }else if(goingDown&&crossedBoxes>=1){
                     int nextRow = getRow(column[i]);
                     
                     while(column[i]<currentValue){
@@ -167,27 +175,25 @@ public class PointAndFigure extends Table{
     public double getValue(int row){
         return boxes.get(row).get(0);
     }
-    //START HERE
     public int getCrossedBoxes(double startValue, double endValue){
         int crossedBoxes = 0;
-     
         for(ArrayList<Double> row:boxes){
-            if(startValue>=row.get(0)){
-                int rowIndex = boxes.indexOf(row);
+            if(startValue>row.get(0)){
+                int rowIndex = boxes.indexOf(row)-1;
                 if(endValue>startValue){
                     
                     while(startValue<endValue){
-                        rowIndex--;
-                        startValue = boxes.get(rowIndex).get(0);
                         
+                        startValue = boxes.get(rowIndex).get(0);
+                        rowIndex--;
                         crossedBoxes++;
                     }
                 }else if(endValue<startValue){
                     
                     while(endValue<startValue){
-                        rowIndex++;
-                        startValue = boxes.get(rowIndex).get(0);
                         
+                        startValue = boxes.get(rowIndex).get(0);
+                        rowIndex++;
                         crossedBoxes++;
                     }
                 }
@@ -201,15 +207,23 @@ public class PointAndFigure extends Table{
     
     public double getNextBox(boolean upOrDown, double currentValue){
         for(ArrayList<Double> row:boxes){
-            if(currentValue>=row.get(0)){
+            int rowIndex = boxes.indexOf(row);
+            if(currentValue>row.get(0)){
                 if(upOrDown){
-                    return boxes.get(boxes.indexOf(row)-1).get(0);
+                    return boxes.get(rowIndex-2).get(0);
                 }else{
-                    return boxes.get(boxes.indexOf(row)+1).get(0);
+                    return boxes.get(rowIndex).get(0);
+                }
+            }else if(currentValue==row.get(0)){
+                if(upOrDown){
+                    return boxes.get(rowIndex-1).get(0);
+                }else{
+                    return boxes.get(rowIndex+1).get(0);
                 }
             }
         }
- 
+        //if it is lower than all rows
+       
         return -1;
     }
     

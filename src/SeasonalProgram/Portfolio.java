@@ -46,7 +46,7 @@ public class Portfolio {
         
         //creates cash at 100% with value of 1 and adds to holdings
         //Uses buy and sell dates of Core position, swapped for Cash
-        cash = new Core("Cash",getCore(securities).sellDate,getCore(securities).buyDate,100);
+        cash = new Core("Cash",new Date(getCore(securities).sellDate.getTime()),new Date(getCore(securities).buyDate.getTime()),100);
         securities.add(0,cash);
         /*
         Double[] cashStats = new Double[3];
@@ -255,6 +255,7 @@ public class Portfolio {
         c.setTime(dateNow);
         //System.out.println(dateNow);
         for(Security s:securities){
+            
             //Draw it out
             if(compareDates(s.sellDate, s.buyDate)){
                 if(compareDates(s.buyDate, c.getTime())){
