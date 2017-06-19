@@ -70,10 +70,12 @@ public class PnFPortfolio extends Portfolio{
             if(!inSeasonal){   
                 if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
                     if(getHoldingsCore().name.equals("Cash")){
+                        System.out.println("");
                         System.out.println("Buying Remaining Core");
                         buyRemainingCore(calendar.getTime());
                     }
                     try {
+                        System.out.println("");
                         System.out.println("Buying Remaining Sectors");
                         buyRemainingSectors(calendar.getTime());
                     } catch (IOException ex) {
@@ -477,7 +479,7 @@ public class PnFPortfolio extends Portfolio{
     
     //checks if sector buy is triggered
     //X exceedes previous PnF X row
-    //Mame variable minimum how many in a Row 
+    //Make variable minimum how many in a Row 
     private boolean buyTriggered(Date d, Security s) throws IOException, CloneNotSupportedException, ParseException {
         PointAndFigure pf = new PointAndFigure("PnF",SeasonalProgram.data.getDataset(s.name),startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
         return(pf.buySignal());
@@ -525,6 +527,7 @@ public class PnFPortfolio extends Portfolio{
     }
     
     private void printMatrix() throws ParseException, IOException, CloneNotSupportedException {
+        System.out.println("");
         System.out.println("Matrix (In list if Sector/Benchmark is Buy):");
         HashMap<Security, HashMap<Security, Double>> matrix = makeMatrix();
         if(matrix.size()==0){System.out.println("No Possible Sector Buys");}
@@ -658,6 +661,34 @@ public class PnFPortfolio extends Portfolio{
             //System.out.println(s.name+" | "+s.buyDate+" | "+s.sellDate);
         }
         //System.out.println("");
+    }
+    
+    @Override
+    public void printPreTransaction(boolean sell){
+        System.out.println("");
+        System.out.println(sm.format(convertToTrading(calendar.getTime(),sell)));
+        System.out.println("Initial Portfolio");
+        printHoldings();
+        
+        try {
+            printMatrix();
+        } catch (ParseException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            printSignals();
+        } catch (IOException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Transactions");
     }
 
 
