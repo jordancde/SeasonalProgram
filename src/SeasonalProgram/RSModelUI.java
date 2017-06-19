@@ -186,7 +186,7 @@ public class RSModelUI extends JPanel {
             secThree.add(new JLabel("Sector"));
             secThree.add(new JLabel("Type"));
             secThree.add(new JLabel("Sell Type"));
-            secThree.add(new JLabel("Allocation %"));
+            secThree.add(new JLabel("Allocation (5%/10%)"));
             
             JComponent[] components = new JComponent[4];
        

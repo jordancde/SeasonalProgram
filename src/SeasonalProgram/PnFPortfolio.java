@@ -27,6 +27,7 @@ public class PnFPortfolio extends Portfolio{
     public double boxSizePercent;
     
     
+    
     public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,double boxSizePercent,int reversalBoxes, int signalBoxes, double minCoreAllocation ){
         super(securities,startDate,endDate);
         inSeasonal = false;
@@ -35,6 +36,8 @@ public class PnFPortfolio extends Portfolio{
         this.signalBoxes = signalBoxes;
         this.minCoreAllocation = minCoreAllocation;
         //cash already added
+        
+        
     }
     
     @Override
@@ -44,7 +47,6 @@ public class PnFPortfolio extends Portfolio{
         printUpdate(calendar.getTime());
         days.add(new TradingDay(calendar.getTime(),holdings,portfolioValue));
         
-        System.out.println(endDate);
         while(calendar.getTime().before(endDate)){
 
             updatePortfolio(calendar.getTime());
@@ -64,6 +66,7 @@ public class PnFPortfolio extends Portfolio{
             twoWeeksBeforeSell.setTime(SP.sellDate);
             twoWeeksBeforeSell.add(Calendar.DATE, -14);
                 
+            
             if(!inSeasonal){   
                 if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
                     if(getHoldingsCore().name.equals("Cash")){
@@ -217,9 +220,9 @@ public class PnFPortfolio extends Portfolio{
         for(Security s:holdings.keySet()){
             if(s instanceof Sector){
                 if(((Sector) s).type.equals("Major")){
-                    if(holdings.get(s)[0]/getPortfolioValue(d)<10){
+                    if(100*holdings.get(s)[0]/getPortfolioValue(d)<10){
                         increasePosition(s,d,10.0,(Core)getBenchmark());
-                        setDate(c,s);
+                        //setDate(c,s);
                     }
                 }
             }
@@ -249,11 +252,11 @@ public class PnFPortfolio extends Portfolio{
             if(s instanceof Sector){
                 double allocation = 0;
                 if(((Sector) s).type.equals("Major")){
-                    allocation = 10;
+                    allocation = 5;
                 }else if(((Sector) s).type.equals("Minor")){
                     allocation = 5;
                 }
-                if(buyTriggered(d,s)){
+                if(!holdings.containsKey(s)&&buyTriggered(d,s)){
                     if(!overAllocation(d,allocation)){
                         buy(s,allocation,false);
                     }else{
@@ -271,10 +274,11 @@ public class PnFPortfolio extends Portfolio{
     @Override
     public boolean overAllocation(Date d, double toBeAdded){
         double sum = 0;
+        
         for(Security s:holdings.keySet()){
             //just changed, might want to check if cash needs min 10% allocation
-            if(!(s instanceof Core)){
-                sum+=holdings.get(s)[0]/getPortfolioValue(d);  
+            if(!(s instanceof Core)){   
+                sum+=100*holdings.get(s)[0]/getPortfolioValue(d);  
             }
         }
         sum+=toBeAdded;
@@ -336,8 +340,8 @@ public class PnFPortfolio extends Portfolio{
         
         //trades.add(new Trade(calendar.getTime(),core,s));
 
-        System.out.println("Sell "+core.name+" "+realIncrease+" ("+increase+"%), new value "+round(holdings.get(core)[0]));
-        System.out.println("Buy "+s.name+" "+realIncrease+" ("+increase+"%), price "+round(holdings.get(s)[1])+", new value "+round(holdings.get(s)[0]));
+        System.out.println("Sell "+core.name+" "+round(realIncrease)+" ("+round(increase)+"%), new value "+round(holdings.get(core)[0]));
+        System.out.println("Buy "+s.name+" "+round(realIncrease)+" ("+round(increase)+"%), price "+round(holdings.get(s)[1])+", new value "+round(holdings.get(s)[0]));
 
         System.out.println("End Portfolio");
         printHoldings();

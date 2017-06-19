@@ -616,14 +616,14 @@ public class Portfolio {
     public boolean overAllocation(Date d){
         double sum = 0;
         for(Security s:holdings.keySet()){
-            sum+=holdings.get(s)[0]/getPortfolioValue(d);  
+            sum+=100*holdings.get(s)[0]/getPortfolioValue(d);  
         }
         return(sum>100);
     }
     public boolean overAllocation(Date d, double toBeAdded){
         double sum = 0;
         for(Security s:holdings.keySet()){
-            sum+=holdings.get(s)[0]/getPortfolioValue(d);  
+            sum+=100*holdings.get(s)[0]/getPortfolioValue(d);  
         }
         return(sum+toBeAdded>100);
     }
@@ -699,7 +699,7 @@ public class Portfolio {
                 return day.portfolioValue;
             }
         }
-        return 0;
+        return days.get(days.size()-1).portfolioValue;
     }
     
     
