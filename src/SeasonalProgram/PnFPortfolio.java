@@ -69,7 +69,7 @@ public class PnFPortfolio extends Portfolio{
             
             if(!inSeasonal){   
                 if(calendar.getTime().after(SP.buyDate)||calendar.getTime().equals(SP.buyDate)){
-                    if(getHoldingsCore().name.equals("Cash")){
+                    if(holdingsContainCash()){
                         System.out.println("");
                         System.out.println("Buying Remaining Core");
                         buyRemainingCore(calendar.getTime());
@@ -103,6 +103,19 @@ public class PnFPortfolio extends Portfolio{
                     } catch (CloneNotSupportedException ex) {
                         Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    try {
+                        if(!holdings.containsKey(getBenchmark())&&buyTriggered(calendar.getTime(),getBenchmark())){
+                            System.out.println("Buying Core Early");
+                            buyCoreEarly(calendar.getTime());
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (CloneNotSupportedException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
                     
                 }
             }else{
@@ -463,7 +476,7 @@ public class PnFPortfolio extends Portfolio{
         }else if(totalSum<50){
             if(sectorSum<50){
                 increasePosition(getBenchmark(),d,50-sectorSum,(Core)getCash());
-                sellRemainingCore(d);
+                //sellRemainingCore(d);
             }
         }
         
@@ -689,6 +702,15 @@ public class PnFPortfolio extends Portfolio{
             Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println("Transactions");
+    }
+    
+    public boolean holdingsContainCash(){
+        for(Security s: holdings.keySet()){
+            if(s.name.equals("Cash")){
+                return true;
+            }
+        }
+        return false;
     }
 
 
