@@ -135,18 +135,27 @@ public class PnFPortfolio extends Portfolio{
                     try {
                         
                         sellTriggered(calendar.getTime());
-                    } catch (Exception ex){System.out.println(ex);}
+                    } catch (Exception ex){Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);;}
                 }else if(calendar.getTime().after(twoWeeksBeforeSell.getTime())||calendar.getTime().equals(twoWeeksBeforeSell.getTime())){
                     try {
-                        if(sellTriggered(calendar.getTime(),(Security)getHoldingsCore())){
+                        if(getHoldingsCore().equals(getBenchmark())&&sellTriggered(calendar.getTime(),(Security)getHoldingsCore())){
                             System.out.println("Selling Core Early");
                             sellCoreEarly(calendar.getTime());
                         }
-                    } catch (Exception ex){System.out.println(ex);}
+                    } catch (Exception ex){Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);}
                 }else{
                     //if in seasonal period but not near sell dates
                     try {
                         buyTriggered(calendar.getTime());
+                    } catch (IOException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (CloneNotSupportedException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    try {
+                        sellTriggered(calendar.getTime());
                     } catch (IOException ex) {
                         Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (ParseException ex) {
@@ -319,7 +328,7 @@ public class PnFPortfolio extends Portfolio{
                 
                 if(((Sector) s).sellType.equals("Regular")){
                     if(sellTriggered(d, s)){
-                        decreasePosition(s,d,5.0,(Core)getBenchmark());
+                        decreasePosition(s,d,5.0,(Core)getHoldingsCore());
                     }
                 }
   
@@ -511,6 +520,7 @@ public class PnFPortfolio extends Portfolio{
     }
     
     private void dropLowestSector() throws ParseException, IOException, CloneNotSupportedException{
+        System.out.println("Dropping lowest sector***");
         ArrayList<Security> topSectors = getTopSectors();
         int worst = 0;
         for(Security s:holdings.keySet()){
