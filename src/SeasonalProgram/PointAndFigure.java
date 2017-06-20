@@ -76,7 +76,14 @@ public class PointAndFigure extends Table{
         //datasets.add(this.data.opens);
         //datasets.add(this.data.highs);
         //datasets.add(this.data.lows);
-        datasets.add(data.trimvalues);
+        
+        //Reversing for efficiency
+        double[] reversed = new double[data.trimvalues.length];
+        for(int i = 0;i<data.trimvalues.length;i++){
+            reversed[i] = data.trimvalues[data.trimvalues.length-1-i];
+        }
+        datasets.add(reversed);
+        
         
         ArrayList<ArrayList<String>> graph = runPnF(datasets,reversalBoxes);
         table = convertToArray(graph);
@@ -141,6 +148,8 @@ public class PointAndFigure extends Table{
                 
                 
             }
+            //since running in reverse, all you need is three columns for signals
+            if(columns.size()>3){break;}
         }
         return filledBoxes;
         
@@ -250,16 +259,16 @@ public class PointAndFigure extends Table{
     }
     
     public boolean buySignal(){
-        if(columns.get(columns.size()-1)>=signalBoxes){
-            if(columns.get(columns.size()-1)>columns.get(columns.size()-3)){
+        if(columns.get(0)>=signalBoxes){
+            if(columns.get(0)>columns.get(2)){
                 return true;
             }
         }
         return false;
     }
     public boolean sellSignal(){
-        if(columns.get(columns.size()-1)<=signalBoxes*(-1)){
-            if(columns.get(columns.size()-1)<columns.get(columns.size()-3)){
+        if(columns.get(0)<=signalBoxes*(-1)){
+            if(columns.get(0)<columns.get(2)){
                 return true;
             }
         }

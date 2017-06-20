@@ -3,29 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/UI.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Portfolio.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Core.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/OutputTables/Table.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/OutputTables/MonthlyStaticTable.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/RSModelUI.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/PnFPortfolio.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Trade.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/TradingDay.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/IndividualTradesUI.java</file>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/BoxSize.java</file>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/RSModel.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/SeasonalProgram.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/PointAndFigure.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Dataset.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/StaticTradesTable.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/StaticModel.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Trigger.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/UI.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/MonthSummaryUI.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/BoxSize.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Sector.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/RSModel.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/StaticModelUI.java</file>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/NewDataset.java</file>
             <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Data.java</file>
-            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/Security.java</file>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/StaticModel.java</file>
+            <file>file:/Users/jordandearsley/SeasonalProgram/src/SeasonalProgram/OldDataset.java</file>
         </group>
     </open-files>
 </project-private>

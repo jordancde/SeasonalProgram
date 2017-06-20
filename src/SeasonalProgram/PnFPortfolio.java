@@ -143,6 +143,17 @@ public class PnFPortfolio extends Portfolio{
                             sellCoreEarly(calendar.getTime());
                         }
                     } catch (Exception ex){System.out.println(ex);}
+                }else{
+                    //if in seasonal period but not near sell dates
+                    try {
+                        buyTriggered(calendar.getTime());
+                    } catch (IOException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (CloneNotSupportedException ex) {
+                        Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
             
@@ -244,7 +255,7 @@ public class PnFPortfolio extends Portfolio{
             }
         }
         
-        for(Security s:securities){
+        /*for(Security s:securities){
             if(s instanceof Sector&&!holdings.containsKey(s)){
                 if(buyTriggered(d,s)){
                     if(((Sector) s).type.equals("Major")){
@@ -255,7 +266,7 @@ public class PnFPortfolio extends Portfolio{
                     //setDate(c,s);
                 }
             }
-        }
+        }*/
         
     }
     
