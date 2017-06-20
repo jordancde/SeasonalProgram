@@ -457,7 +457,7 @@ public class Portfolio {
         Calendar dayBefore = Calendar.getInstance();
         dayBefore.setTime(days.get(0).d);
         dayBefore.add(Calendar.DATE, -1);
-        double closeBenchmarkValue = getStaticBenchmarkValue(dayBefore.getTime());
+        double closeBenchmarkValue = getBenchmarkValue(dayBefore.getTime());
         
         for(int i = 0;i<days.size();i++){
             
@@ -491,7 +491,7 @@ public class Portfolio {
                 }
        
                 closeValue = days.get(j).portfolioValue;
-                closeBenchmarkValue = getStaticBenchmarkValue(days.get(j).d);
+                closeBenchmarkValue = getBenchmarkValue(days.get(j).d);
             }
             
             double portfolioGrowth = (closeValue-openValue)/openValue;
@@ -596,7 +596,7 @@ public class Portfolio {
         return trades;
     }
     
-    public double getStaticBenchmarkValue(Date d){
+    public double getBenchmarkValue(Date d){
         for(Security s:securities){
             if(s.name.equals(SeasonalProgram.staticModel.core.name)){
                 return getValue(d,s);
@@ -604,14 +604,7 @@ public class Portfolio {
         }
         return 0;
     }
-    public double getRSBenchmarkValue(Date d){
-        for(Security s:securities){
-            if(s.name.equals(SeasonalProgram.RSModel.core.name)){
-                return getValue(d,s);
-            }
-        }
-        return 0;
-    }
+    
     
     public boolean overAllocation(Date d){
         double sum = 0;

@@ -70,8 +70,8 @@ public class StaticTradesTable extends Table {
                 if(sellTrade==null){
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(endDate,buyTrade.to);//???
-                    coreBuyValue = SeasonalProgram.portfolio.getStaticBenchmarkValue(buyTrade.date);
-                    coreSellValue = SeasonalProgram.portfolio.getStaticBenchmarkValue(endDate);
+                    coreBuyValue = SeasonalProgram.portfolio.getBenchmarkValue(buyTrade.date);
+                    coreSellValue = SeasonalProgram.portfolio.getBenchmarkValue(endDate);
                     //Fix for end of portfolio, no use of convertToTrading()
                     row[2] = sm.format(endDate);
                     row[3] = Double.toString(roundDouble((sectorSellValue-sectorBuyValue)/sectorBuyValue));
@@ -82,8 +82,8 @@ public class StaticTradesTable extends Table {
                                                 
                     sectorBuyValue = SeasonalProgram.portfolio.getValue(buyTrade.date,buyTrade.to);
                     sectorSellValue = SeasonalProgram.portfolio.getValue(sellTrade.date,sellTrade.from);//???
-                    coreBuyValue = SeasonalProgram.portfolio.getStaticBenchmarkValue(buyTrade.date);
-                    coreSellValue = SeasonalProgram.portfolio.getStaticBenchmarkValue(sellTrade.date);
+                    coreBuyValue = SeasonalProgram.portfolio.getBenchmarkValue(buyTrade.date);
+                    coreSellValue = SeasonalProgram.portfolio.getBenchmarkValue(sellTrade.date);
 
                     row[3] = Double.toString(roundDouble((sectorSellValue-sectorBuyValue)/sectorBuyValue));
                     row[4] = Double.toString(roundDouble((coreSellValue-coreBuyValue)/coreBuyValue));

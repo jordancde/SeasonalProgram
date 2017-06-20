@@ -44,9 +44,42 @@ public class SeasonalProgram {
  
     }
     
-    public static void runRSModel(){
+    public static void runRSModel() throws IOException{
         PnFportfolio = new PnFPortfolio(RSModel.getSecurities(),RSModel.startDate,RSModel.endDate,RSModel.boxSizePercent,RSModel.reversalBoxes,RSModel.signalBoxes, RSModel.minCoreAllocation);
         PnFportfolio.runPortfolio();
+        
+        Map<String, Double[]> monthlyReturns = PnFportfolio.getReturns("Full", false);
+        MonthlyStaticTable fullPortfolio = new MonthlyStaticTable("RS Portfolio % Monthly Gains",monthlyReturns,RSModel.startDate,RSModel.endDate,0);
+        fullPortfolio.writeTable();
+        
+        Map<String, Double[]> benchmarkMonthlyReturns = PnFportfolio.getReturns("Benchmark", false);
+        MonthlyStaticTable benchmark = new MonthlyStaticTable("Benchmark Gains",benchmarkMonthlyReturns,RSModel.startDate,RSModel.endDate,1);
+        benchmark.writeTable();
+        
+        Map<String, Double[]> relativeBenchmarkMonthlyReturns = PnFportfolio.getReturns("Relative Benchmark", false);
+        MonthlyStaticTable relativeBenchmark = new MonthlyStaticTable("RS Portfolio minus Benchmark",relativeBenchmarkMonthlyReturns,RSModel.startDate,RSModel.endDate,2);
+        relativeBenchmark.writeTable();
+        
+        Map<String, Double[]> fqMonthlyReturns = PnFportfolio.getReturns("Full", true);
+        MonthlyStaticTable fq = new MonthlyStaticTable("RS Frequency Pos",fqMonthlyReturns,RSModel.startDate,RSModel.endDate,3);
+        fq.writeTable();
+        
+        Map<String, Double[]> fqBenchmarkMonthlyReturns = PnFportfolio.getReturns("Benchmark", true);
+        MonthlyStaticTable fqBenchmark = new MonthlyStaticTable("RS Frequency Pos",fqBenchmarkMonthlyReturns,RSModel.startDate,RSModel.endDate,4);
+        fqBenchmark.writeTable();
+        
+        Map<String, Double[]> fqRelativeBenchmarkMonthlyReturns = PnFportfolio.getReturns("Relative Benchmark", true);
+        MonthlyStaticTable fqRelativeBenchmark = new MonthlyStaticTable("RS Portfolio minus Benchmark Frequency Pos",fqRelativeBenchmarkMonthlyReturns,RSModel.startDate,RSModel.endDate,5);
+        fqRelativeBenchmark.writeTable();
+        
+        Map<String, Double[]> cash = PnFportfolio.getReturns("Cash", false);
+        MonthlyStaticTable cashTable = new MonthlyStaticTable("RS Portfolio Avg % Cash",cash,RSModel.startDate,RSModel.endDate,6);
+        cashTable.writeTable();
+        
+        Map<String, Double[]> trades = PnFportfolio.getMonthlyTrades();
+        MonthlyStaticTable tradeTable = new MonthlyStaticTable("RS Portfolio Number of Trades",trades,RSModel.startDate,RSModel.endDate,7);
+        tradeTable.writeTable();
+
     }
     
     public static void runStaticModel() throws IOException, CloneNotSupportedException, ParseException{
@@ -89,9 +122,7 @@ public class SeasonalProgram {
         ArrayList<Trade> tradeHistory = portfolio.getTrades();
         StaticTradesTable tradeHistoryTable = new StaticTradesTable("Trade History",tradeHistory,staticModel.startDate,staticModel.endDate);
         tradeHistoryTable.writeTable();
-        
-        ArrayList<Double[]> boxSizes = new ArrayList<Double[]>();
-        boxSizes.add(new Double[]{0.0,3000.0,50.0});
+
         
 
         

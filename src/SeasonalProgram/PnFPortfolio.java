@@ -357,7 +357,7 @@ public class PnFPortfolio extends Portfolio{
         //in the case that it isn't already bought
         try{
             currentAllocationPercent = 100*holdings.get(s)[0]/portfolioValue;
-        }catch(Exception e){System.out.println(e);}
+        }catch(Exception e){Logger.getLogger(PnFPortfolio.class.getName()).log(Level.SEVERE, null, e);}
         
         double increase = increaseTo-currentAllocationPercent;
         
@@ -396,9 +396,18 @@ public class PnFPortfolio extends Portfolio{
         double realAllocation = portfolioValue*decreaseTo/100;
         
         Security core = c;
-        Double[] currentCoreStats = holdings.get(core);
+        Double[] currentCoreStats;
+        if(holdings.containsKey(c)){
+        
+            currentCoreStats = holdings.get(core);
+            
+        }else{
+            //if it's cash and theres no cash in holdings, make it
+            currentCoreStats = new Double[]{0.0,1.0,1.0};
+        }
         currentCoreStats[0] += realDecrease;
         holdings.put(core,currentCoreStats);
+        
         
         /*trades.add(new Trade(calendar.getTime(),s,core));
         
@@ -749,6 +758,14 @@ public class PnFPortfolio extends Portfolio{
             }
         }
         return longest;
+    }
+    public double getBenchmarkValue(Date d){
+        for(Security s:securities){
+            if(s.name.equals(SeasonalProgram.RSModel.core.name)){
+                return getValue(d,s);
+            }
+        }
+        return 0;
     }
 
 
