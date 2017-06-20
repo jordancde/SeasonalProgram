@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -543,22 +544,23 @@ public class PnFPortfolio extends Portfolio{
         System.out.println("");
         System.out.println("Matrix (In list if Sector/Benchmark is Buy):");
         HashMap<Security, HashMap<Security, Double>> matrix = makeMatrix();
+        int longest =  getLongestNameLen(matrix.keySet());
         if(matrix.size()==0){System.out.println("No Possible Sector Buys");}
-        System.out.print("      ");
+        printSpaces(longest+1);
         for(Security s: matrix.keySet()){
             System.out.print(s.name);
-            printSpaces(5-s.name.length());  
+            printSpaces(longest-s.name.length());  
             System.out.print("|");
         }
         System.out.println("");
         
         for(Security s: matrix.keySet()){
             System.out.print(s.name);
-            printSpaces(5-s.name.length());  
+            printSpaces(longest-s.name.length());  
             System.out.print("|");
             for(Security t:matrix.get(s).keySet()){
                 System.out.print(matrix.get(s).get(t));
-                printSpaces(5-matrix.get(s).get(t).toString().length()); 
+                printSpaces(longest-matrix.get(s).get(t).toString().length()); 
                 System.out.print("|");
             }
             System.out.println("");
@@ -588,13 +590,18 @@ public class PnFPortfolio extends Portfolio{
     //Sector/SP500, In array
     //Create PnF from this data
     //Brooke to come back to me on that
+    
     public ArrayList<Security> getPossibleBuys() throws IOException, CloneNotSupportedException, ParseException {
         ArrayList<Security> possibleBuyList = new ArrayList<Security>();
         for(Security s: securities){
             if(s instanceof Core){continue;}
+            
+            //CURRENTLY CONFIGURED TO NEED BOTH BUY AND BENCHMARK BUY
             NewDataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(getBenchmark().name));
-            PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
-            if(pf.buySignal()){
+            PointAndFigure pfCompare = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
+            PointAndFigure pf = new PointAndFigure("PnF",s.dataset,startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
+
+            if(pf.buySignal()&&pfCompare.buySignal()){
                 possibleBuyList.add(s);
             }
         }
@@ -711,6 +718,16 @@ public class PnFPortfolio extends Portfolio{
             }
         }
         return false;
+    }
+
+    private int getLongestNameLen(Set<Security> keySet) {
+        int longest = 0;
+        for(Security s:keySet){
+            if(s.name.length()>longest){
+                longest = s.name.length();
+            }
+        }
+        return longest;
     }
 
 

@@ -31,8 +31,6 @@ public class UI extends JFrame {
         RSModelUI RSmodel = new RSModelUI();
         tabbedPane.addTab("RS Model", RSmodel);
         
-        MonthSummaryUI month = new MonthSummaryUI();
-        tabbedPane.addTab("Month Summary", month);
         
         IndividualTradesUI trades = new IndividualTradesUI();
         tabbedPane.addTab("Individual Trades", trades);
