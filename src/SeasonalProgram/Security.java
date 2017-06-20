@@ -15,7 +15,7 @@ public class Security {
     public String name;
     public Date buyDate;
     public Date sellDate;
-    public Dataset dataset;
+    public NewDataset dataset;
     public double allocation;
     
     public Security(String name, Date buyDate, Date sellDate, double allocation){

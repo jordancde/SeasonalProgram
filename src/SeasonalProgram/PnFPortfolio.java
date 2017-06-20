@@ -592,7 +592,7 @@ public class PnFPortfolio extends Portfolio{
         ArrayList<Security> possibleBuyList = new ArrayList<Security>();
         for(Security s: securities){
             if(s instanceof Core){continue;}
-            Dataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(getBenchmark().name));
+            NewDataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(getBenchmark().name));
             PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
             if(pf.buySignal()){
                 possibleBuyList.add(s);
@@ -605,7 +605,7 @@ public class PnFPortfolio extends Portfolio{
     //sector x/y, Counting Xs
     //Brooke to come back to me on that
     private Double compareSectors(Security s, Security t) throws ParseException, IOException, CloneNotSupportedException {
-        Dataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(t.name));
+        NewDataset comparison = SeasonalProgram.data.getDataset(s.name).compareTo(SeasonalProgram.data.getDataset(t.name));
         PointAndFigure pf = new PointAndFigure("PnF",comparison,startDate,calendar.getTime(),boxSizePercent,reversalBoxes,signalBoxes);
         if(s.equals(t)){
             return 0.0;

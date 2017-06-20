@@ -26,7 +26,7 @@ public class PointAndFigure extends Table{
     
     public ArrayList<ArrayList<Double>> boxes;
     
-    public PointAndFigure(String name, Dataset data, Date startDate, Date endDate, 
+    public PointAndFigure(String name, NewDataset data, Date startDate, Date endDate, 
             double boxSizePercent, int reversalBoxes, int signalBoxes) throws IOException, CloneNotSupportedException, ParseException{
         super(name, data, startDate, endDate);
         
@@ -39,8 +39,8 @@ public class PointAndFigure extends Table{
         
         boxes = new ArrayList<ArrayList<Double>>();
         
-        double currentValue = getMin(data.closes);
-        double maxValue = getMax(data.closes);
+        double currentValue = getMin(data.values);
+        double maxValue = getMax(data.values);
         double increment = Math.log(1+boxSizePercent/100);
         //equation to find box one below lowest value
         double previousValue = Math.exp(Math.log(currentValue)-(increment));
@@ -76,7 +76,7 @@ public class PointAndFigure extends Table{
         //datasets.add(this.data.opens);
         //datasets.add(this.data.highs);
         //datasets.add(this.data.lows);
-        datasets.add(data.trimcloses);
+        datasets.add(data.trimvalues);
         
         ArrayList<ArrayList<String>> graph = runPnF(datasets,reversalBoxes);
         table = convertToArray(graph);

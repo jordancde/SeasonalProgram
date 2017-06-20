@@ -364,7 +364,7 @@ public class Portfolio {
                 Calendar c = Calendar.getInstance();
                 c.setTime(d);
                 //if(isWeekend(c)||d.equals(startDate)){ 
-                    return SeasonalProgram.data.getDataset(s.name).closes[i-1];
+                    return SeasonalProgram.data.getDataset(s.name).values[i-1];
                 /*}else{
                     return SeasonalProgram.data.getDataset(s.name).closes[i];
                 }*/

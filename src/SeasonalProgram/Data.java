@@ -21,7 +21,7 @@ import java.util.Date;
 public class Data {
     public static String FILEPATH;
     public static String[][] rawData;
-    public Dataset[] datasets;
+    public NewDataset[] datasets;
     
     public Data(String name) throws IOException, ParseException{
         URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
@@ -34,11 +34,11 @@ public class Data {
         
     }
     
-    public static Dataset[] createDataSets() throws ParseException{
+    public static NewDataset[] createDataSets() throws ParseException{
         //Row of "S&P 500", etc.
         int nameListPos = 1;
         //Columns for one dataset
-        int dataColumnCount = 6;
+        int dataColumnCount = 2;
         
         //gets the names of the dataset headers
         String[] nameHeader = rawData[nameListPos];
@@ -51,9 +51,9 @@ public class Data {
         }
         
         //creates the datasets
-        Dataset[] datasets = new Dataset[names.size()];
+        NewDataset[] datasets = new NewDataset[names.size()];
         for(int i = 0;i<names.size();i++){
-            datasets[i] = new Dataset(rawData,i,nameListPos,dataColumnCount);
+            datasets[i] = new NewDataset(rawData,i,nameListPos,dataColumnCount);
         }  
         
         return datasets;
@@ -75,7 +75,7 @@ public class Data {
         Date[] dates = getDataset(s.name).dates;
         for(int i = 0;i<dates.length;i++){
             if(dates[i].after(d)||dates[i].equals(d)){
-                return getDataset(s.name).closes[i];
+                return getDataset(s.name).values[i];
             }
         }
         return 0;
@@ -103,7 +103,7 @@ public class Data {
         return historicalData;
     }
     
-    public Dataset getDataset(String setName){
+    public NewDataset getDataset(String setName){
         for(int i = 0;i<datasets.length;i++){
             if(datasets[i].name.equals(setName)){
                 return datasets[i];

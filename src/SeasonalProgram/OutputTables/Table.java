@@ -5,7 +5,7 @@
  */
 package SeasonalProgram.OutputTables;
 
-import SeasonalProgram.Dataset;
+import SeasonalProgram.NewDataset;
 import SeasonalProgram.SeasonalProgram;
 import SeasonalProgram.SeasonalProgram;
 import SeasonalProgram.Trade;
@@ -33,7 +33,7 @@ public class Table {
     public Date startDate;
     public Date endDate;
     public String outputName = "Out";
-    public Dataset data;
+    public NewDataset data;
     
     public Table(String name, Map<String,Double> data, Date startDate, Date endDate) throws IOException{
         this.name = name;
@@ -54,7 +54,7 @@ public class Table {
         this.endDate = endDate;
     }
     
-    public Table(String name, Dataset data, Date startDate, Date endDate) throws IOException {
+    public Table(String name, NewDataset data, Date startDate, Date endDate) throws IOException {
         this.name = name;
         this.data = data;
         this.startDate = startDate;
