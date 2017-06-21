@@ -107,13 +107,13 @@ public class IndividualTable extends Table{
             String[] avgRow = new String[tableColumns];
             avgRow[0] = "Average";
             
-            for(int i = 0;i<tableColumns;i++){
+            for(int i = 1;i<tableColumns;i++){
                 //in case of empty or date row
                 try{
                     avgRow[i] = round(calcAverage(dataRows, i));
                 }catch(Exception e){}
             }
-            
+            table.add(avgRow);
             String[] space = new String[tableColumns];
             table.add(space);
 
