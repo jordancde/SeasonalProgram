@@ -28,6 +28,8 @@ public class MonthlyStaticTable extends Table {
     public final int CASH = 6;
     public final int TRADES = 7;
     
+    public int tableColumns = 17;
+    
     
     public int type;
     

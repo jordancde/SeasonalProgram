@@ -27,7 +27,7 @@ public class StaticTradesTable extends Table {
     }
     
     SimpleDateFormat sm = new SimpleDateFormat("yyyy/MM/dd");
-    
+    public int tableColumns = 17;
     public ArrayList<String[]> makeTable(ArrayList<Trade> data){
         ArrayList<String[]> table = new ArrayList<String[]>();
         

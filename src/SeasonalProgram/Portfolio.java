@@ -62,6 +62,12 @@ public class Portfolio {
         
     }
     
+    public Portfolio(IndividualModel model){
+        this.startDate = model.startDate;
+        this.endDate = model.endDate;
+        
+    }
+    
     public void runPortfolio(){
         setInitDates(calendar.getTime());
         loadInitialHoldings(calendar);

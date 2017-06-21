@@ -28,8 +28,8 @@ public class UI extends JFrame {
         StaticModelUI Smodel = new StaticModelUI();
         tabbedPane.addTab("Static Model", Smodel);
         
-        RSModelUI RSmodel = new RSModelUI();
-        tabbedPane.addTab("RS Model", RSmodel);
+        /*RSModelUI RSmodel = new RSModelUI();
+        tabbedPane.addTab("RS Model", RSmodel);*/
         
         
         IndividualTradesUI trades = new IndividualTradesUI();

@@ -23,4 +23,13 @@ public class Sector extends Security{
         super(name, buyDate, sellDate, allocation);
 
     }
+    
+    public Sector(String name, Date buyDate, Date sellDate){
+        super(name, buyDate, sellDate);
+
+    }
+    public Sector(String name){
+        super(name);
+
+    }
 }

@@ -27,10 +27,14 @@ public class SeasonalProgram {
      */
     public static StaticModel staticModel;
     public static RSModel RSModel;
+    public static IndividualModel individualTradeModel;
+    
     public static Data data;
     public static UI ui;
     public static Portfolio portfolio;
     public static PnFPortfolio PnFportfolio;
+    public static IndividualTradePortfolio tradeportfolio;
+    
     
     public static void main(String[] args) throws IOException, ParseException {
 
@@ -42,6 +46,12 @@ public class SeasonalProgram {
         
         
  
+    }
+    
+    public static void runIndividualTrade(){
+        IndividualTradePortfolio tradeportfolio = new IndividualTradePortfolio(individualTradeModel);
+        tradeportfolio.runPortfolio();
+        
     }
     
     public static void runRSModel() throws IOException{

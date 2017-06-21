@@ -29,7 +29,7 @@ import java.util.Map;
 public class Table {
     public String name;
     public ArrayList<String[]> table;
-    public int tableColumns = 17;
+    //public int tableColumns = 17;
     public Date startDate;
     public Date endDate;
     public String outputName = "Out";

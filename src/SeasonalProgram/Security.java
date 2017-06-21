@@ -34,6 +34,19 @@ public class Security {
     }
     public Security(){}
     
-    
+    public Security(String name){
+        this.name = name;
+
+        dataset = SeasonalProgram.data.getDataset(name);
+        //dataset.trimData(buyDate, sellDate);
+    }
+    public Security(String name, Date buyDate, Date sellDate){
+        this.name = name;
+        this.buyDate = buyDate;
+        this.sellDate = sellDate;
+        
+        dataset = SeasonalProgram.data.getDataset(name);
+        //dataset.trimData(buyDate, sellDate);
+    }
     
 }

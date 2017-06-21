@@ -18,4 +18,10 @@ public class Core extends Security{
     super(name, buyDate, sellDate, allocation);
     
     } 
+    
+    public Core(String name){
+
+    super(name);
+    
+    } 
 }

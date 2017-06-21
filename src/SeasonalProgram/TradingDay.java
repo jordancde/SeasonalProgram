@@ -21,4 +21,5 @@ public class TradingDay {
         this.holdings = holdings;
         this.portfolioValue = portfolioValue;
     }
+
 }
