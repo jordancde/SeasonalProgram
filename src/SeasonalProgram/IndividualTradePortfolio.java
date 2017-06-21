@@ -70,7 +70,7 @@ public class IndividualTradePortfolio extends Portfolio{
                     pnfGains = calcGains((Security)core,PnFDates);
                 }
                 
-                IndividualYearRow row = new IndividualYearRow(benchGains,sectorGains,pnfGains,PnFDates.startDate, PnFDates.endDate);
+                IndividualYearRow row = new IndividualYearRow(benchGains,sectorGains,pnfGains,PnFDates.startDate, PnFDates.endDate, c.getTime());
                 map.get(d).add(row);
                 
                 c.add(Calendar.YEAR, 1);

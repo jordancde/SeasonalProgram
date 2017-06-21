@@ -14,16 +14,18 @@ import java.util.Date;
 public class IndividualYearRow {
     public double benchmarkGains;
     public double sectorGains;
+    public Date date;
     public double PnF;
     public Date PnFEntry;
     public Date PnFExit;
     
     public IndividualYearRow(double benchmarkGains,double sectorGains,double PnF
-    ,Date PnFEntry,Date PnFExit){
+    ,Date PnFEntry,Date PnFExit, Date date){
         this.benchmarkGains = benchmarkGains;
         this.sectorGains = sectorGains;
         this.PnF = PnF;
         this.PnFEntry = PnFEntry;
         this.PnFExit = PnFExit;
+        this.date = date;
     }
 }

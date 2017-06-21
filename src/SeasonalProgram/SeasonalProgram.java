@@ -51,7 +51,7 @@ public class SeasonalProgram {
     public static void runIndividualTrade(){
         IndividualTradePortfolio tradeportfolio = new IndividualTradePortfolio(individualTradeModel);
         tradeportfolio.runPortfolio();
-        
+        //NAME OF TABLE HAS TO BE NAME OF SECTOR
     }
     
     public static void runRSModel() throws IOException{
