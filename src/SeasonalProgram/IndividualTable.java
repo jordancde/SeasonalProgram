@@ -70,6 +70,8 @@ public class IndividualTable extends Table{
             int firstYear = getFirstYear(d);
             int lastYear = getLastYear(d);
             
+            
+            ArrayList<String[]> dataRows = new ArrayList<String[]>();
             for(IndividualYearRow input:data.get(d)){
                 String[] datarow = new String[tableColumns];
                 Calendar c = Calendar.getInstance();
@@ -81,16 +83,49 @@ public class IndividualTable extends Table{
                 datarow[4] = monthsdf.format(input.PnFEntry);
                 datarow[5] = monthsdf.format(input.PnFExit);
                 
+                datarow[7] = Double.toString(input.sectorGains-input.benchmarkGains);
+                datarow[8] = Double.toString(input.PnF-input.benchmarkGains);
+                datarow[9] = Double.toString(input.PnF-input.sectorGains);
+                
+                datarow[11] = fq(input.benchmarkGains);
+                datarow[12] = fq(input.sectorGains);
+                datarow[13] = fq(input.PnF);
+                
+                datarow[15] = fq(input.sectorGains-input.benchmarkGains);
+                datarow[16] = fq(input.PnF-input.benchmarkGains);
+                datarow[17] = fq(input.PnF-input.sectorGains);
+                
+                dataRows.add(datarow);
                 table.add(datarow);
                 
+            }
+            
+            //Average Row
+            String[] avgRow = new String[tableColumns];
+            avgRow[0] = "Average";
+            
+            for(int i = 0;i<tableColumns;i++){
+                //in case of empty or date row
+                try{
+                    avgRow[i] = Double.toString(calcAverage(dataRows, i));
+                }catch(Exception e){}
             }
             
             String[] space = new String[tableColumns];
             table.add(space);
         }
         
+        table = roundTable(table);
+        
         return table;
         
+    }
+    
+    public String fq(double value){
+        if(value>0){
+            return "1";
+        }
+        return "0";
     }
     
     public int getFirstYear(DateSet d){
@@ -117,5 +152,27 @@ public class IndividualTable extends Table{
             }
         }
         return highestYear;
+    }
+
+    private double calcAverage(ArrayList<String[]> dataRows, int i) {
+        double sum = 0;
+        double count = 0;
+        for(String[] row:dataRows){
+            sum+=Double.parseDouble(row[i]);
+            count++;
+        }
+        
+        return sum/count;
+    }
+
+    private ArrayList<String[]> roundTable(ArrayList<String[]> table) {
+        for(String[] row:table){
+            for(String s:row){
+                try{
+                    s = round(Double.parseDouble(s));
+                }catch(Exception e){}
+            }
+        }
+        return table;
     }
 }
