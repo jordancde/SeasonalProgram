@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class IndividualTable extends Table{
     
     public HashMap<DateSet,ArrayList<IndividualYearRow>> data;
-    public int tableColumns = 17;
+    public int tableColumns = 18;
     public SimpleDateFormat monthsdf = new SimpleDateFormat("MM/dd");
     
     public IndividualTable(String name, Date startDate, Date endDate,HashMap<DateSet,ArrayList<IndividualYearRow>> data) throws IOException{
@@ -67,9 +67,7 @@ public class IndividualTable extends Table{
 
             table.add(header);
         
-        
-            int firstYear = getFirstYear(d);
-            int lastYear = getLastYear(d);
+
             
             
             ArrayList<String[]> dataRows = new ArrayList<String[]>();
@@ -126,12 +124,64 @@ public class IndividualTable extends Table{
         titleCompound[0] = "Compound Growth";
         table.add(titleCompound);
         String[] headerCompound = new String[tableColumns];
-        headerCompound[0] = "Benchmark Return";
-        headerCompound[1] = name+" Return";
-        headerCompound[2] = "DIFF";
+        headerCompound[1] = "Benchmark Return";
+        headerCompound[2] = name+" Return";
+        headerCompound[3] = name+ " PnF Return";
+        headerCompound[4] = name+" Return - Benchmark";
+        headerCompound[5] = "PnF - "+name;
+        headerCompound[6] = "PnF - Benchmark";
+        
         table.add(headerCompound);
         
+        ArrayList<Integer> years = new ArrayList<Integer>();
+        ArrayList<ArrayList<Double>> benchMark = new ArrayList<ArrayList<Double>>();
+        ArrayList<ArrayList<Double>> sector = new ArrayList<ArrayList<Double>>();
+        ArrayList<ArrayList<Double>> pnF = new ArrayList<ArrayList<Double>>();
+
+        //sorry shit code, just wanted a quick fix
+        boolean checked = false;
         
+        for(DateSet d:data.keySet()){
+            for(int i = 0;i<data.get(d).size();i++){
+                if(i==0&&!checked){
+                    
+                    for(int j = 0;j<data.get(d).size();j++){
+                        years.add(0);
+                        benchMark.add(new ArrayList<Double>());
+                        sector.add(new ArrayList<Double>());
+                        pnF.add(new ArrayList<Double>());
+
+                    }
+                    checked = true;
+                }
+                Calendar c = Calendar.getInstance();
+                c.setTime(data.get(d).get(i).date);
+                years.set(i, c.get(Calendar.YEAR));
+                
+                benchMark.get(i).add(data.get(d).get(i).benchmarkGains);
+                sector.get(i).add(data.get(d).get(i).sectorGains);
+                pnF.get(i).add(data.get(d).get(i).PnF);
+
+                
+                
+            }
+            
+            
+        }
+        
+        for(int i = 0;i<benchMark.size();i++){
+            String[] row = new String[tableColumns];
+            
+            row[0] = Integer.toString(years.get(i));
+            row[1] = round(getCompoundedTotals(benchMark.get(i)));
+            row[2] = round(getCompoundedTotals(sector.get(i)));
+            row[3] = round(getCompoundedTotals(pnF.get(i)));
+            row[4] = round(getCompoundedTotals(sector.get(i))-getCompoundedTotals(benchMark.get(i)));
+            row[5] = round(getCompoundedTotals(pnF.get(i))-getCompoundedTotals(sector.get(i)));
+            row[6] = round(getCompoundedTotals(pnF.get(i))-getCompoundedTotals(benchMark.get(i)));
+            
+            table.add(row);
+        }
         
         return table;
         
@@ -180,6 +230,8 @@ public class IndividualTable extends Table{
         
         return sum/count;
     }
+
+   
 
     
 }

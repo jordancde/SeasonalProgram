@@ -429,9 +429,9 @@ public class IndividualTradesUI extends JPanel {
                 JTextField jtf2 = (JTextField)datesInput.get(i)[1];
                 JComboBox jcb = (JComboBox)datesInput.get(i)[2];
 
-                jtf.setText(preset.get(2)[0+i*2]);
-                jtf2.setText(preset.get(2)[1+i*2]);
-                jcb.setSelectedItem(preset.get(2)[2+i*2]);
+                jtf.setText(preset.get(2)[0+i*3]);
+                jtf2.setText(preset.get(2)[1+i*3]);
+                jcb.setSelectedItem(preset.get(2)[2+i*3]);
 
             }
             
