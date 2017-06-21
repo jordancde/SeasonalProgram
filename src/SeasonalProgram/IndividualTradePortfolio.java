@@ -61,16 +61,18 @@ public class IndividualTradePortfolio extends Portfolio{
                 DateSet PnFDates = null;
                 try {
                     PnFDates = getPnFDates((Security)sector,d);
-                } catch (Exception ex) {
-                    Logger.getLogger(IndividualTradePortfolio.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                } catch (Exception ex) {} 
                 
+                IndividualYearRow row;
                 double pnfGains = 0.0;
                 if(PnFDates!=null){
                     pnfGains = calcGains((Security)core,PnFDates);
+                    row = new IndividualYearRow(benchGains,sectorGains,pnfGains,PnFDates.startDate, PnFDates.endDate, c.getTime());
+
+                }else{
+                    row = new IndividualYearRow(benchGains,sectorGains,pnfGains,c.getTime());
                 }
                 
-                IndividualYearRow row = new IndividualYearRow(benchGains,sectorGains,pnfGains,PnFDates.startDate, PnFDates.endDate, c.getTime());
                 map.get(d).add(row);
                 
                 c.add(Calendar.YEAR, 1);

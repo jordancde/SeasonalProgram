@@ -28,4 +28,10 @@ public class IndividualYearRow {
         this.PnFExit = PnFExit;
         this.date = date;
     }
+    public IndividualYearRow(double benchmarkGains,double sectorGains, double PnF, Date date){
+        this.benchmarkGains = benchmarkGains;
+        this.sectorGains = sectorGains;
+        this.PnF = PnF;
+        this.date = date;
+    }
 }

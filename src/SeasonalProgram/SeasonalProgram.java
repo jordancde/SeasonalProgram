@@ -48,10 +48,13 @@ public class SeasonalProgram {
  
     }
     
-    public static void runIndividualTrade(){
+    public static void runIndividualTrade() throws IOException{
         IndividualTradePortfolio tradeportfolio = new IndividualTradePortfolio(individualTradeModel);
         tradeportfolio.runPortfolio();
+        
         //NAME OF TABLE HAS TO BE NAME OF SECTOR
+        IndividualTable individualTable = new IndividualTable(tradeportfolio.sector.name,individualTradeModel.startDate,individualTradeModel.endDate,tradeportfolio.map);
+        individualTable.writeTable();
     }
     
     public static void runRSModel() throws IOException{

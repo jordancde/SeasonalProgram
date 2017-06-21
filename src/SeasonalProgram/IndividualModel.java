@@ -50,7 +50,7 @@ class IndividualModel {
          ) throws ParseException {
     
         startDate = sdf.parse(startDateText.getText());
-        endDate = sdf.parse(endDateText.getText());
+        endDate = sdf.parse(Integer.toString(Integer.parseInt(endDateText.getText())+1));
 
         /*if(model.isSelected()){
             isModel = true;

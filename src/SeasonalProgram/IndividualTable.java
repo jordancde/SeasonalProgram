@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class IndividualTable extends Table{
     
     public HashMap<DateSet,ArrayList<IndividualYearRow>> data;
-    public int tableColumns = 23;
+    public int tableColumns = 17;
     public SimpleDateFormat monthsdf = new SimpleDateFormat("MM/dd");
     
     public IndividualTable(String name, Date startDate, Date endDate,HashMap<DateSet,ArrayList<IndividualYearRow>> data) throws IOException{
@@ -32,41 +32,42 @@ public class IndividualTable extends Table{
     //@Override
     public ArrayList<String[]> makeTable(HashMap<DateSet,ArrayList<IndividualYearRow>> data){
         ArrayList<String[]> table = new ArrayList<String[]>();
-        //Title Row
-        String[] title = new String[tableColumns];
-        
-        HashMap.Entry<DateSet,ArrayList<IndividualYearRow>> entry = data.entrySet().iterator().next();
-        
-        title[0] = name+" "+monthsdf.format(entry.getKey().startDate)+" to "+
-                monthsdf.format(entry.getKey().endDate);
-        
-        title[1] = "% Gain";
-        title[12] = "Fq>0";
-        title[16] = "Fq> Benchmark";
-        title[18] = "Fq> Sector";
-
-        table.add(title);
-        
-        //headers
-        String[] header = new String[tableColumns];
-        header[1] = "Benchmark";
-        header[2] = name;
-        header[3] = name+" PnF";
-        header[4] = "PnF Entry Date";
-        header[5] = "PnF Exit Date";
-        header[7] = name+" > Benchmark";
-        header[8] = name+" PnF > Benchmark";
-        header[9] = name+" PnF > "+name;
-        header[11] = "Benchmark";
-        header[12] = name;
-        header[13] = name+" PnF";
-        header[15] = name;
-        header[16] = name+" PnF";
-        header[17] = name+" PnF > "+name;
-        
-        table.add(header);
         
         for(DateSet d:data.keySet()){
+        //Title Row
+            String[] title = new String[tableColumns];
+
+
+            title[0] = name+" "+monthsdf.format(d.startDate)+" to "+
+                    monthsdf.format(d.endDate);
+
+            title[1] = "% Gain";
+            title[11] = "Fq>0";
+            title[15] = "Fq > Benchmark";
+            title[17] = "Fq > Sector";
+
+            table.add(title);
+
+            //headers
+            String[] header = new String[tableColumns];
+            header[1] = "Benchmark";
+            header[2] = name;
+            header[3] = name+" PnF";
+            header[4] = "PnF Entry Date";
+            header[5] = "PnF Exit Date";
+            header[7] = name+" > Benchmark";
+            header[8] = name+" PnF > Benchmark";
+            header[9] = name+" PnF > "+name;
+            header[11] = "Benchmark";
+            header[12] = name;
+            header[13] = name+" PnF";
+            header[15] = name;
+            header[16] = name+" PnF";
+            header[17] = name+" PnF > "+name;
+
+            table.add(header);
+        
+        
             int firstYear = getFirstYear(d);
             int lastYear = getLastYear(d);
             
@@ -77,15 +78,19 @@ public class IndividualTable extends Table{
                 Calendar c = Calendar.getInstance();
                 c.setTime(input.date);
                 datarow[0] = Integer.toString(c.get(Calendar.YEAR));
-                datarow[1] = Double.toString(input.benchmarkGains);
-                datarow[2] = Double.toString(input.sectorGains);
-                datarow[3] = Double.toString(input.PnF);
-                datarow[4] = monthsdf.format(input.PnFEntry);
-                datarow[5] = monthsdf.format(input.PnFExit);
+                datarow[1] = round(input.benchmarkGains);
+                datarow[2] = round(input.sectorGains);
+                datarow[3] = round(input.PnF);
                 
-                datarow[7] = Double.toString(input.sectorGains-input.benchmarkGains);
-                datarow[8] = Double.toString(input.PnF-input.benchmarkGains);
-                datarow[9] = Double.toString(input.PnF-input.sectorGains);
+                //in case PnF trade never occured
+                try{
+                    datarow[4] = monthsdf.format(input.PnFEntry);
+                    datarow[5] = monthsdf.format(input.PnFExit);
+                }catch (Exception e){}
+                
+                datarow[7] = round(input.sectorGains-input.benchmarkGains);
+                datarow[8] = round(input.PnF-input.benchmarkGains);
+                datarow[9] = round(input.PnF-input.sectorGains);
                 
                 datarow[11] = fq(input.benchmarkGains);
                 datarow[12] = fq(input.sectorGains);
@@ -107,15 +112,26 @@ public class IndividualTable extends Table{
             for(int i = 0;i<tableColumns;i++){
                 //in case of empty or date row
                 try{
-                    avgRow[i] = Double.toString(calcAverage(dataRows, i));
+                    avgRow[i] = round(calcAverage(dataRows, i));
                 }catch(Exception e){}
             }
             
             String[] space = new String[tableColumns];
             table.add(space);
+
         }
         
-        table = roundTable(table);
+        //Compounding Section
+        String[] titleCompound = new String[tableColumns];
+        titleCompound[0] = "Compound Growth";
+        table.add(titleCompound);
+        String[] headerCompound = new String[tableColumns];
+        headerCompound[0] = "Benchmark Return";
+        headerCompound[1] = name+" Return";
+        headerCompound[2] = "DIFF";
+        table.add(headerCompound);
+        
+        
         
         return table;
         
@@ -165,14 +181,5 @@ public class IndividualTable extends Table{
         return sum/count;
     }
 
-    private ArrayList<String[]> roundTable(ArrayList<String[]> table) {
-        for(String[] row:table){
-            for(String s:row){
-                try{
-                    s = round(Double.parseDouble(s));
-                }catch(Exception e){}
-            }
-        }
-        return table;
-    }
+    
 }
