@@ -38,13 +38,19 @@ public class IndividualTable extends Table{
         for(DateSet d:data.keySet()){
             if(orderedDates.size()==0){
                 orderedDates.add(d);
+                
             }else{
+                int index = 0;
                 for(DateSet i:orderedDates){
+                    
                     if(i.startDate.after(d.startDate)){
-                        orderedDates.add(orderedDates.indexOf(i), d);
+                        index = orderedDates.indexOf(i);
+                        
                         break;
                     }
                 }
+                orderedDates.add(index, d);
+
                
             }
         }

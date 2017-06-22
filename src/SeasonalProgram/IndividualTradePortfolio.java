@@ -116,7 +116,7 @@ public class IndividualTradePortfolio extends Portfolio{
                 //-1 for previous day close
                 Calendar c = Calendar.getInstance();
                 c.setTime(d);
-                if(buy){ 
+                if(buy||isWeekend(c)){ 
                     return SeasonalProgram.data.getDataset(s.name).values[i-1];
                 }else{
                     return SeasonalProgram.data.getDataset(s.name).values[i];

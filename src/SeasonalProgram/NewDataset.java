@@ -77,7 +77,11 @@ public class NewDataset {
         
         //Under the dataset name list by two rows starts the data
         for(int i = 0;i<lastRow-nameListPos-rowOffset;i++){
-            dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[lastRow-i-1][startColumn]);
+            try{
+                dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[lastRow-i-1][startColumn]);
+            }catch(Exception e){
+                dates[i]=new SimpleDateFormat("yyyy-MM-dd").parse(data[lastRow-i-1][startColumn]);
+            }
             values[i]=Double.parseDouble(data[lastRow-i-1][startColumn+1]);
         }
         
@@ -107,8 +111,11 @@ public class NewDataset {
         
         //Under the dataset name list by two rows starts the data
         for(int i = 0;i<lastRow;i++){
-            
-            dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[lastRow-i-1][0]);
+            try{
+                dates[i]=new SimpleDateFormat("yyyy/MM/dd").parse(data[lastRow-i-1][0]);
+            }catch(Exception e){
+                dates[i]=new SimpleDateFormat("yyyy-MM-dd").parse(data[lastRow-i-1][0]);
+            }
             values[i]=Double.parseDouble(data[lastRow-i-1][1]);
 
         }
@@ -122,7 +129,11 @@ public class NewDataset {
 
 
         for(int i = 0;i<arrayLength;i++){
-            newData[i][0] = new SimpleDateFormat("yyyy/MM/dd").format(dates[dates.length-1-i]);
+            try{
+                newData[i][0] = new SimpleDateFormat("yyyy/MM/dd").format(dates[dates.length-1-i]);
+            }catch(Exception e){
+                newData[i][0] = new SimpleDateFormat("yyyy-MM-dd").format(dates[dates.length-1-i]);
+            }
             newData[i][1] = Double.toString(values[values.length-1-i]/s.values[s.values.length-1-i]);
 
         }

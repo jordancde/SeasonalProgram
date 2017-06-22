@@ -133,7 +133,8 @@ public class PointAndFigure extends Table{
                     while(column[i]>currentValue){
                         currentValue=getNextBox(true,currentValue);
                         filledBoxes.get(getRow(currentValue)).add("X");
-                        columns.set(columns.size()-1, columns.get(columns.size()-1)+1);
+                        //swapped
+                        columns.set(columns.size()-1, columns.get(columns.size()-1)-1);
                     }
                 }else if(goingDown&&crossedBoxes>=1){
                     int nextRow = getRow(column[i]);
@@ -141,7 +142,8 @@ public class PointAndFigure extends Table{
                     while(column[i]<currentValue){
                         currentValue=getNextBox(false,currentValue);
                         filledBoxes.get(getRow(currentValue)).add("O");
-                        columns.set(columns.size()-1, columns.get(columns.size()-1)-1);
+                        //swapped
+                        columns.set(columns.size()-1, columns.get(columns.size()-1)+1);
                         
                     }
                 }
