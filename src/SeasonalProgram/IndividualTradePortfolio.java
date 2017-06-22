@@ -106,17 +106,37 @@ public class IndividualTradePortfolio extends Portfolio{
         }
     }
     
+    public double getValue(Date d,Security s, boolean buy){
+        if(s.name.equals("Cash")){
+            return 1;
+        }
+        Date[] dates = SeasonalProgram.data.getDataset(s.name).dates;
+        for(int i = 0;i<dates.length;i++){
+            if(dates[i].after(d)||dates[i].equals(d)){
+                //-1 for previous day close
+                Calendar c = Calendar.getInstance();
+                c.setTime(d);
+                if(buy){ 
+                    return SeasonalProgram.data.getDataset(s.name).values[i-1];
+                }else{
+                    return SeasonalProgram.data.getDataset(s.name).values[i];
+                }
+            }
+        }
+        return 0;
+    }
+    
     public double calcGains(Security s,DateSet d){
-        double startValue = getValue(d.startDate,s);
-        double endValue = getValue(d.endDate,s);
+        double startValue = getValue(d.startDate,s, true);
+        double endValue = getValue(d.endDate,s, false);
         
-        if(d.longShort.equals("Long")){
+        //if(d.longShort.equals("Long")){
             return (endValue-startValue)/startValue;
-        }else if(d.longShort.equals("Short")){
+        /*}else if(d.longShort.equals("Short")){
             return (startValue-endValue)/startValue;
         }else{
             return (endValue-startValue)/startValue;
-        }
+        }*/
     }
 
     public DateSet getPnFDates(Security security, DateSet d) throws IOException, CloneNotSupportedException, ParseException {

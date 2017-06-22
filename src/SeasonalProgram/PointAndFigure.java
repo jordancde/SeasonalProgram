@@ -76,7 +76,7 @@ public class PointAndFigure extends Table{
         //datasets.add(this.data.opens);
         //datasets.add(this.data.highs);
         //datasets.add(this.data.lows);
-        data.trimData(startDate, endDate);
+        //data.trimData(startDate, endDate);
         //Reversing for efficiency
         double[] reversed = new double[data.trimvalues.length];
         for(int i = 0;i<data.trimvalues.length;i++){

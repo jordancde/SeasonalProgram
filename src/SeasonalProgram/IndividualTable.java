@@ -33,7 +33,23 @@ public class IndividualTable extends Table{
     public ArrayList<String[]> makeTable(HashMap<DateSet,ArrayList<IndividualYearRow>> data){
         ArrayList<String[]> table = new ArrayList<String[]>();
         
+        
+        ArrayList<DateSet> orderedDates = new ArrayList<DateSet>();
         for(DateSet d:data.keySet()){
+            if(orderedDates.size()==0){
+                orderedDates.add(d);
+            }else{
+                for(DateSet i:orderedDates){
+                    if(i.startDate.after(d.startDate)){
+                        orderedDates.add(orderedDates.indexOf(i), d);
+                        break;
+                    }
+                }
+               
+            }
+        }
+        
+        for(DateSet d:orderedDates){
         //Title Row
             String[] title = new String[tableColumns];
 
@@ -138,6 +154,9 @@ public class IndividualTable extends Table{
         ArrayList<ArrayList<Double>> sector = new ArrayList<ArrayList<Double>>();
         ArrayList<ArrayList<Double>> pnF = new ArrayList<ArrayList<Double>>();
 
+        
+        
+
         //sorry shit code, just wanted a quick fix
         boolean checked = false;
         
@@ -158,9 +177,15 @@ public class IndividualTable extends Table{
                 c.setTime(data.get(d).get(i).date);
                 years.set(i, c.get(Calendar.YEAR));
                 
-                benchMark.get(i).add(data.get(d).get(i).benchmarkGains);
-                sector.get(i).add(data.get(d).get(i).sectorGains);
-                pnF.get(i).add(data.get(d).get(i).PnF);
+                if(d.longShort.equals("Long")){
+                    benchMark.get(i).add(data.get(d).get(i).benchmarkGains);
+                    sector.get(i).add(data.get(d).get(i).sectorGains);
+                    pnF.get(i).add(data.get(d).get(i).PnF);
+                }else{
+                    benchMark.get(i).add(-1*data.get(d).get(i).benchmarkGains);
+                    sector.get(i).add(-1*data.get(d).get(i).sectorGains);
+                    pnF.get(i).add(-1*data.get(d).get(i).PnF);
+                }
 
                 
                 
@@ -168,7 +193,7 @@ public class IndividualTable extends Table{
             
             
         }
-        
+        ArrayList<String[]> compoundRows = new ArrayList<String[]>();
         for(int i = 0;i<benchMark.size();i++){
             String[] row = new String[tableColumns];
             
@@ -179,9 +204,22 @@ public class IndividualTable extends Table{
             row[4] = round(getCompoundedTotals(sector.get(i))-getCompoundedTotals(benchMark.get(i)));
             row[5] = round(getCompoundedTotals(pnF.get(i))-getCompoundedTotals(sector.get(i)));
             row[6] = round(getCompoundedTotals(pnF.get(i))-getCompoundedTotals(benchMark.get(i)));
+            compoundRows.add(row);
             
             table.add(row);
         }
+        
+        
+        String[] avgRow2 = new String[tableColumns];
+        avgRow2[0] = "Average";
+            
+        for(int i = 1;i<tableColumns;i++){
+            //in case of empty or date row
+            try{
+                avgRow2[i] = round(calcAverage(compoundRows, i));
+            }catch(Exception e){}
+        }
+        table.add(avgRow2);
         
         return table;
         
@@ -231,7 +269,23 @@ public class IndividualTable extends Table{
         return sum/count;
     }
 
-   
+   public boolean compareDates(Date date1,Date date2){
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        
+        
+        if(cal1.get(Calendar.MONTH)>cal2.get(Calendar.MONTH)){
+            return true;
+        }else if(cal1.get(Calendar.MONTH)==cal2.get(Calendar.MONTH)){
+            if(cal1.get(Calendar.DAY_OF_MONTH)>cal2.get(Calendar.DAY_OF_MONTH)){
+                return true;
+            }
+        }
+        return false;
+        
+    }
 
     
 }
