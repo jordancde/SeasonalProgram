@@ -318,8 +318,10 @@ public class IndividualTradesUI extends JPanel {
         }
         
         public String loadPresets() throws URISyntaxException, IOException{
+            String presetName = JOptionPane.showInputDialog("Enter Preset Name without prefix (Ex.----PRESET) or suffix(.csv):");
+
             URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
-            File folder = new File(location.toURI());
+            /*File folder = new File(location.toURI());
             File[] listOfFiles = folder.listFiles();
             
             int numPresets = 0;
@@ -343,8 +345,8 @@ public class IndividualTradesUI extends JPanel {
            
             String input = (String) JOptionPane.showInputDialog(null, "Select Preset",
             "Presets", JOptionPane.QUESTION_MESSAGE, null, fileNames,fileNames[0]);
-            
-            String path = location.getFile()+"INDPRESET"+input+".csv";
+            */
+            String path = location.getFile().substring(0,location.getFile().lastIndexOf(SeasonalProgram.directoryChar))+SeasonalProgram.directoryChar+"INDPRESET"+presetName+".csv";
             return path;
             
             
@@ -467,7 +469,7 @@ public class IndividualTradesUI extends JPanel {
             
             URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
 
-            String path = location.getFile()+"INDPRESET"+presetName+".csv";
+            String path = location.getFile().substring(0,location.getFile().lastIndexOf(SeasonalProgram.directoryChar))+SeasonalProgram.directoryChar+"INDPRESET"+presetName+".csv";
             int result = 0;
             if(!(new File(path).canRead())){
                 (new File(path)).createNewFile();

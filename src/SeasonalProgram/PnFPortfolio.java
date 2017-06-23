@@ -29,7 +29,7 @@ public class PnFPortfolio extends Portfolio{
     
     
     
-    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,double boxSizePercent,int reversalBoxes, int signalBoxes, double minCoreAllocation ){
+    public PnFPortfolio(ArrayList<Security> securities, Date startDate, Date endDate,double boxSizePercent,int reversalBoxes, int signalBoxes, double minCoreAllocation ) throws IOException{
         super(securities,startDate,endDate);
         inSeasonal = false;
         this.boxSizePercent = boxSizePercent;
@@ -50,7 +50,7 @@ public class PnFPortfolio extends Portfolio{
         
         while(calendar.getTime().before(endDate)){
 
-            updatePortfolio(calendar.getTime());
+            updatePortfolio(calendar.getTime(), true);
             
             //Modified logic start
             
@@ -369,7 +369,7 @@ public class PnFPortfolio extends Portfolio{
         currentCoreStats[0] -= realIncrease;
         holdings.put(core,currentCoreStats);
         
-        double newSecurityValue = getValue(calendar.getTime(),s);
+        double newSecurityValue = getValue(calendar.getTime(),s, true);
         Double[] newSecurityStats = {realAllocation, newSecurityValue,newSecurityValue};
         holdings.put(s, newSecurityStats);
         
@@ -419,7 +419,7 @@ public class PnFPortfolio extends Portfolio{
         }*/
         
         System.out.println("Sell "+s.name+" "+round(realDecrease)+", new value "+round(realAllocation));
-        double buyValue = getValue(calendar.getTime(),core);
+        double buyValue = getValue(calendar.getTime(),core, false);
         System.out.println("Buy "+core.name+" "+round(realDecrease)+", price "+round(buyValue)+", new value "+round(holdings.get(core)[0]));
         
         Double[] currentSectorStats = holdings.get(s);
@@ -762,7 +762,7 @@ public class PnFPortfolio extends Portfolio{
     public double getBenchmarkValue(Date d){
         for(Security s:securities){
             if(s.name.equals(SeasonalProgram.RSModel.core.name)){
-                return getValue(d,s);
+                return getValue(d,s, true);
             }
         }
         return 0;

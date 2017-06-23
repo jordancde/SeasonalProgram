@@ -5,6 +5,7 @@
  */
 package SeasonalProgram.OutputTables;
 
+import static SeasonalProgram.Data.FILEPATH;
 import SeasonalProgram.NewDataset;
 import SeasonalProgram.SeasonalProgram;
 import SeasonalProgram.SeasonalProgram;
@@ -134,9 +135,9 @@ public class Table {
     
     
     public void writeTable() throws IOException{
-        URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
+        URL location =  SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
 
-        String path = location.getFile()+"OUTPUT "+outputName+".csv";
+        String path = location.getFile().substring(0,location.getFile().lastIndexOf(SeasonalProgram.directoryChar))+SeasonalProgram.directoryChar+"OUTPUT "+outputName+".csv";
             
         if(!(new File(path).canRead())){
             (new File(path)).createNewFile();

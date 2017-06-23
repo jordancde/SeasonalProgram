@@ -40,7 +40,7 @@ public class IndividualTable extends Table{
                 orderedDates.add(d);
                 
             }else{
-                int index = 0;
+                int index = -1;
                 for(DateSet i:orderedDates){
                     
                     if(i.startDate.after(d.startDate)){
@@ -48,8 +48,13 @@ public class IndividualTable extends Table{
                         
                         break;
                     }
+                    
                 }
-                orderedDates.add(index, d);
+                if(index<0){
+                    orderedDates.add(d);
+                }else{
+                    orderedDates.add(index, d);
+                }
 
                
             }
@@ -184,13 +189,13 @@ public class IndividualTable extends Table{
                 years.set(i, c.get(Calendar.YEAR));
                 
                 if(d.longShort.equals("Long")){
-                    benchMark.get(i).add(data.get(d).get(i).benchmarkGains);
-                    sector.get(i).add(data.get(d).get(i).sectorGains);
-                    pnF.get(i).add(data.get(d).get(i).PnF);
+                    benchMark.get(data.get(d).indexOf(data.get(d).get(i))).add(data.get(d).get(i).benchmarkGains);
+                    sector.get(data.get(d).indexOf(data.get(d).get(i))).add(data.get(d).get(i).sectorGains);
+                    pnF.get(data.get(d).indexOf(data.get(d).get(i))).add(data.get(d).get(i).PnF);
                 }else{
-                    benchMark.get(i).add(-1*data.get(d).get(i).benchmarkGains);
-                    sector.get(i).add(-1*data.get(d).get(i).sectorGains);
-                    pnF.get(i).add(-1*data.get(d).get(i).PnF);
+                    benchMark.get(data.get(d).indexOf(data.get(d).get(i))).add(-1*data.get(d).get(i).benchmarkGains);
+                    sector.get(data.get(d).indexOf(data.get(d).get(i))).add(-1*data.get(d).get(i).sectorGains);
+                    pnF.get(data.get(d).indexOf(data.get(d).get(i))).add(-1*data.get(d).get(i).PnF);
                 }
 
                 

@@ -26,7 +26,7 @@ public class Data {
     public Data(String name) throws IOException, ParseException{
         URL location = SeasonalProgram.class.getProtectionDomain().getCodeSource().getLocation();
 
-        FILEPATH = location.getFile()+name;
+        FILEPATH = location.getFile().substring(0,location.getFile().lastIndexOf("/"))+"/"+name;
         
         rawData = convertToArray(readFile(FILEPATH));
         

@@ -35,6 +35,8 @@ public class SeasonalProgram {
     public static PnFPortfolio PnFportfolio;
     public static IndividualTradePortfolio tradeportfolio;
     
+    public static String directoryChar = "/";
+    
     
     public static void main(String[] args) throws IOException, ParseException {
 
